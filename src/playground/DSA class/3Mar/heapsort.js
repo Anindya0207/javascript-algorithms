@@ -37,7 +37,8 @@ const heapify = (arr, pivot, end) => {
 };
 
 const maxHeapify = (arr, start, end) => {
-  if(start < end) {
+  while(start< end){
+  // if(start < end) {
     const mid = Math.floor((start + end) /2);
     for(var i = mid; i >=0; i--) {
       heapify(arr, i, end);
@@ -45,7 +46,8 @@ const maxHeapify = (arr, start, end) => {
     let temp = arr[start];
     arr[start] = arr[end];
     arr[end] = temp;
-    maxHeapify(arr, start, end-1)
+    // maxHeapify(arr, start, end-1) // this will give max call stack error for 5k + Array
+    end--; 
   }
 }
 

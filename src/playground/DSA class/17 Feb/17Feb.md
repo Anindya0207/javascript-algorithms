@@ -17,6 +17,12 @@ Sorting
     Counting sort
     radix sort
 
+Stack
+Queue
+    Normal queue
+    Circular queue
+    Priority Queue
+
 Hashing
     Different Hashing algorithm
     Collision techniques (One index have two elements in aray. what to do? that 's collision technique)
@@ -26,11 +32,6 @@ Linked list
     double linked list
     circular linked list
 
-Stack
-Queue
-    Normal queue
-    Circular queue
-    Priority Queue
 Tree
     Binary Tree
     Binary Saerch Tree

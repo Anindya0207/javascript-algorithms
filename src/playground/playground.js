@@ -18,45 +18,21 @@ const arrayLength =20000;
 let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
 
 
-const heapify = (arr, pivot, end) => {
-  let leftChild = 2 * pivot + 1;
-  let rightChild = 2 * pivot + 2;
-  let maxPivot = pivot;
-  if(arr[leftChild] && arr[leftChild] > arr[maxPivot] && leftChild <= end) {
-    maxPivot = leftChild;
-  }
-  if(arr[rightChild] && arr[rightChild] > arr[maxPivot] && rightChild <= end) {
-    maxPivot = rightChild;
-  }
-  if(maxPivot != pivot) {
-    let temp = arr[pivot];
-    arr[pivot] = arr[maxPivot];
-    arr[maxPivot] = temp;
-    heapify(arr, maxPivot, end);
-  }
-};
-
-const maxHeapify = (arr, start, end) => {
-  if(start < end) {
-    const mid = Math.floor((start + end) /2);
-    for(var i = mid; i >=0; i--) {
-      heapify(arr, i, end);
-    }
-    let temp = arr[start];
-    arr[start] = arr[end];
-    arr[end] = temp;
-    maxHeapify(arr, start, end-1)
-  }
-}
-
-const heapSort = arr => {
-  maxHeapify(arr, 0, arr.length-1);
-}
 var playground = function() {
-  let arr = [7,7, 0, 6,4, 3, 11, 14, 16, 23]; //[10,5,81,22,65,99,4,26,50,72];// [...randomArray];
-  console.log("Before sorting", arr);
-  let now = Date.now();
-  heapSort(arr);
-  console.log("After heap sorting", arr, Date.now() - now);// 729 for 20k elements
+  let top = -1;
+  let len = 10;
+  Array.prototype.mypush = function(elem) {
+      if(top == len-1) return;
+      this[++top] = elem;
+  }
+  Array.prototype.mypop = function() {
+      if(top == -1) return;
+      return this[top--];
+  }
+  Array.prototype.mydisplay = function() {
+      for(var i = top; i>=0; i--) {
+          console.log(this[i]);
+      }
+  }
 };
 playground();

@@ -36,21 +36,26 @@ const heapify = (arr, pivot, end) => {
   }
 };
 
-const heapSort = arr => {
-  let start = 0, end = arr.length - 1;
-  const mid = Math.floor((start + end)/ 2);
-  for(var i = mid; i >=0 ; i--) {
-    heapify(arr, i, arr.length - 1);
-  }
-  while(start < end){
+const maxHeapify = (arr, start, end) => {
+  while(start< end){
+  // if(start < end) {
+    const mid = Math.floor((start + end) /2);
+    for(var i = mid; i >=0; i--) {
+      heapify(arr, i, end);
+    }
     let temp = arr[start];
     arr[start] = arr[end];
     arr[end] = temp;
-    heapify(arr, start, --end);
+    // maxHeapify(arr, start, end-1) // this will give max call stack error for 5k + Array
+    end--; 
   }
 }
+
+const heapSort = arr => {
+  maxHeapify(arr, 0, arr.length-1);
+}
 var playground = function() {
-  let arr = [7,7, 0, 6,4, 3, 11, 14, 16, 23]; //[10,5,81,22,65,99,4,26,50,72];// [7,7, 0, 6,4, 3, 11, 14, 16, 23];  [...randomArray];
+  let arr = [7,7, 0, 6,4, 3, 11, 14, 16, 23]; //[10,5,81,22,65,99,4,26,50,72];// [...randomArray];
   console.log("Before sorting", arr);
   let now = Date.now();
   heapSort(arr);

@@ -49,8 +49,9 @@ function shuffleArray(array) {
       heapify(arr, start, --end);
     }
   }
+  
   var playground = function() {
-    let arr = [7,7, 0, 6,4, 3, 11, 14, 16, 23]; //[10,5,81,22,65,99,4,26,50,72];// [7,7, 0, 6,4, 3, 11, 14, 16, 23];  [...randomArray];
+    let arr = [7,7, 0, 6,4, 3, 11, 14, 16, 23]; //[10,5,81,22,65,99,4,26,50,72]; // [7,7, 0, 6,4, 3, 11, 14, 16, 23];  [...randomArray];
     console.log("Before sorting", arr);
     let now = Date.now();
     heapSort(arr);

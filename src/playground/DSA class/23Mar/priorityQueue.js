@@ -17,8 +17,6 @@ function shuffleArray(array) {
   
   let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
   
-  
-  
   const heapify = (arr, root, start, end) => {
     
     let left = 2 * root + 1 - start;

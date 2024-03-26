@@ -17,102 +17,151 @@ const arrayLength =20000;
 
 let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
 
-
-
-const heapify = (arr, root, start, end) => {
-  
-  let left = 2 * root + 1 - start;
-  let right = 2 * root + 2 - start;
-  let maxPriorityIndex = root;
-  if(arr[left] && arr[left].priority > arr[maxPriorityIndex].priority && left <= end) {
-    maxPriorityIndex = left;
+class Node {
+  constructor(_data, _prev, _next) {
+    this.data = _data;
+    this.prev = _prev;
+    this.next = _next;
   }
-  if(arr[right] && arr[right].priority > arr[maxPriorityIndex].priority && right <= end) {
-    maxPriorityIndex = right;
-  }
-  if(maxPriorityIndex != root) {
-    let temp = arr[root];
-    arr[root] = arr[maxPriorityIndex];
-    arr[maxPriorityIndex] = temp;
-    heapify(arr, maxPriorityIndex, start, end);
-  } 
- 
-  else {
-    let minPrecendence = root;
-    if(arr[left] && arr[left].index < arr[minPrecendence].index && arr[left].priority ==  arr[minPrecendence].priority && left <= end) {
-      minPrecendence = left;
-    }
-    if(arr[right] && arr[right].index < arr[minPrecendence].index && arr[right].priority == arr[minPrecendence].priority && right <= end) {
-      minPrecendence = right;
-    }
-    if(minPrecendence != root) {
-      let temp = arr[root];
-      arr[root] = arr[minPrecendence];
-      arr[minPrecendence] = temp;
-      heapify(arr, minPrecendence, end);
+}
+
+class DLinkedList {
+  constructor() {
+    this.head = null;
+    this.createNode = (data) => {
+      const node = new Node(data, null, null);
+      return node;
     }
   }
- 
-}
-
-const buildMaxHeap = (arr, start, end) => {
-  const mid = Math.floor((start + end) /2);
-  for(let i = mid ; i >= start ; i--) {
-    heapify(arr, i, start, end);
+  display = () => {
+    if(this.head == null) {
+      console.log("List empty bye bye");
+      return;
+    }
+    let pivot = this.head;
+    while(pivot != null) {
+      console.log(pivot.data);
+      pivot = pivot.next;
+    }
+  }
+  insertAtBeg = (data) => {
+    const node = this.createNode(data);
+    if(this.head == null) {
+      this.head = node;
+    } else {
+        this.head.prev = node;
+        node.next = this.head;
+        this.head = node;
+    }
+  }
+  insertAtEnd = (data) => {
+    const node = this.createNode(data);
+    if(this.head == null) {
+      this.head = node;
+      return;
+    }
+    let pivot = this.head;
+    while(pivot.next != null) {
+      pivot = pivot.next;
+    }
+    node.prev = pivot;
+    pivot.next = node;
+  }
+  insertAfterNode = (data, currentNode) => {
+    let node = this.createNode(data);
+    if(this.head == null) {
+      this.head = node;
+      return;
+    }
+    let pivot = this.head;
+    while(pivot != null) {
+      if(pivot.data == currentNode){
+        const afterNode = pivot.next;
+        if(afterNode) afterNode.prev = node;
+        node.next = afterNode;
+        node.prev = pivot;
+        pivot.next = node;
+        break;
+      }
+      pivot= pivot.next;
+    }
+  }
+  insertBeforeNode = (data, currentNode) => {
+    let node = this.createNode(data);
+    if(this.head == null) {
+      this.head = node;
+      return;
+    }
+    if(this.head.data == currentNode) {
+      const currentHead = this.head;
+      node.next = {...currentHead, prev: node};
+      this.head = node;
+      return;
+    }
+    let pivot = this.head;
+    while(pivot != null) {
+      if(pivot.data == currentNode){
+        const beforeNode = pivot.prev;
+        node.prev= beforeNode;
+        node.next = pivot;
+        if(beforeNode) beforeNode.next = node;
+        pivot.prev = node;
+        break;
+      }
+      pivot= pivot.next;
+    }
+  }
+  deleteFromBeg = () => {
+    if(this.head == null) {
+      console.log("List is empty bye bye");
+      return;
+    }
+    console.log("Deleted", this.head.data);
+    this.head = this.head.next;
+    this.head.prev = null;
+  }
+  deleteFromEnd = () => {
+    if(this.head == null) {
+      console.log("List is empty bye bye");
+      return;
+    }
+    if(this.head.next == null) {
+      console.log("Deleted", this.head.data);
+      this.head = null;
+      return;
+    }
+    let pivot = this.head;
+    while(pivot.next != null) {
+      pivot = pivot.next;
+    }
+    console.log("Deleted", pivot.data);
+    let previous = pivot.prev; 
+    previous.next = null;
+  }
+  deleteNode = (data) => {
+    if(this.head == null) {
+      console.log("List is empty bye bye");
+      return;
+    }
+    if(this.head.data == data) {
+      console.log("Deleted", this.head.data);
+      this.head = this.head.next;
+      return;
+    }
+    let pivot = this.head;
+    while(pivot != null) {
+      let previous = pivot.prev;
+      let next = pivot.next;
+      if(pivot.data == data){
+        console.log("Deleted", pivot.data);
+        previous.next = pivot.next;
+        if(next) next.prev = previous;
+        break;
+      }
+      pivot = pivot.next;
+    }
   }
 }
-class Item {
-  index;
-  priority;
-  value;
-  constructor(_index, _priority, _value) {
-    this.index = _index;
-    this.priority = _priority;
-    this.value = _value;
-  }
-}
-
-var PriorityQueue = function(length) {
-  this.front = -1; this.rear = -1;
-  this.arr = new Array(length);
-}
-
-PriorityQueue.prototype.enqueue = function(item) {
-  if(!item.value || !item.priority) {
-    console.error("The Item should have a value and priority {value: 1, priority: 1}");
-    return;
-  }
-  if(this.rear == this.arr.length - 1) {
-    console.log("Queue is full, sorry!");
-    return;
-  }
-  if(this.front == -1) this.front = 0;
-  const newItem = new Item(++this.rear, item.priority, item.value);
-  this.arr[this.rear] = newItem;
-}
-
-
-PriorityQueue.prototype.dequeue = function() {
-  if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
-    console.log('No element in the queue');
-    return;
-  }
-  buildMaxHeap(this.arr, this.front, this.rear);
-  return this.arr[this.front++];
-}
-
-
-const pq = new PriorityQueue(10);
-pq.enqueue({value: 1, priority: 1});
-pq.enqueue({value: 7, priority: 2});
-pq.enqueue({value: 2, priority: 1});
-pq.enqueue({value: 3, priority: 1});
-pq.enqueue({value: 4, priority: 2});
-pq.enqueue({value: 8, priority: 3});
-pq.enqueue({value: 5, priority: 2});
-pq.enqueue({value: 6, priority: 3});
-pq.enqueue({value: 9, priority: 4});
-
 var playground = function() {
   
 };

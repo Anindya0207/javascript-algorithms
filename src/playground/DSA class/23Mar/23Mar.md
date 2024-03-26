@@ -13,3 +13,28 @@ this will be globally defined
 every element will have next and previous (if double linked list) and value stored
 
 
+
+class Node {
+    data: any;
+    next: Node;
+}
+
+class SLinkedList {
+    Node head = null;
+    createNode = (data) => {
+      const node = new Node(data, null);
+      return node;
+    }
+    insertAtBeg = (data) => {
+        node = createNode(data);
+        if(head == null) {
+            head = node;
+        } else {
+            node.next = head;
+            head = node;
+        }
+    }
+    insertAtEnd();
+    insertAfterNode(node);
+    display();
+}

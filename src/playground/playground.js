@@ -17,19 +17,19 @@ const arrayLength =20000;
 
 let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
 
+
 class Node {
-  constructor(_data, _prev, _next) {
+  constructor(_data, _next) {
     this.data = _data;
-    this.prev = _prev;
     this.next = _next;
   }
 }
 
-class DLinkedList {
+class SLinkedList {
   constructor() {
     this.head = null;
     this.createNode = (data) => {
-      const node = new Node(data, null, null);
+      const node = new Node(data, null);
       return node;
     }
   }
@@ -49,7 +49,6 @@ class DLinkedList {
     if(this.head == null) {
       this.head = node;
     } else {
-        this.head.prev = node;
         node.next = this.head;
         this.head = node;
     }
@@ -64,7 +63,6 @@ class DLinkedList {
     while(pivot.next != null) {
       pivot = pivot.next;
     }
-    node.prev = pivot;
     pivot.next = node;
   }
   insertAfterNode = (data, currentNode) => {
@@ -77,9 +75,7 @@ class DLinkedList {
     while(pivot != null) {
       if(pivot.data == currentNode){
         const afterNode = pivot.next;
-        if(afterNode) afterNode.prev = node;
         node.next = afterNode;
-        node.prev = pivot;
         pivot.next = node;
         break;
       }
@@ -94,20 +90,19 @@ class DLinkedList {
     }
     if(this.head.data == currentNode) {
       const currentHead = this.head;
-      node.next = {...currentHead, prev: node};
+      node.next = {...currentHead };
       this.head = node;
       return;
     }
     let pivot = this.head;
+    let previous = this.head;
     while(pivot != null) {
       if(pivot.data == currentNode){
-        const beforeNode = pivot.prev;
-        node.prev= beforeNode;
         node.next = pivot;
-        if(beforeNode) beforeNode.next = node;
-        pivot.prev = node;
+        previous.next = node;
         break;
       }
+      previous = pivot;
       pivot= pivot.next;
     }
   }
@@ -118,7 +113,6 @@ class DLinkedList {
     }
     console.log("Deleted", this.head.data);
     this.head = this.head.next;
-    this.head.prev = null;
   }
   deleteFromEnd = () => {
     if(this.head == null) {
@@ -131,11 +125,12 @@ class DLinkedList {
       return;
     }
     let pivot = this.head;
+    let previous = this.head;
     while(pivot.next != null) {
+      previous = pivot;
       pivot = pivot.next;
     }
     console.log("Deleted", pivot.data);
-    let previous = pivot.prev; 
     previous.next = null;
   }
   deleteNode = (data) => {
@@ -149,15 +144,14 @@ class DLinkedList {
       return;
     }
     let pivot = this.head;
+    let previous = this.head;
     while(pivot != null) {
-      let previous = pivot.prev;
-      let next = pivot.next;
       if(pivot.data == data){
         console.log("Deleted", pivot.data);
         previous.next = pivot.next;
-        if(next) next.prev = previous;
         break;
       }
+      previous = pivot;
       pivot = pivot.next;
     }
   }

@@ -155,6 +155,21 @@ class SLinkedList {
       pivot = pivot.next;
     }
   }
+  reverse = () => {
+    if(this.head == null) {
+      console.log("List is empty bye bye");
+      return;
+    }
+    let pivot = this.head;
+    let previous = null;
+    while(pivot != null) {
+      let temp = pivot.next;
+      pivot.next = previous;
+      previous = pivot;
+      pivot = temp;
+    }
+    this.head = previous;
+  }
 }
 var playground = function() {
   

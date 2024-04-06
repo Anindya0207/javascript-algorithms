@@ -34,7 +34,7 @@ Linked list
 
 Tree
     Binary Tree
-    Binary Saerch Tree
+    Binary Search Tree
         Traversal
         Insertion
         Deletion

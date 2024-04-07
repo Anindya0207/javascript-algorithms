@@ -77,7 +77,7 @@ class BinarySearchTree {
       _insert(this.root);
     }
   }
-  display = () => {
+  displayInorder = () => {
     const _display = (pivot) => {
       if(!pivot) {
         return;
@@ -93,6 +93,124 @@ class BinarySearchTree {
       _display(this.root);
     }
   }
+  displayInorderDesc = () => {
+    const _display = (pivot) => {
+      if(!pivot) {
+        return;
+      }
+      _display(pivot.right);
+      console.log(pivot.data);
+      _display(pivot.left);
+    }
+    if(this.root == null) {
+      console.log("Tree is empty bye bye");
+      return;
+    } else {
+      _display(this.root);
+    }
+  }
+  displayPreorder = () => {
+    const _display = (pivot) => {
+      if(!pivot) {
+        return;
+      }
+      console.log(pivot.data);
+      _display(pivot.left);
+      _display(pivot.right);
+    }
+    if(this.root == null) {
+      console.log("Tree is empty bye bye");
+      return;
+    } else {
+      _display(this.root);
+    }
+  }
+  displayPostOrder = () => {
+    const _display = (pivot) => {
+      if(!pivot) {
+        return;
+      }
+      _display(pivot.left);
+      _display(pivot.right);
+      console.log(pivot.data);
+    }
+    if(this.root == null) {
+      console.log("Tree is empty bye bye");
+      return;
+    } else {
+      _display(this.root);
+    }
+  }
+  search = (data) => {
+    const _search = (pivot) => {
+      if(!pivot) return null;
+      if(pivot.data == data) {
+        return pivot;
+      }
+      if(data > pivot.data) {
+        return _search(pivot.right);
+      } else if(data < pivot.data) {
+        return _search(pivot.left);
+      }
+      return null;
+    }
+    if(this.root == null) {
+      console.log("Tree is empty. bye bye")
+    } else {
+      console.log(_search(this.root));
+    }
+  }
+  delete = (data) => {
+    const _find = (pivot) => {
+      if(!pivot.left) return pivot;
+      return _find(pivot.left);
+    }
+    const _deleteDuplicate = (pivot, element) => {
+      if(pivot.left == element) {
+        pivot.left = element.right;
+        return pivot;
+      }
+      return _deleteDuplicate(pivot.left, element);
+    }
+    const _delete = (pivot) => {
+      if(!pivot) return null;
+      if(pivot.data == data) {
+        if(!pivot.right && !pivot.left) {
+          return null;
+        }
+        if(pivot.right && !pivot.left) {
+          return pivot.right;
+        }
+        if(pivot.left && !pivot.right) {
+          return pivot.left;
+        }
+        if(pivot.left && pivot.right) {
+          let _currentLeft = pivot.left;
+          let _currentRight = pivot.right;
+          let _leftMostChild = _find(pivot.right);
+          if(_leftMostChild != _currentRight) {
+            _currentRight = _deleteDuplicate(_currentRight, _leftMostChild);
+            _leftMostChild.right = _currentRight;
+          }
+          _leftMostChild.left = _currentLeft;
+          return _leftMostChild;
+        }
+      }
+      if(data > pivot.data) {
+        pivot.right = _delete(data, pivot.right);
+      }
+      else if(data < pivot.data) {
+        pivot.left = _delete(data, pivot.left);
+      }
+      return pivot;
+    };
+    if(this.root == null) {
+      console.log("Tree is empty. bye bye")
+      return;
+    }
+    this.root = _delete(this.root);
+    console.log(this.root);
+  }
 } 
 
 const bst = new BinarySearchTree();
@@ -104,5 +222,7 @@ bst.insert(89);
 bst.insert(8);
 bst.insert(91);
 bst.insert(11);
-bst.insert(90);
+bst.insert(70);
+bst.insert(71);
+
 console.log(bst);

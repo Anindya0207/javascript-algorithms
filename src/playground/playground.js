@@ -197,10 +197,10 @@ class BinarySearchTree {
         }
       }
       if(data > pivot.data) {
-        pivot.right = _delete(data, pivot.right);
+        pivot.right = _delete(pivot.right);
       }
       else if(data < pivot.data) {
-        pivot.left = _delete(data, pivot.left);
+        pivot.left = _delete(pivot.left);
       }
       return pivot;
     };

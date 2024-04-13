@@ -211,6 +211,31 @@ function shuffleArray(array) {
       this.root = _delete(this.root);
       console.log(this.root);
     }
+    findClosest = (data) => {
+      const map = {}, minDiff = 9999999999;
+      const _find = (pivot) => {
+        if(!pivot) {
+          return map[minDiff];
+        }
+        if(pivot.data == data) {
+          return pivot;
+        } else {
+          diff = Math.abs(pivot.data - data);
+          minDiff = Math.min(diff, minDiff);
+          map[diff] = pivot;
+          if(data > pivot.data) {
+            return _find(pivot.right);
+          } else if(data < pivot.data) {
+            return _find(pivot.left);
+          }
+        }
+      }
+      if(this.root == null) {
+        return null;
+      } else {
+        _find(this.root);
+      }
+    }
   } 
   
   const bst = new BinarySearchTree();

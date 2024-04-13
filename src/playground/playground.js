@@ -211,6 +211,32 @@ class BinarySearchTree {
     this.root = _delete(this.root);
     console.log(this.root);
   }
+  findClosest = (data) => {
+    const map = {};
+    let minDiff = 9999999999;
+    const _find = (pivot) => {
+      if(!pivot) {
+        return map[minDiff];
+      }
+      if(pivot.data == data) {
+        return pivot;
+      } else {
+        const diff = Math.abs(pivot.data - data);
+        minDiff = Math.min(diff, minDiff);
+        map[diff] = pivot;
+        if(data > pivot.data) {
+          return _find(pivot.right);
+        } else if(data < pivot.data) {
+          return _find(pivot.left);
+        }
+      }
+    }
+    if(this.root == null) {
+      return null;
+    } else {
+      return _find(this.root);
+    }
+  }
 } 
 
 const bst = new BinarySearchTree();
@@ -226,3 +252,26 @@ bst.insert(70);
 bst.insert(71);
 
 console.log(bst);
+
+var getMinimumDifference = function(root) {
+  let minDiff = 9999999999;
+  const _find = (pivot) => {
+    if(!pivot) {
+      return minDiff;
+    }
+    if(pivot.left) {
+      minDiff = Math.min(Math.abs(pivot.data - pivot.left.data) , minDiff);
+    }
+    if(pivot.right) {
+      minDiff = Math.min(Math.abs(pivot.data - pivot.right.data) , minDiff);
+    }
+    return Math.min(minDiff, Math.min(_find(pivot.right), _find(pivot.left)));
+  }
+  if(this.root == null) {
+    return null;
+  } else {
+    return _find(this.root);
+  }
+};
+
+getMinimumDifference()

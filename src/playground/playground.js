@@ -253,25 +253,69 @@ bst.insert(71);
 
 console.log(bst);
 
-var getMinimumDifference = function(root) {
-  let minDiff = 9999999999;
-  const _find = (pivot) => {
-    if(!pivot) {
-      return minDiff;
-    }
-    if(pivot.left) {
-      minDiff = Math.min(Math.abs(pivot.data - pivot.left.data) , minDiff);
-    }
-    if(pivot.right) {
-      minDiff = Math.min(Math.abs(pivot.data - pivot.right.data) , minDiff);
-    }
-    return Math.min(minDiff, Math.min(_find(pivot.right), _find(pivot.left)));
-  }
-  if(this.root == null) {
-    return null;
-  } else {
-    return _find(this.root);
-  }
-};
 
-getMinimumDifference()
+var playground = () => {
+   
+      var arr1 = [9, 4, 7, 9, 2] // 6 4 2 1
+      var arr2 = [5, 10, 10, 8, 9] // 1 2 3 3 5 7
+    arr1.sort((a,b) => b-a);
+    arr2.sort((a,b) => b-a);
+    var left1 = 0, right1 = arr1.length -1, left2 = 0, right2 = arr2.length -1, sum = 0;
+    while(left1 <= right1) {
+      
+      var a = Math.abs(arr1[left1] - arr2[left2]);
+      var b = Math.abs(arr1[left1] - arr2[right2]);
+      var c = Math.abs(arr1[right1] - arr2[left2]);
+      var d = Math.abs(arr1[right1] - arr2[right2]);
+      if(a > b) {
+        if(c > a) {
+          if(d > c) {
+            console.log("matching", arr1[right1], arr2[right2])
+            sum += d;
+            right1--; right2--;
+          } else {
+            console.log("matching", arr1[right1], arr2[left2])
+            sum += c;
+            right1--; left2++;
+          }
+        } else {
+          if(d > a) {
+            console.log("matching", arr1[right1], arr2[right2])
+            sum += d;
+            right1--; right2--;
+          } else {
+            console.log("matching", arr1[left1], arr2[left2])
+            sum += a;
+            left1++; left2++;
+          }
+        }
+      } else {
+        if(c > b) {
+          if(d > c) {
+            console.log("matching", arr1[right1], arr2[right2])
+            sum += d;
+            right1--; right2--;
+          } else {
+            console.log("matching", arr1[right1], arr2[left2])
+            sum += c;
+            right1--; left2++;
+          }
+        } else {
+          if(d > b) {
+            console.log("matching", arr1[right1], arr2[right2])
+            sum += d;
+            right1--; right2--;
+          } else {
+            console.log("matching", arr1[left1], arr2[right2])
+          sum += b;
+          left1++; right2--;
+          }
+        }
+        
+      }
+    }    
+    console.log(sum);
+  
+}
+
+playground();

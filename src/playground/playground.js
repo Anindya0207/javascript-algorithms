@@ -19,10 +19,12 @@ let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
 
 
 class Node {
-  constructor(_data, _left, _right) {
+  constructor(_data, _left, _right, _height, _bf) {
     this.data = _data;
     this.left = _left;
     this.right = _right;
+    this.height = _height;
+    this.bf = _bf;
   }
 }
 
@@ -30,7 +32,7 @@ class BinarySearchTree {
   constructor() {
     this.root = null;
     this.createNode = (data) => {
-      const node = new Node(data, null, null);
+      const node = new Node(data, null, null, 1, 0);
       return node;
     }
   }
@@ -69,6 +71,8 @@ class BinarySearchTree {
       } else if(data < pivot.data) {
         pivot.left = _insert(pivot.left);
       }
+      pivot.height = Math.max(pivot.left?.height || 0, pivot.right?.height || 0) + 1;
+      pivot.bf = (pivot.left?.height || 0) - (pivot.right?.height || 0);
       return pivot;
     }
     if(this.root == null) {
@@ -212,8 +216,7 @@ class BinarySearchTree {
     console.log(this.root);
   }
   findClosest = (data) => {
-    const map = {};
-    let minDiff = 9999999999;
+    const map = {}, minDiff = 9999999999;
     const _find = (pivot) => {
       if(!pivot) {
         return map[minDiff];
@@ -221,7 +224,7 @@ class BinarySearchTree {
       if(pivot.data == data) {
         return pivot;
       } else {
-        const diff = Math.abs(pivot.data - data);
+        diff = Math.abs(pivot.data - data);
         minDiff = Math.min(diff, minDiff);
         map[diff] = pivot;
         if(data > pivot.data) {
@@ -234,7 +237,7 @@ class BinarySearchTree {
     if(this.root == null) {
       return null;
     } else {
-      return _find(this.root);
+      _find(this.root);
     }
   }
 } 
@@ -252,70 +255,3 @@ bst.insert(70);
 bst.insert(71);
 
 console.log(bst);
-
-
-var playground = () => {
-   
-      var arr1 = [9, 4, 7, 9, 2] // 6 4 2 1
-      var arr2 = [5, 10, 10, 8, 9] // 1 2 3 3 5 7
-    arr1.sort((a,b) => b-a);
-    arr2.sort((a,b) => b-a);
-    var left1 = 0, right1 = arr1.length -1, left2 = 0, right2 = arr2.length -1, sum = 0;
-    while(left1 <= right1) {
-      
-      var a = Math.abs(arr1[left1] - arr2[left2]);
-      var b = Math.abs(arr1[left1] - arr2[right2]);
-      var c = Math.abs(arr1[right1] - arr2[left2]);
-      var d = Math.abs(arr1[right1] - arr2[right2]);
-      if(a > b) {
-        if(c > a) {
-          if(d > c) {
-            console.log("matching", arr1[right1], arr2[right2])
-            sum += d;
-            right1--; right2--;
-          } else {
-            console.log("matching", arr1[right1], arr2[left2])
-            sum += c;
-            right1--; left2++;
-          }
-        } else {
-          if(d > a) {
-            console.log("matching", arr1[right1], arr2[right2])
-            sum += d;
-            right1--; right2--;
-          } else {
-            console.log("matching", arr1[left1], arr2[left2])
-            sum += a;
-            left1++; left2++;
-          }
-        }
-      } else {
-        if(c > b) {
-          if(d > c) {
-            console.log("matching", arr1[right1], arr2[right2])
-            sum += d;
-            right1--; right2--;
-          } else {
-            console.log("matching", arr1[right1], arr2[left2])
-            sum += c;
-            right1--; left2++;
-          }
-        } else {
-          if(d > b) {
-            console.log("matching", arr1[right1], arr2[right2])
-            sum += d;
-            right1--; right2--;
-          } else {
-            console.log("matching", arr1[left1], arr2[right2])
-          sum += b;
-          left1++; right2--;
-          }
-        }
-        
-      }
-    }    
-    console.log(sum);
-  
-}
-
-playground();

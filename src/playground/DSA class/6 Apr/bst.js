@@ -19,10 +19,12 @@ function shuffleArray(array) {
   
   
   class Node {
-    constructor(_data, _left, _right) {
+    constructor(_data, _left, _right, _height) {
       this.data = _data;
       this.left = _left;
       this.right = _right;
+      this.height = _height;
+      this.bf = _bf;
     }
   }
   
@@ -30,7 +32,7 @@ function shuffleArray(array) {
     constructor() {
       this.root = null;
       this.createNode = (data) => {
-        const node = new Node(data, null, null);
+        const node = new Node(data, null, null, 1, 0);
         return node;
       }
     }
@@ -69,6 +71,8 @@ function shuffleArray(array) {
         } else if(data < pivot.data) {
           pivot.left = _insert(pivot.left);
         }
+        pivot.height = Math.max(pivot.left?.height || 0 , pivot.right?.height || 0) + 1;
+        pivot.bf = (pivot.left?.right || 0) - (pivot.right?.right || 0)
         return pivot;
       }
       if(this.root == null) {

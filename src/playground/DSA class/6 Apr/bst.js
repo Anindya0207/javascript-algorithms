@@ -72,7 +72,7 @@ function shuffleArray(array) {
           pivot.left = _insert(pivot.left);
         }
         pivot.height = Math.max(pivot.left?.height || 0 , pivot.right?.height || 0) + 1;
-        pivot.bf = (pivot.left?.right || 0) - (pivot.right?.right || 0)
+        pivot.bf = (pivot.left?.height || 0) - (pivot.right?.height || 0)
         return pivot;
       }
       if(this.root == null) {

@@ -17,26 +17,61 @@ const arrayLength =20000;
 
 let randomArray = generateUniqueRandomArray(arrayLength, minNumber, maxNumber);
 
-const playground = () => {
-  const arr = [
-    [0,1,1,1,0],
-    [1,0,0,0,1],
-    [1,0,0,1,0],
-    [1,0,1,0,1],
-    [0,1,0,1,0]
-  ];
-  console.log(arr);
- let map = {}, edge = 0;
-  for(var i = 0; i < arr.length; i ++ ){ 
-    for(j = 0; j < arr[i].length; j++) {
-      if(arr[i][j] == 1 &&  !map[`${i}${j}`]) {
-        edge++;
-        map[`${i}${j}`] = true;
-        map[`${j}${i}`] = true;
-      }
+const playground = (vertex, connections) => {
+  const getNewArr = () => new Array(vertex).fill(0)
+  const graph = new Array(vertex);
+  for(var i = 0; i< graph.length; i++) {
+    graph[i] = getNewArr()
+  }
+  for(var c = 0; c < connections.length; c++) {
+    const {to, from, isDirected} = connections[c];
+    if(isDirected) {
+      graph[from][to] = 1;
+    } else {
+      graph[from][to] = 1;
+      graph[to][from] = 1;
     }
   }
-  console.log(edge);
+  console.log(graph)
 }
 
-playground();
+const vertex = 5;
+const connections = [
+  {
+    from: 0,
+    to: 1,
+    isDirected: true,
+  },
+  {
+    from: 1,
+    to: 3,
+    isDirected: true,
+  },
+  {
+    from: 1,
+    to: 4,
+    isDirected: true,
+  },
+  {
+    from: 2,
+    to: 0,
+    isDirected: true,
+  },
+  {
+    from: 2,
+    to: 1,
+    isDirected: true,
+  },
+  {
+    from: 2,
+    to: 3,
+    isDirected: true,
+  },
+  {
+    from: 4,
+    to: 3,
+    isDirected: true,
+  }
+
+]
+playground(vertex, connections);

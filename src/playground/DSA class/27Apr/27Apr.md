@@ -59,3 +59,11 @@ In a tree DS, indegree of any node is 1 becuse there is only one edge incoming t
 But in Graph, there can be n edges inoming to a node. Then in degree of the node is n. 
 
 Similarly, the number of edges outgoing from a node in a graph is called outdegree. In a BST, outdegree is <=2 
+
+# Dynamic Graph
+
+- how many vertex
+- how many edges
+- enter the edge where the connection exist
+    - 1-2 (directed / undirected)
+    - 2-1

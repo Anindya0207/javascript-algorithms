@@ -29,7 +29,7 @@ function shuffleArray(array) {
           this[++rear] = elem;
       }
       Array.prototype.dequeue = function() {
-          if(front == -1 || front == this.length-1 || front > rear) {
+          if(front == -1  || front > rear) {
             console.log('no element');
             return;
           }

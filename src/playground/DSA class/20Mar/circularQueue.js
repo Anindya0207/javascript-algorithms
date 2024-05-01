@@ -22,7 +22,7 @@ var playground = function() {
   let front = -1, rear = -1;
     Array.prototype.enqueue = function(elem) {
       if(front == -1) front = 0;  
-      if((front == 0 && rear == this.length - 1) || (front > 0 && front == rear + 1))  {
+      if((front == 0 && rear == this.length - 1) || (front > 0 && front == rear + 1))  {  //front > 0 not needed
           console.log('no space');
           return;
         }

@@ -149,44 +149,39 @@ const representAdjacentList = (vertices, connections) => {
 }
 
 
-const vertices = [0,1,2,3,4];
+const vertices = [0,1,2,3,4,5];
 const connections = [
   {
     from: 0,
     to: 1,
-    isDirected: true,
+    isDirected: false,
+  },
+  {
+    from: 0,
+    to: 2,
+    isDirected: false,
+  },
+  {
+    from: 0,
+    to: 3,
+    isDirected: false,
+  },
+  {
+    from: 2,
+    to: 5,
+    isDirected: false,
   },
   {
     from: 1,
-    to: 3,
-    isDirected: true,
+    to: 5,
+    isDirected: false,
   },
   {
     from: 1,
     to: 4,
-    isDirected: true,
+    isDirected: false,
   },
-  {
-    from: 2,
-    to: 0,
-    isDirected: true,
-  },
-  {
-    from: 2,
-    to: 1,
-    isDirected: true,
-  },
-  {
-    from: 2,
-    to: 3,
-    isDirected: true,
-  },
-  {
-    from: 4,
-    to: 3,
-    isDirected: true,
-  }
-
+  
 ]
 
 const playground = () => {

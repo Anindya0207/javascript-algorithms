@@ -1,73 +1,54 @@
-const calculateEdges = () => {
-  const arr = [
-    [0,1,1,1,0],
-    [1,0,0,0,1],
-    [1,0,0,1,0],
-    [1,0,1,0,1],
-    [0,1,0,1,0]
-  ];
-  console.log(arr);
- let map = {}, edge = 0;
-  for(var i = 0; i < arr.length; i ++ ){ 
-    for(j = 0; j < arr[i].length; j++) {
-      if(arr[i][j] == 1 &&  !map[`${i}${j}`]) {
-        edge++;
-        map[`${i}${j}`] = true;
-        map[`${j}${i}`] = true;
-      }
-    }
-  }
-  console.log(edge);
+
+const arr = [
+  [0,1,1,1,0,0],
+  [1,0,0,0,1,0],
+  [1,0,0,0,0,1],
+  [1,0,0,0,0,0],
+  [0,1,0,0,0,0],
+  [0,1,1,0,0,0]
+]
+const init = 0;
+let finalMap = {
+  0: 'A',
+  1: 'B',
+  2: 'C',
+  3: 'D',
+  4: 'E',
+  5: 'F'
 }
 
-const calculateDegree = () => {
-  const map = {
-    0: 'A',
-    1: 'B',
-    2: 'C',
-    3: 'D',
-    4: 'E'
-  }
-  const arr = [
-    [0,1,0,0,0],
-    [0,0,0,1,1],
-    [1,1,0,1,0],
-    [0,0,0,0,0],
-    [0,0,0,1,0]
-  ];
-  console.log(arr);
-  let indegree = {}, outdegree = {};
-  for(var i = 0; i < arr.length; i ++ ){ 
-      outdegree[map[i]] = arr[i].reduce((acc, curr) => acc + curr, 0)
-  }
-  for(var i = 0; i < arr.length; i ++ ){ 
-    for(var j= 0; j<arr[i].length; j++) {
-      indegree[map[j]] = (indegree[map[j]] || 0) + arr[i][j];
+const adjacencyMatrixGraphTraversal = (arr, index) => {
+  const subArr = arr[index];
+  map[index] = true;
+  console.log(finalMap[index]);
+  for(var i = subArr.length-1; i>0; i--) {
+    if(subArr[i] == 1 && !map[i]) {
+      adjacencyMatrixGraphTraversal(arr, i);
     }
   }
-  console.log(indegree, outdegree)
-}
+};
 
-
-
-const representAdjacentMatrix = (vertices, connections) => {
-  const getNewArr = () => new Array(vertices.length).fill(0)
-  const graph = new Array(vertices.length);
-  for(var i = 0; i< graph.length; i++) {
-    graph[i] = getNewArr()
-  }
-  for(var c = 0; c < connections.length; c++) {
-    const {to, from, isDirected} = connections[c];
-    if(isDirected) {
-      graph[from][to] = 1;
-    } else {
-      graph[from][to] = 1;
-      graph[to][from] = 1;
+const adjacencyListGraphTraversal = (arr, val) => {
+  let node = arr[val];
+  map[val] = true;
+  console.log(finalMap[val]);
+  let pivot = node.next;
+  while(pivot != null) {
+    if(!map[pivot.data]) {
+      adjacencyListGraphTraversal(arr, pivot.data);
     }
+    pivot = pivot.next;
   }
-  console.log(graph)
+};
+let map = {}
+const playground = () => {
+  console.log("Adj Matrix traversal");
+  adjacencyMatrixGraphTraversal(arr, init);
+  map = {}
+  console.log("Adj list traversal");
+  const adjacencyList = representAdjacentList(vertices, connections);
+  adjacencyListGraphTraversal(adjacencyList, init)  
 }
-
 
 
 class Node {
@@ -125,72 +106,42 @@ const representAdjacentList = (vertices, connections) => {
     }
   }
   graph = vertices.map(v => map[v])
-  console.log(graph);
-  let numofEdges = 0, indegree = {}, outdegree= {};
-  for(var i =0; i < graph.length; i++) {
-    let _pivot = graph[i];
-    if(!outdegree[i]) outdegree[i] = 0;
-    if(!indegree[i]) indegree[i] = 0;
-    while(_pivot && _pivot.next != null) {
-      numofEdges++;
-      outdegree[i]++;
-      _pivot = _pivot.next;
-    }
-    _pivot = graph[i];
-    if(_pivot) _pivot = _pivot.next;
-    while(_pivot != null) {
-      if(!indegree[_pivot.data]) indegree[_pivot.data] = 0;
-      indegree[_pivot.data]++;
-      _pivot = _pivot.next;
-    }
-  }
-  console.log(numofEdges);
-  console.log(indegree, outdegree)
+  return graph;
 }
 
 
-const vertices = [0,1,2,3,4];
+const vertices = [0,1,2,3,4,5];
 const connections = [
   {
     from: 0,
     to: 1,
-    isDirected: true,
+    isDirected: false,
+  },
+  {
+    from: 0,
+    to: 2,
+    isDirected: false,
+  },
+  {
+    from: 0,
+    to: 3,
+    isDirected: false,
+  },
+  {
+    from: 2,
+    to: 5,
+    isDirected: false,
   },
   {
     from: 1,
-    to: 3,
-    isDirected: true,
+    to: 5,
+    isDirected: false,
   },
   {
     from: 1,
     to: 4,
-    isDirected: true,
+    isDirected: false,
   },
-  {
-    from: 2,
-    to: 0,
-    isDirected: true,
-  },
-  {
-    from: 2,
-    to: 1,
-    isDirected: true,
-  },
-  {
-    from: 2,
-    to: 3,
-    isDirected: true,
-  },
-  {
-    from: 4,
-    to: 3,
-    isDirected: true,
-  }
-
+  
 ]
-
-const playground = () => {
-  representAdjacentList(vertices, connections)
-};
-
 playground();

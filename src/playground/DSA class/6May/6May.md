@@ -8,7 +8,7 @@ For any number n = 2 ^ x => n & n-1 = 0
 to count set bits => do n = n & n-1 till n > 0 and simply count++;
 n * ( a1 ^ a2 ^ a3) = (n * a1) ^ (n * a2) ^ (n * a3)
 for Sum of XORs in a array sum = sum + (2 ^ i) * (setcount * unsetcount)
-
+(a1 & a3) ^ (a1 & a4) ^ (a2 & a3) ^ (a2 & a4 )= (a1 & (a3 ^ a4)) ^ (a2 & (a3 ^ a4))
 
 # Bit manipulation
 
@@ -177,3 +177,20 @@ const fn = (arr) => {
   }
   return [duplicate, missing]
 }
+
+# Power set in bit manipulation
+[1,2,3]
+to find all possible subset of this array using power set we can 
+
+mask the digits with 
+000 -> []
+001 -> [3]
+010 -> [2]
+011 -> [2,3]
+100 -> [1]
+101 -> [1,3]
+110 -> [1,2]
+111 -> [1,2,3]
+
+the time completxity is for outer loop which will run from 0 -- Math.pow(2, n) -> O(2^n) and for inner loop to traverse bits  0 -n O(n)
+so total is O(n * 2^n)

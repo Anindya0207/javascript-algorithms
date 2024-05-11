@@ -77,4 +77,20 @@ var lenOfLongSubarrTwoPointer = (arr, k) => {
   }
   console.log(maxLen)
 }
-lenOfLongSubarrTwoPointer([2,3,5], 5)
+// lenOfLongSubarrTwoPointer([2,3,5], 5)
+
+var maxScore = arr => {
+  let smallest = null, secondSmallest = null;
+  for(var i = 0; i < arr.length; i++) {
+    if(!smallest) {
+      smallest = arr[i];
+      secondSmallest = arr[i+1];
+    }
+    else if(arr[i] > smallest) {
+      secondSmallest = smallest;
+      smallest = arr[i];
+    }
+  }
+  console.log(smallest + secondSmallest)
+}
+maxScore([4, 3, 9, 5, 6])

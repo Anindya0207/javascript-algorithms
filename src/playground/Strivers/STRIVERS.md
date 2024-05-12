@@ -222,6 +222,7 @@ https://leetcode.com/problems/3sum/submissions/1255996853/
 4Sum same way.. take two outer loop and Keep Left and right pivots
 https://leetcode.com/problems/4sum/submissions/1256020557/
 
+--------------------------------------------------------------------------------------------------------------------------------
 11. Merge intervals
 
 We are given an interval [[1,3],[2,6],[8,10],[15,18]] 
@@ -246,7 +247,7 @@ var merge = function(intervals) {
     }
     return intervals;
 };
-
+--------------------------------------------------------------------------------------------------------------------------------
 12. Merge two sorted array without extra space
 
 One way is set i = arr1.length-1 and j = 0 
@@ -277,4 +278,46 @@ Approach 2: Gap method which is derived from shell sort
 - Calculate gap = Math.ceil(m + n / 2) and place two pointers L and R separated by gap
 - keep increemnting L and R and swap if arr1[L] > arr2[R]
 - keep decrementing gap = Math.ceil(gap/2) till gap reaches 1
+--------------------------------------------------------------------------------------------------------------------------------
+13. Bit Manipulation Main formulas
 
+2 ^ i = 1 << i
+to find setbit at i => num & (1 << i) == 1
+to set bit at i => num = num | (1 << i)
+XOR => n ^ 0 = n ; n ^ n =0
+For any number n = 2 ^ x => n & n-1 = 0
+to count set bits => do n = n & n-1 till n > 0 and simply count++;
+n * ( a1 ^ a2 ^ a3) = (n * a1) ^ (n * a2) ^ (n * a3)
+for Sum of XORs in a array sum = sum + (2 ^ i) * (setcount * unsetcount)
+(a1 & a3) ^ (a1 & a4) ^ (a2 & a3) ^ (a2 & a4 )= (a1 & (a3 ^ a4)) ^ (a2 & (a3 ^ a4))
+--------------------------------------------------------------------------------------------------------------------------------
+14. Missing and repeating numbers
+
+- One easy way is to calculate Sum(arr) and Sum(natural 1 to n) and subtract them . We will get x - y where x =repeating number and y=missing
+- Then again calculate Sum(Square of all elem of arr) and Sum(Square of natural 1-n) and subtract them, we will get x^2 - y^2
+- then we can easily get x+y
+
+
+const findTwoElement= ( arr, n) => 
+{
+  var xminusy = [], xplusy = [], sum1 = 0, sum2 = 0, squareSum1 = 0, squareSum2 = 0;
+  for(var i =1; i <= arr.length ; i++) {
+    sum1 = sum1 + arr[i-1];
+    sum2 = sum2 + i;
+    squareSum1 = squareSum1 + Math.pow(arr[i-1], 2);
+    squareSum2 = squareSum2 + Math.pow(i, 2);
+  }
+  xminusy = sum1 - sum2;
+  xplusy = (squareSum1 - squareSum2)/ xminusy;
+  var x = (xminusy + xplusy)/2;
+  var  y = xplusy - x;
+  console.log(x, y)
+}
+
+XOR method: 
+- Step 1: WE need to XOR all elements of the array with all the natural numbers from 1 to NThis way we will get the Xor of repeating and missing number x ^ y
+- Step 2: Now we need to find out the first setbit of the Xor element from right. We can do that using 1<<i and incrementing i from 0 to 32
+- Step 3: Divide the array elements + natural numbers (1-N) in two buckets left and right. Left bucket should consist all numbers which doesn't have setbit at the index we found at Step 2. And Right bucket should consist all numbers which has setbit at the index we found at Step 2
+- Step 4: Xor Left and Right bucket elements separately. We will get the missing and repeating numbers for sure. But we don't know which one is missing and which one is duplicate
+- Step 5: Iterate over the array to find out which one is missing and which one is duplicate
+--------------------------------------------------------------------------------------------------------------------------------

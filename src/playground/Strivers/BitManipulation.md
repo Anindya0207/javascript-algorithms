@@ -96,7 +96,7 @@ var singleNumber = function(nums) {
 
 ## Xor queries in a array
 whenever we need to find the sum or Xor of a range within a array always prefix array calculation is best approach.
-we will calculate prefix Xor array. then prefixArray[Right] XOR prefixarray[left - 1] is our answer
+we will calculate prefix Xor array. then prefixArray[Right +1] XOR prefixarray[left] is our answer
 
 ## XOR of Sum of every possible pair of an array
 If we have been given any set of numbers a1 a2 a3
@@ -157,26 +157,48 @@ const fn = (arr) => {
 
 ## Missing and repeating number
 
-const fn = (arr) => {
-  let missing = 0, duplicate = 0
-  for(var i = 0; i < 32; i++) {
-     let  count1 = 0, count2 = 0;
-     for(var j = 1; j <= arr.length; j++) {
-      let num = arr[j-1];
-      if(num & (1<<i)) count1++;
-      if(j & (1<<i)) count2++;
-     }
-     if(count1 > count2) {
-      duplicate += (1<< i)
-     } else if (count2 > count1) {
-      missing += (1 << i)
-     } else if(count2 == count1 && count1 > 0) {
-      duplicate += (1<< i);
-      missing += (1 << i)
-     }
+const findTwoElement= ( arr, n) => 
+{
+  let xor = 0;
+  //Step 1: Find the Xor between missing and repeating. To do that Xor all element of arr with all natural numbers
+  for(var i =1; i <= arr.length ; i++) {
+    xor = xor ^ arr[i-1] ^ i;
   }
-  return [duplicate, missing]
+  //Step 2: find the closest setbit of the xor number from right
+  let setbitIndex = 0
+  for(var i = 0; i < 32; i++) {
+    if(xor & (1 << i)){ 
+      setbitIndex = i;
+      break
+    }
+  }
+  // Step3: Divide all numbers of the array and all the natural numbers from 1 to n in a left and right bucket basis the setbit value at the setBitIndex
+  let left = [], right = []
+  for(var i = 1; i <=arr.length; i++) {
+    if(arr[i-1]&(1 << setbitIndex)) {
+      right.push(arr[i-1]);
+    } else {
+      left.push(arr[i-1])
+    }
+    if(i&(1<<setbitIndex)) {
+      right.push(i);
+    } else {
+      left.push(i)
+    }
+  }
+
+  console.log(left.sort((a,b) => a-b),right.sort((a,b) => a-b))
+  //Step4: Do Xor of left and right arrays (Left is 0 club and right is 1 club) we will get the missing number and repeating number
+  const leftXor = left.reduce((acc, curr) => (acc ^ curr), 0);
+  const rightXor = right.reduce((acc, curr) => (acc ^ curr), 0);
+  console.log(leftXor, rightXor)
+  // Step5: Check which one is the missing and duplicate from these two numbers
+  const isDuplicate = arr.find(n => n == leftXor);
+  return isDuplicate ? [leftXor, rightXor] : [rightXor, leftXor]
 }
+
+findTwoElement([1,3,3])
+// findTwoElement([3,24,22,7,10,34,27,29,13,2,11,23,9,26,32,12,1,14,4,8,6,19,17,15,30,28,20,31,5,16,25,18,9,33])
 
 # Power set in bit manipulation
 [1,2,3]
@@ -194,3 +216,17 @@ mask the digits with
 
 the time completxity is for outer loop which will run from 0 -- Math.pow(2, n) -> O(2^n) and for inner loop to traverse bits  0 -n O(n)
 so total is O(n * 2^n)
+
+var subsets = function(nums) {
+    let final = [];
+    for(var mask = 0; mask < (1 << nums.length); mask++) {
+        let temp = [];
+        for(var i = 0; i < nums.length; i++) {
+            if(mask & (1<<i)) {
+                temp.push(nums[i]);
+            }
+        }
+        final.push(temp);
+    }
+    return final;
+};

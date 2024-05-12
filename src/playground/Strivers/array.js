@@ -31,7 +31,7 @@ const secondLargest = (arr) => {
     }
   };
   
-    
+  //Kadane's algo
   var maxSubArray = function(nums) {
     let max = -Infinity, currMax = 0;
     for(var i =0; i< nums[i]; i++) {
@@ -111,3 +111,4 @@ var subarraySum = function(arr, k) {
     }
     return count;
   };
+

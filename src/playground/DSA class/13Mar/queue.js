@@ -21,8 +21,8 @@ function shuffleArray(array) {
   var playground = function() {
     let front = -1, rear = -1;
       Array.prototype.enqueue = function(elem) {
-        if(front - 1) front = 0;  
-        if(rear == this.length - 1)  {
+        if(front == -1) front = 0;  
+        if(rear > 0 && rear == this.length - 1)  {
             console.log('no element');
             return;
           }

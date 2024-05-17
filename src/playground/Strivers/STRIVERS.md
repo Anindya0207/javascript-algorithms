@@ -321,3 +321,157 @@ XOR method:
 - Step 4: Xor Left and Right bucket elements separately. We will get the missing and repeating numbers for sure. But we don't know which one is missing and which one is duplicate
 - Step 5: Iterate over the array to find out which one is missing and which one is duplicate
 --------------------------------------------------------------------------------------------------------------------------------
+15. Inversion count
+
+Need to find the inversion count of an unsorted array. Inversion count is the array is how far from getting sorted. 
+for 2, 4, 1, 3, 5 -> it is 3. [4,1] [2,1] [4,3]
+
+One way to do is insertion sort but it will be O(n^2)
+
+Otherway to do is using merge sort - 
+- Do Normal merge sort and while merging two arrays arr1 and arr2 take two pointers i and j  = 0 
+- increment i and j such that if arr1[i] > arr2[j] count = count + arr.length - arr1[i] and j++ else i++
+- Means if for a ith elemnt in arr1 if it's more than jth elemtn of arr2 that arr2[j] can be formed a pair with all the elements after i in arr1
+- so count of pairs will increase by arr.length - i
+- again check for j++ element till any ith element in arr1 beomes less than arr2[j]
+- if that happens, increment i++
+https://www.geeksforgeeks.org/problems/inversion-of-array-1587115620/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=inversion-of-array
+
+Same pattern for another problem reverse pairs: https://leetcode.com/problems/reverse-pairs/submissions/1256915172/
+--------------------------------------------------------------------------------------------------------------------------------
+16. Binary search lower and upper bound
+
+Lower bound means to find a numbers arr[i] >= x
+- initiate ans = arr.length
+- keep changing ans = mid whenever arr[mid] >= x
+
+Upper bound means to find a numbers arr[i] > x
+- initiate ans = -1
+- keep changing ans = mid whenever arr[mid] <= x
+
+Floor of an sorted array > We need to find maximum arr[i] <= x
+- Can we say if the x smaller than the first element  my ans will be -1
+- if I get any number a[mid] > x I will just make end = mid - 1 to check smaller number
+- But if I get a[mid] <= x I will say probably ans = mid and I will try to find a larger number than arr[mid] by start=mid+ 1
+findFloor(arr, n, x)
+    {
+       let start = 0, end = n-1, ans = -1
+       while(start <= end) {
+           let mid = Math.floor((start + end) /2);
+           if(arr[mid] > x) {
+               end = mid-1;
+           } else {
+               ans = mid;
+               start = mid+ 1;
+           }
+       }
+       
+       return ans;
+    }
+--------------------------------------------------------------------------------------------------------------------------------
+17. How to search in a rotated sorted array
+
+- find mid and see if left part sorted or right part sorted If arr[start] <= arr[mid] then obv left part sorted and right part is not
+- if arr[start] > arr[mid] then obv right part sorted and left part is not
+- see if the target is lying in the sorted part or not. if lying elminate the other part
+
+var search = function(nums, target) {
+  let _start = 0, _end = nums.length -1, final = -1
+  const _find = (start, end) => {
+      if(start > end) return;
+      let mid = Math.floor((start + end)/2);
+      if(nums[mid] == target) {
+          final = mid;
+          return;
+      }
+      if(nums[mid] >= nums[start]) { // this means left part sorted
+        if(nums[start] <= target && target <= nums[mid]) { // see if target is lying within start and mid then elimiate right part
+            _find(start, mid-1)
+        } else { // else elimiate the left part
+            _find(mid+1, end);
+        }
+      } else { // this means right part sorted
+        if(nums[mid] <= target && target <= nums[end]) { // see if target lying in the mid to right part, if yes, elimiate the left part
+            _find(mid+1, end);
+        } else { // else the right part
+           _find(start, mid-1)
+        }
+      }
+      
+  }
+  _find(_start, _end);
+  return final;
+};
+
+If we need to find out the same in a rotated sorted array with duplicates though, we can't just apply the rule 
+that if arr[mid] == arr[start] the left side is sorted because it may be possible they are duplicated
+ex: 10111 -> 101 is not sorted though arr[start] = arr[mid] = 1
+
+To handle this, we need to add a condition - to basically shrink the search space from both end
+if(arr[start] == arr[mid] && arr[mid] == arr[end]) {
+  _find(start+1, end-1);
+}
+https://leetcode.com/problems/search-in-rotated-sorted-array-ii/submissions/1257880783/ 
+--------------------------------------------------------------------------------------------------------------------------------
+18. How to find minimum in a rotated sorted array
+
+- If we see arr[start] <= arr[mid] means left part is sorted, arr[start] is minimum, no need to check more in left part. check in right part _find(mid+1, end)
+- else right part is sorted, so arr[mid] is the minimum, no need to further check in right part. check in left part _find(start, mid -1);
+var findMin = function(nums) {
+    let _start = 0, _end = nums.length -1, min = Infinity
+  const _find = (start, end) => {
+      if(start > end) return;
+      let mid = Math.floor((start + end)/2);
+      if(nums[start] <= nums[mid]) { 
+        min = Math.min(min, nums[start])
+        _find(mid+1, end);
+      } else { 
+         min = Math.min(min, nums[mid])
+        _find(start, mid-1)
+      }
+  }
+  _find(_start, _end);
+  return min;
+};
+- Find number of array rotation same pattern 
+https://www.geeksforgeeks.org/problems/rotation4723/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=rotation
+--------------------------------------------------------------------------------------------------------------------------------
+19. Koko eating banana/ bouquet problem / find the smallest divisor and similar problem
+
+- Consider finding out a sorted searchspace where we need find a element based on a condition
+- Next step is find the condition to go left or right. 
+
+https://leetcode.com/problems/koko-eating-bananas/
+https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/submissions/1258626955/
+https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/submissions/1258607211/
+
+--------------------------------------------------------------------------------------------------------------------------------
+20. Kth Missing number
+
+- To do it in log(n) we do a binary search 
+- condition to switch left right would be the mid missing => the missing numbers before mid will be arr[mid] - mid - 1
+- if midmissing >= k we check left because if missing numbers are more at mid it is obvious that the missing numbers will be lesser in left side
+- else we check right
+- we let it run till start > end and start crosses over end and end becomes less than start
+- at this point the element at high index + "some more" will give us the Kth missing number
+- this some more is nothing but k - missing number at high index
+- so our ans is arr[high] + (k - missing number at high)  = arr[high] + k - (arr[high] - high -1) = k + high + 1
+- or since low is high+1 at this moment ans = k + low is also true
+
+var findKthPositive = function(arr, k) {
+    let _start = 0, _end = arr.length -1, missingIndex = -1;
+    const _find = (start, end) => {
+        missingIndex = start;
+        if(start > end) return;
+        let mid = Math.floor((start + end) /2);
+        let midMissing = arr[mid] - mid -1
+        if(midMissing >= k) {
+           _find(start, mid-1);
+        } else {
+           _find(mid +1, end)
+        }
+    };
+    _find(_start, _end);    
+    return missingIndex + k
+};
+--------------------------------------------------------------------------------------------------------------------------------

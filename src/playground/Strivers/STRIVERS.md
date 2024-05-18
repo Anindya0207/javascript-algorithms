@@ -1,28 +1,48 @@
-1. when in a loop we keep on dividing the number, like while (n > 0).... n = n / x; then the time complexity is O(logx N)
---------------------------------------------------------------------------------------------------------------------------------
-2. Euclidean algorithm states that GCD(a,b) = GCD(a % b, b) where a > b
+# DSA key notes
+
+### 1. How time complexity works specially with logn
+```
+when in a loop we keep on dividing the number, like while (n > 0).... n = n / x; then the time complexity is O(logx N)
+```
+---
+###  2. Euclidean algorithm states that GCD(a,b) = GCD(a % b, b) where a > b
+
+```javascript
 const findGCD = (num1, num2) => {
   if(num1 == 0) return num2;
   if(num1 > num2) return findGCD(num1 % num2, num2);
   return findGCD(num2 % num1, num1);
 }
+```
+
 --------------------------------------------------------------------------------------------------------------------------------
-3. A subsequence is a sub-sequenece which should follow the order of the actual sequence. it can be either contiguous or non contiguous
+### 3. A subsequence is a sub-sequenece which should follow the order of the actual sequence. 
+
+- It can be either contiguous or non contiguous
+- This can be achieved by Power set also which is mentioned in 6May.md
+
+```
 [3,1,2] => [3] [1] [2] [3,1] [3,2] [1,2] [3,1,2] these are all possible subsequence. 
 [3,2] is a non contigious subsequnce
 [1,2,3] is not a subsequence becuase it doesn't follow the order.
-This can be achieved by Power set also which is mentioned in 6May.md
+
+```
 --------------------------------------------------------------------------------------------------------------------------------
 
-4. To rotate a array by k we can simply do
+### 4. To rotate a array by k we can simply do arr[i] = arr1[(i+k)%arr.length]
+
+```
 arr1 = [...arr]
 arr[i] = arr1[(i+k)%arr.length]
 This is very powerful formula to rotate the array or to check if an array is rotated k times. 
 To check if A and B are same array but after k rotation
 A[i] = B[(i+k)%A.length]
+```
 --------------------------------------------------------------------------------------------------------------------------------
 
-5. Length of longest subarray with K sum using Prefixmap/Hashing
+### 5. Length of longest subarray with K sum using Prefixmap/Hashing
+
+```javascript
   var lenOfLongSubarr = (arr, k) => {
     let map = {}, maxLen = 0, sum = 0;
     for (var i = 0; i < arr.length; i++) {
@@ -52,35 +72,43 @@ A[i] = B[(i+k)%A.length]
     }
     console.log(maxLen)
   }
+```
 --------------------------------------------------------------------------------------------------------------------------------  
   
-6. Dutch National Flag algo
-This algorithm contains 3 pointers i.e. low, mid, and high, and 3 main rules.  The rules are the following:
+### 6. Dutch National Flag algo
 
-arr[0….low-1] contains 0. [Extreme left part]
-arr[low….mid-1] contains 1.
-arr[high+1….n-1] contains 2. [Extreme right part], n = size of the array
-The middle part i.e. arr[mid….high] is the unsorted segment. 
+- This algorithm contains 3 pointers i.e. low, mid, and high, and 3 main rules.  The rules are the following:
+- arr[0….low-1] contains 0. [Extreme left part]
+- arr[low….mid-1] contains 1.
+- arr[high+1….n-1] contains 2. [Extreme right part], n = size of the array
+- The middle part i.e. arr[mid….high] is the unsorted segment. 
 
+```
 There can be three different values of mid pointer i.e. arr[mid]
 If arr[mid] == 0, => swap(arr[low], arr[mid]) low++; mid++
 If arr[mid] == 1 => mid++
 If arr[mid] == 2 => swap(arr[mid], arr[high]); high--
+```
+
 --------------------------------------------------------------------------------------------------------------------------------
 
-7. Moores Voting Algo
+### 7. Moores Voting Algo - Find the element which appears more than n/2 or n/3
 
-Find the element which appears more than n/2
-Initialize 2 variables:
-Count –  for tracking the count of element
-Element – for which element we are counting
-Traverse through the given array.
-If Count is 0 then store the current element of the array as Element.
-If the current element and Element are the same increase the Count by 1.
-If they are different decrease the Count by 1.
-After the traversal, if count > 0 the Element can be the majority element.
-Step 2: We also need to verify if it is the majority element by running through the array and count the occurance > n/2
+Step 1: 
 
+- Initialize 2 variables:
+- Count –  for tracking the count of element
+- Element – for which element we are counting
+- Traverse through the given array.
+- If Count is 0 then store the current element of the array as Element.
+- If the current element and Element are the same increase the Count by 1.
+- If they are different decrease the Count by 1.
+- After the traversal, if count > 0 the Element can be the majority element.
+
+Step 2: 
+- We also need to verify if it is the majority element by running through the array and count the occurance > n/2
+
+```javascript
 var majorityElement = function(nums) {
     let el = null, count = 0
     for(var i  = 0; i <nums.length; i++) {
@@ -94,13 +122,16 @@ var majorityElement = function(nums) {
     }
     return el;
 }
+```
 
-lets say we need to find all elements which appears more than n/3 or n/k or whatever
+Lets say we need to find all elements which appears more than n/3 or n/k or whatever - 
+
 - We can say for sure that for more than n/k occurances there won't be more than k elements in the array. 
 - Means there will be atmost 2 elements which can appear more than 2 times in the array. Chahe to check kar lo 8 length ki array lo. 3 times do hi element aa skta hai. kyu ki teen element 3 times aane se total size 9 ho jayega
 - Toh instead of taking one count and one element variable in the above algo, we can take 2 counts and 2 element variables right?
 - After getting the POSSIBLE majority elements don't forget to verify that. because both of them might not appear more than n/3 times
 
+```javascript
 var majorityElement = function(nums) {
     let el1 = null, el2 = null, count1 = 0, count2 = 0
     for(var i = 0; i < nums.length; i++) {
@@ -130,14 +161,16 @@ var majorityElement = function(nums) {
     }
     return final
 }
+```
 --------------------------------------------------------------------------------------------------------------------------------
 
-8. Kadane's Algo
+### 8. Kadane's Algo
 
-We will run a loop(say i) to iterate the given array.
-Now, while iterating we will add the elements to the sum variable and consider the maximum one.
-If at any point the sum becomes negative we will set the sum to 0 as we are not going to consider it as a part of our answer.
+- We will run a loop(say i) to iterate the given array.
+- Now, while iterating we will add the elements to the sum variable and consider the maximum one.
+- If at any point the sum becomes negative we will set the sum to 0 as we are not going to consider it as a part of our answer.
 
+```javascript
 var maxSubArray = function(nums) {
     let max = -Infinity, currSum = 0;
     for(var i= 0; i <nums.length; i++) {
@@ -149,16 +182,19 @@ var maxSubArray = function(nums) {
     }
     return max;
 };
+```
 --------------------------------------------------------------------------------------------------------------------------------
 
-9. Next Permutation
+### 9. Next Permutation
 
 We need to find out the next permutaion of 2,1,5,4,3,0,0 lets say ans : 2,3,0,0,1,4,5
-Step1: find out the break index from last to first where arr[i-1] < arr[i] ... here it will be 2 where 1 is sitting
-Step2: again run a loop from last to first and for the first element > the element at brwakindex swap them . 
-At this point it will be 2 3 5 4 1 0 0. Notice that after 2 3 rest array is sorted in descending order
-Step3: from breakindex + 1 to last index reverse the array. take two pointer 
 
+- Step1: find out the break index from last to first where arr[i-1] < arr[i] ... here it will be 2 where 1 is sitting
+- Step2: again run a loop from last to first and for the first element > the element at brwakindex swap them . 
+At this point it will be 2 3 5 4 1 0 0. Notice that after 2 3 rest array is sorted in descending order
+- Step3: from breakindex + 1 to last index reverse the array. take two pointer 
+
+```javascript
 var nextPermutation = function(nums) {
    var breakIndex = -1;
    //Step 1
@@ -188,16 +224,18 @@ var nextPermutation = function(nums) {
   }
   return nums;
 };
+```
 --------------------------------------------------------------------------------------------------------------------------------
 
-10. 2Sum 3Sum 4Sum
+### 10. 2Sum 3Sum 4Sum
 
-2Sum is pretty easy. So you need to sort the array first. 
-take two pointers left and right; left = 0, right = n-1
-if a[left] + a[right] == sum -> valid pair
-if a[left] + a[right] < sum -> left++;
-else right--
+- 2Sum is pretty easy. So you need to sort the array first. 
+- take two pointers left and right; left = 0, right = n-1
+- if a[left] + a[right] == sum -> valid pair
+- if a[left] + a[right] < sum -> left++;
+- else right--
 
+```javascript
 var twoSum = function(nums, target) {
     nums.sort((a, b) => a-b);
     let left = 0, right = nums.length -1;
@@ -215,24 +253,25 @@ var twoSum = function(nums, target) {
     }
     return []
 };
+```
 
-For 3Sum, the trick is to fix one pivot and then do same two pointer as we did in 2Sum for the remaining array
+- For 3Sum, the trick is to fix one pivot and then do same two pointer as we did in 2Sum for the remaining array
 https://leetcode.com/problems/3sum/submissions/1255996853/
 
-4Sum same way.. take two outer loop and Keep Left and right pivots
+- 4Sum same way.. take two outer loop and Keep Left and right pivots
 https://leetcode.com/problems/4sum/submissions/1256020557/
 
 --------------------------------------------------------------------------------------------------------------------------------
-11. Merge intervals
+### 11. Merge intervals
 
-We are given an interval [[1,3],[2,6],[8,10],[15,18]] 
-We need to convert this to [[1, 6], [8, 10], [15, 18]]
-For these problems we need to either sort it based on it's start times or end times
-Here we sort it based on their start times and we do inplace merge. 
-Whenever iTh index end time > j (i+1)th index start tiem we need to merge them
-While merging we need to take the minimum start time b/w i and j but max end time b/w i and j
-Whenever we have to merge 
+We are given an interval [[1,3],[2,6],[8,10],[15,18]] We need to convert this to [[1, 6], [8, 10], [15, 18]]
+- For these problems we need to either sort it based on it's start times or end times
+- Here we sort it based on their start times and we do inplace merge. 
+- Whenever iTh index end time > j (i+1)th index start tiem we need to merge them
+- While merging we need to take the minimum start time b/w i and j but max end time b/w i and j
+- Whenever we have to merge 
 
+```javascript
 var merge = function(intervals) {
     intervals.sort((a, b) => a[0] - b[0]);
     let i =0;
@@ -247,13 +286,15 @@ var merge = function(intervals) {
     }
     return intervals;
 };
+```
 --------------------------------------------------------------------------------------------------------------------------------
-12. Merge two sorted array without extra space
+### 12. Merge two sorted array without extra space
 
-One way is set i = arr1.length-1 and j = 0 
-make sure to swap arr1[i] and arr2[j] if arr1[i] > arr2[j] so that arr1 holds all lesser values than arr2 values.
-now sort arr1 and arr2 individually and then merge
+- One way is set i = arr1.length-1 and j = 0 
+- make sure to swap arr1[i] and arr2[j] if arr1[i] > arr2[j] so that arr1 holds all lesser values than arr2 values.
+- now sort arr1 and arr2 individually and then merge
 
+```javascript
 var merge = function (arr1, m , arr2, n ) {
     let i = m -1, j = 0;
     arr1.splice(m);
@@ -273,31 +314,36 @@ var merge = function (arr1, m , arr2, n ) {
     }
     return arr1
 }
+```
 
 Approach 2: Gap method which is derived from shell sort
+
 - Calculate gap = Math.ceil(m + n / 2) and place two pointers L and R separated by gap
 - keep increemnting L and R and swap if arr1[L] > arr2[R]
 - keep decrementing gap = Math.ceil(gap/2) till gap reaches 1
---------------------------------------------------------------------------------------------------------------------------------
-13. Bit Manipulation Main formulas
 
-2 ^ i = 1 << i
-to find setbit at i => num & (1 << i) == 1
-to set bit at i => num = num | (1 << i)
-XOR => n ^ 0 = n ; n ^ n =0
-For any number n = 2 ^ x => n & n-1 = 0
-to count set bits => do n = n & n-1 till n > 0 and simply count++;
-n * ( a1 ^ a2 ^ a3) = (n * a1) ^ (n * a2) ^ (n * a3)
-for Sum of XORs in a array sum = sum + (2 ^ i) * (setcount * unsetcount)
-(a1 & a3) ^ (a1 & a4) ^ (a2 & a3) ^ (a2 & a4 )= (a1 & (a3 ^ a4)) ^ (a2 & (a3 ^ a4))
 --------------------------------------------------------------------------------------------------------------------------------
-14. Missing and repeating numbers
+### 13. Bit Manipulation Main formulas
+
+```
+- 2 ^ i = 1 << i
+- to find setbit at i => num & (1 << i) == 1
+- to set bit at i => num = num | (1 << i)
+- XOR => n ^ 0 = n ; n ^ n =0
+- For any number n = 2 ^ x => n & n-1 = 0
+- to count set bits => do n = n & n-1 till n > 0 and simply count++;
+- n * ( a1 ^ a2 ^ a3) = (n * a1) ^ (n * a2) ^ (n * a3)
+- for Sum of XORs in a array sum = sum + (2 ^ i) * (setcount * unsetcount)
+- (a1 & a3) ^ (a1 & a4) ^ (a2 & a3) ^ (a2 & a4 )= (a1 & (a3 ^ a4)) ^ (a2 & (a3 ^ a4))
+```
+--------------------------------------------------------------------------------------------------------------------------------
+### 14. Missing and repeating numbers
 
 - One easy way is to calculate Sum(arr) and Sum(natural 1 to n) and subtract them . We will get x - y where x =repeating number and y=missing
 - Then again calculate Sum(Square of all elem of arr) and Sum(Square of natural 1-n) and subtract them, we will get x^2 - y^2
 - then we can easily get x+y
 
-
+```javascript
 const findTwoElement= ( arr, n) => 
 {
   var xminusy = [], xplusy = [], sum1 = 0, sum2 = 0, squareSum1 = 0, squareSum2 = 0;
@@ -313,6 +359,7 @@ const findTwoElement= ( arr, n) =>
   var  y = xplusy - x;
   console.log(x, y)
 }
+```
 
 XOR method: 
 - Step 1: WE need to XOR all elements of the array with all the natural numbers from 1 to NThis way we will get the Xor of repeating and missing number x ^ y
@@ -320,15 +367,16 @@ XOR method:
 - Step 3: Divide the array elements + natural numbers (1-N) in two buckets left and right. Left bucket should consist all numbers which doesn't have setbit at the index we found at Step 2. And Right bucket should consist all numbers which has setbit at the index we found at Step 2
 - Step 4: Xor Left and Right bucket elements separately. We will get the missing and repeating numbers for sure. But we don't know which one is missing and which one is duplicate
 - Step 5: Iterate over the array to find out which one is missing and which one is duplicate
+
 --------------------------------------------------------------------------------------------------------------------------------
-15. Inversion count
+### 15. Inversion count
 
 Need to find the inversion count of an unsorted array. Inversion count is the array is how far from getting sorted. 
 for 2, 4, 1, 3, 5 -> it is 3. [4,1] [2,1] [4,3]
 
-One way to do is insertion sort but it will be O(n^2)
+- One way to do is insertion sort but it will be O(n^2)
 
-Otherway to do is using merge sort - 
+Other way to do is using merge sort - 
 - Do Normal merge sort and while merging two arrays arr1 and arr2 take two pointers i and j  = 0 
 - increment i and j such that if arr1[i] > arr2[j] count = count + arr.length - arr1[i] and j++ else i++
 - Means if for a ith elemnt in arr1 if it's more than jth elemtn of arr2 that arr2[j] can be formed a pair with all the elements after i in arr1
@@ -338,8 +386,9 @@ Otherway to do is using merge sort -
 https://www.geeksforgeeks.org/problems/inversion-of-array-1587115620/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=inversion-of-array
 
 Same pattern for another problem reverse pairs: https://leetcode.com/problems/reverse-pairs/submissions/1256915172/
+
 --------------------------------------------------------------------------------------------------------------------------------
-16. Binary search lower and upper bound
+### 16. Binary search lower and upper bound
 
 Lower bound means to find a numbers arr[i] >= x
 - initiate ans = arr.length
@@ -353,6 +402,7 @@ Floor of an sorted array > We need to find maximum arr[i] <= x
 - Can we say if the x smaller than the first element  my ans will be -1
 - if I get any number a[mid] > x I will just make end = mid - 1 to check smaller number
 - But if I get a[mid] <= x I will say probably ans = mid and I will try to find a larger number than arr[mid] by start=mid+ 1
+```javascript
 findFloor(arr, n, x)
     {
        let start = 0, end = n-1, ans = -1
@@ -368,13 +418,15 @@ findFloor(arr, n, x)
        
        return ans;
     }
+```
 --------------------------------------------------------------------------------------------------------------------------------
-17. How to search in a rotated sorted array
+### 17. How to search in a rotated sorted array
 
 - find mid and see if left part sorted or right part sorted If arr[start] <= arr[mid] then obv left part sorted and right part is not
 - if arr[start] > arr[mid] then obv right part sorted and left part is not
 - see if the target is lying in the sorted part or not. if lying elminate the other part
 
+```javascript
 var search = function(nums, target) {
   let _start = 0, _end = nums.length -1, final = -1
   const _find = (start, end) => {
@@ -402,21 +454,26 @@ var search = function(nums, target) {
   _find(_start, _end);
   return final;
 };
+```
 
 If we need to find out the same in a rotated sorted array with duplicates though, we can't just apply the rule 
-that if arr[mid] == arr[start] the left side is sorted because it may be possible they are duplicated
-ex: 10111 -> 101 is not sorted though arr[start] = arr[mid] = 1
-
-To handle this, we need to add a condition - to basically shrink the search space from both end
+- that if arr[mid] == arr[start] the left side is sorted because it may be possible they are duplicated
+- ex: 10111 -> 101 is not sorted though arr[start] = arr[mid] = 1
+- To handle this, we need to add a condition - to basically shrink the search space from both end
+```javascript
 if(arr[start] == arr[mid] && arr[mid] == arr[end]) {
   _find(start+1, end-1);
 }
+```
+
 https://leetcode.com/problems/search-in-rotated-sorted-array-ii/submissions/1257880783/ 
+
 --------------------------------------------------------------------------------------------------------------------------------
-18. How to find minimum in a rotated sorted array
+### 18. How to find minimum in a rotated sorted array
 
 - If we see arr[start] <= arr[mid] means left part is sorted, arr[start] is minimum, no need to check more in left part. check in right part _find(mid+1, end)
 - else right part is sorted, so arr[mid] is the minimum, no need to further check in right part. check in left part _find(start, mid -1);
+```javascript
 var findMin = function(nums) {
     let _start = 0, _end = nums.length -1, min = Infinity
   const _find = (start, end) => {
@@ -433,10 +490,13 @@ var findMin = function(nums) {
   _find(_start, _end);
   return min;
 };
+```
+
 - Find number of array rotation same pattern 
 https://www.geeksforgeeks.org/problems/rotation4723/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=rotation
+
 --------------------------------------------------------------------------------------------------------------------------------
-19. Koko eating banana/ bouquet problem / find the smallest divisor and similar problem
+### 19. Koko eating banana/ bouquet problem / find the smallest divisor and similar problem
 
 - Consider finding out a sorted searchspace where we need find a element based on a condition
 - Next step is find the condition to go left or right. 
@@ -446,7 +506,7 @@ https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/submis
 https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/submissions/1258607211/
 
 --------------------------------------------------------------------------------------------------------------------------------
-20. Kth Missing number
+### 20. Kth Missing number
 
 - To do it in log(n) we do a binary search 
 - condition to switch left right would be the mid missing => the missing numbers before mid will be arr[mid] - mid - 1
@@ -458,6 +518,7 @@ https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/submissi
 - so our ans is arr[high] + (k - missing number at high)  = arr[high] + k - (arr[high] - high -1) = k + high + 1
 - or since low is high+1 at this moment ans = k + low is also true
 
+```javascript
 var findKthPositive = function(arr, k) {
     let _start = 0, _end = arr.length -1, missingIndex = -1;
     const _find = (start, end) => {
@@ -474,4 +535,47 @@ var findKthPositive = function(arr, k) {
     _find(_start, _end);    
     return missingIndex + k
 };
+```
+--------------------------------------------------------------------------------------------------------------------------------
+### 21. Aggressive cow
+
+- sort the array
+- i = 1 to max(array) - min(array)  this denotes the distance b/w cows
+- if for mid we can place all cows we will try to maximise so mid + 1, end
+- else try to reduce -> start, mid- 1
+- at last wherever high is, that is the maximum distance the cows can be placed.
+```javascript
+aggresivecows(n, k, stalls) {
+       stalls.sort((a,b) => a-b);
+       let min = stalls[0], max = stalls[stalls.length - 1];
+       let _start = 1, _end = max - min;
+       // Time complexity is O(n)
+       const canBeplaced = (dist) => {
+           let prev = stalls[0], count = 1;
+           for(var i  = 1; i < stalls.length; i++) {
+               if(stalls[i] - prev >= dist) {
+                   prev = stalls[i];
+                   count++;
+               }
+               if(count == k) {
+                   return true;
+               }
+           }
+           return false;
+       }
+       // time complexity is O(logN)
+       const _find = (start, end) => {
+           if(start > end) return end;
+           let mid  = Math.floor((start + end)/2);
+           if(canBeplaced(mid, k)) {
+               return _find(mid + 1, end);
+           } 
+           else {
+               return _find(start, mid - 1);
+           }
+       }
+       const minDis = _find(_start, _end);
+       return minDis;
+    }
+```
 --------------------------------------------------------------------------------------------------------------------------------

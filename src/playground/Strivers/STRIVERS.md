@@ -539,11 +539,30 @@ var findKthPositive = function(arr, k) {
 --------------------------------------------------------------------------------------------------------------------------------
 ### 21. Aggressive cow
 
-- sort the array
+To find "maximum" of "minimum distances b/w cows"
+
+Step 1: Define the search space - "minimum distances b/w cows"
+- very important thing about these problems is to decie the search space. Here we need to find the maximum of minimum distances b/w cows
+- so our searchspace should hold all the minimum distances between cows?
+- So to find the minimum distances basic idea is the consecutive stalls differences should be the minimum always?
+- so the start we can take as 1, end can be maximum stall position - minimum stall position because any two consecutive stall position diff will always be less than the diff b/w last and first stall right?
+- so, sort the array
 - i = 1 to max(array) - min(array)  this denotes the distance b/w cows
-- if for mid we can place all cows we will try to maximise so mid + 1, end
+
+Step2: To decide when to move left and when to move right 
+- If mid is probable ans, find "maximum" bcz we need maximum ans
+- if for any mid value, we can place all the cows we will try to maximise it because we need maximum answer, so mid + 1, end
 - else try to reduce -> start, mid- 1
 - at last wherever high is, that is the maximum distance the cows can be placed.
+
+Step3: Decide if mid is a probable answer?
+- To decide if for a mid value all cows can be placed or not?
+- Place at least one cow in the stalls[0] (last) and set count = 1
+- Iterate the stalls array and increment count if we get a stall more than or equal to "mid" distance from the last stall where we placed the cow (stalls[0])
+- If we get another stall >= mid distance, this becomes my new "last" stall and place another cow.
+- At any point if cowCount == totalCows return true
+- else return false
+
 ```javascript
 aggresivecows(n, k, stalls) {
        stalls.sort((a,b) => a-b);
@@ -578,4 +597,72 @@ aggresivecows(n, k, stalls) {
        return minDis;
     }
 ```
+--------------------------------------------------------------------------------------------------------------------------------
+### 22. Book Allocation Problem
+
+To find "minimum" of "maximum pages a student can be given"
+
+Step 1: Define the search space - "maximum pages a student can be given"
+- we need to define the searchspace as all possible ans of  "maximum pages a student can be given"
+- what is the lower bound of this searchspace? it is max(arr) isn't it? 
+- If our constraint is anything less than max(arr), how would the maximum page wala book be given to any student?
+- REMEMBER: we can't violate the constraint. And constraint says the value should be the max pages a student can be given.
+- So lower bound is max(arr) and upper bound is summation of all elements in array. why? because even if we give all the books to one student, they won't be given more than sum(all_elements_of_array) pages ever.
+
+Step2: When to go right when to go left
+- We need to minimise our ans so if we find a probable mid answer we go left (start, mid - 1)
+- else we go right (mid + 1, right)
+
+Step3: Logic to find our if mid is a probable ans
+- To decide if for a mid value (contraint of max page which can be given to a student) we can give all students all the books or not?
+- Give the first book to the first student, count = 1, sum = arr[0]
+- Now if we give the next book also to the same student is our constraint breaching? means sum + arr[0] > mid ?
+- If not, give it to same student, don't increment count
+- If it's breaching, set sum = arr[i] and count++ 
+- In the end whatever count we got, if it's less than or equal to total student available, return true; else false
+
+```javascript
+const findPages = (arr, m) => {
+  if(m > arr.length) return -1
+  let maxInArr = -Infinity;
+  for(var i = 0; i< arr.length; i++) {
+    if(arr[i] > maxInArr) {
+      maxInArr = arr[i]
+    }
+  }
+  let min = maxInArr, max = arr.reduce((acc, curr) => acc + curr, 0);
+  let _start = min, _end = max, ans = Infinity, final = []
+  const canBeGivenToAllStudents = (_pages) => {
+      let sum = arr[0], count = 1;
+      for(var i  = 1; i < arr.length; i++) {
+        sum = sum + arr[i];
+        if(sum > _pages) {
+          sum = arr[i]
+          count++;
+        }
+      }
+      if(count <= m) return true;
+      return false;
+  }
+  const _find = (start, end) => {
+      if(start > end) return;
+      let pages  = Math.floor((start + end)/2);
+      if(canBeGivenToAllStudents(pages)) {
+        ans = Math.min(ans, pages);
+        _find(start, pages - 1);
+      }
+      else {
+        _find(pages + 1, end);
+      }
+  }
+   _find(_start, _end);
+  console.log(ans);
+}
+```
+Similar problems: 
+https://leetcode.com/problems/split-array-largest-sum/
+https://www.naukri.com/code360/problems/painter-s-partition-problem_1089557?utm_source=striver&utm_medium=website&utm_campaign=a_zcoursetuf&leftPanelTabValue=SUBMISSION
+
+Always remember the three steps for any BS problem
+
 --------------------------------------------------------------------------------------------------------------------------------

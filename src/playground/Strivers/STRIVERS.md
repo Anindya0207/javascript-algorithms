@@ -782,3 +782,44 @@ var findMedianSortedArrays = function(nums1, nums2) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 24. Kth element of two sorted array
+
+- Same pattern as previous problem but instead of drawing the symetrymid at `(n1 + n2 + 1 )/2` we will have to draw at `k` isn't it?
+- Also, when `l1 <= r2 && l2 <= r1` we will return `Math.max(l1, l2)` since that would be the max elem of the left part which is also the Kth element of the sorted merged array
+- But the catch is here the lower bound and upper bound will not be `(0, n1)`
+- Imagine n1 = 6 and k = 2, can we choose 6 elements from arr1 at max? no. we can choose k elements from arr1 at max. So upper bound is `Math.min(n1, k)`
+- Now Imagine n2 (size of the right arr) = 5 and K = 8, we have chooe minimum 3 elem from arr1 right? so the lower boudn is `Math.max(0, k- n2)`\
+
+```javascript
+kthElement(A,B,n,m,k){ 
+        
+        if(B.length < A.length) {
+            return this.kthElement(B, A, m, n,k);
+        }
+        let min = Math.max(0, k - m);
+        let max = Math.min(k, n);
+        const _find = (start, end) => {
+            if(start > end) return 0;
+            let mid1 = Math.floor((start + end) /2);
+            let mid2 = k - mid1;
+            let l1 = -Infinity, l2 = -Infinity;
+            let r1 = Infinity, r2 = Infinity;
+            if(mid1 < n) r1 = A[mid1];
+            if(mid2 < m) r2 = B[mid2];
+            if(mid1-1 >=0) l1 = A[mid1 - 1];
+            if(mid2-1 >=0) l2 = B[mid2 - 1];
+            
+            if(l1 <= r2 && l2 <= r1) {
+                return Math.max(l1, l2);
+            }
+            else if(l1 > r2) {
+                return _find(start, mid1 - 1);
+            } else {
+                return _find(mid1 + 1, end);
+            }
+        }
+       return _find(min, max);
+    }
+```
+--------------------------------------------------------------------------------------------------------------------------------

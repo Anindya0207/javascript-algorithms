@@ -823,3 +823,35 @@ kthElement(A,B,n,m,k){
     }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 24. Search in a 2D matrix where row are sorted in increasing order and column are also sorted in increasing order
+
+```
+const matrix = [
+    [1, 4, 7, 11, 15],
+    [2, 5, 8, 12, 19],
+    [3, 6, 9, 16, 22],
+    [10, 13, 14, 17, 24],
+    [18, 21, 23, 26, 30]
+];
+```
+
+- One way to do is binary search, just traverse every row and do binary search on the columns since we can't traverse the entire range. O(N logM)
+- Another way is start from matrix[n-1, 0] or matrix[0, m-1] and traverse the matrix.
+- If the current element > target we know we want lesser value, so move row wise
+- If the current elemtn < target we need bigger value to move column wise
+
+```javascript
+var searchMatrix = function(matrix, target) {
+    const n = matrix.length;
+    const m = matrix[0].length;
+    let i = n-1, j = 0
+    while(i >= 0 && j < m) {
+        if(matrix[i][j] == target) return true;
+        if(matrix[i][j] > target) i--;
+        else j++;
+    }
+    return false;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

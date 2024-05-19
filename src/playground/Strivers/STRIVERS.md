@@ -666,3 +666,119 @@ https://www.naukri.com/code360/problems/painter-s-partition-problem_1089557?utm_
 Always remember the three steps for any BS problem
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 23. Median of two sorted array
+
+- We can do it using linear search O(n1 + n2) also but optimal way is binary search
+- Let's say `arr1: [ 1 3 4 7 10 12] arr2: [2 3 6 15]`
+
+Step1: To draw a symetry between two arrays we need the num. of elements that would be there in the left part 
+
+- if there are total even elements in both arrays, we can surely say that n/2 elements will be in left part and right part both
+- if there are odd num of elements let's take n/2 + 1 part in left and n/2 elements on right. e.g. total 5 elements, we can say 3 will be on left and 2 on right?
+- If we notice then the symtery line is being drawn at `(arr1.length + arr2.length + 1) /2` position
+
+```
+symteryMid = (arr1.length + arr2.length + 1) /2
+```
+
+Step2: Figure out the searchspace of binary search
+
+- We will have to figure what are the elements that should be there in the left part of the symtetry line. 
+- This left part will consist of elements from both arr1 and arr2, right?
+- So we need to figure out how many elements will be there from arr1 and how many from arr2
+- So there can be minimum `0` elements from arr1 and maximum `arr1.length` num of elements from arr1
+- So can we say our search space is from `0 to arr1.length`?
+- `IMP: arr1 should have least number of elements. if not, swap arr1 and arr2`
+
+Step3: Figure out the l1, l2 r1, r2
+
+- Now that we are running a loop from `0 to arr1.length`, for any start1 and end1 we will get a mid1
+- mid1 is the number of elements we are picking from arr1
+- so `mid2  = (arr1.length + arr2.length + 1) /2  - mid1` where `mid2` is the number of elements we are picking from arr2
+- then what is the last index of the arr1 that is present in left part of the symtery line? its obvly `arr[mid1 - 1]` we call this `l1`
+- what is the last element of arr2 that is present in left part? it would be `arr[mid2 - 1]` we call this `l2`
+- what is first element of arr1 present in right side of the symtery line? it would be `arr[mid1]` bcz we have picked mid1 elemns from arr1 for the left side right? we call it `r1`
+- and the first elem from arr2 present in right side is `arr[mid2]` we call it `l2`
+
+```
+mid1 = (start1 + end1) / 2
+mid2 = symteryMid - mid1;
+
+if(mid1 - 1 >=0) l1 = arr1[mid1 -1];
+if(mid2- 1 >=0)  l2 = arr2[mid2 -1];
+if(mid1 < arr1.length)  r1 = arr1[mid1];
+if(mid2 < arr2.length)  r2 = arr2[mid2];
+```
+
+Step3: When to go left and when to go right and when to exit
+
+- In typpical binary search we say `if arr[mid] == element` exit `if arr[mid] > element` shift end to mid else shift start to mid, right?
+- here `l1 <= l2` and `r1 <= r2` is always guranteed bcz they are part of same array and sorted, right?
+- So just have to check l1 ith r2 and l2 with r1
+- So if `l1 <= r2 && l2 <= r1` we exit and we calculate median
+- If `l1 > r2` we need to find a smaller number for l1 so we go left in arr1 `find(start1, mid1 - 1);`
+- Else we go right - `find(mid1 + 1, end1);`
+
+```
+if(l1 <= r2 && l2 <= r1) {
+  //calculate median
+}
+else if(l1 > r2) {
+  _find(start1, mid1 -1)
+} else {
+  _find(mid1 + 1, end1)
+}
+```
+
+Step4: Finding the median
+
+- Final step is to determne the median if `l1 <= r2 && l2 <= r1`
+- if it is a even case there will be l1, l2 and r1, r2 in both sides, right? so median should be `(min(l1, l2) + max(r1, r2))/2`
+- if it's a odd case, then  median will be `max(l1, l2)`
+
+```
+if ((arr1.length + arr2.length) % 2 === 1) return Math.max(l1, l2);
+else return (Math.max(l1, l2) + Math.min(r1, r2)) / 2;
+```
+
+```javascript
+var findMedianSortedArrays = function(nums1, nums2) {
+    if(nums2.length < nums1.length) {
+       return findMedianSortedArrays(nums2, nums1);
+    }
+    const n1 = nums1.length;
+    const n2 = nums2.length;
+    const totalLength = n1 + n2;
+    const symetryMid = Math.floor((n1 + n2 + 1)/ 2);
+    const _find = (start, end) => {
+        if(start > end) return 0;
+        let mid1 = Math.floor((start + end)/ 2);
+        let mid2 = symetryMid - mid1;
+        let l1 = -Infinity, l2 = -Infinity;
+        let r1 = Infinity, r2 = Infinity;
+
+        if(mid1 < n1) r1 = nums1[mid1];
+        if(mid2 < n2) r2 = nums2[mid2];
+        if(mid1 - 1 >= 0) l1 = nums1[mid1 - 1];
+        if(mid2 - 1>= 0) l2 = nums2[mid2 - 1];
+
+        if(l1 <= r2 && l2 <= r1) {
+            if(totalLength % 2 == 0) {
+                return ((Math.max(l1, l2) + Math.min(r1, r2)) / 2);
+            }
+            else {
+                return Math.max(l1, l2);
+            }
+        }
+        else if(l1 > r2) {
+            return _find(start, mid1 -1);
+        }
+        else {
+            return _find(mid1+1, end);
+        }
+    };
+    return _find(0, n1);
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

@@ -855,3 +855,84 @@ var searchMatrix = function(matrix, target) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+### 25. Find the median in a 2D matrix where rows are sorted
+
+```
+[
+[1, 3, 5], 
+[2, 6, 9], 
+[3, 6, 9]
+];
+```
+Step1: Find the min and max of the matrix
+
+- Iterate the first column to find min, and last column to find max
+
+Step2: Apply binary search between min and max
+
+- Now that we know the search space apply BS betweem min and max
+- Now for a element to be median there should be at least `(row * col) / 2` elements to the left of it?
+- So our condition to go left or right in BS will be based on that
+- If for a element the `number of elements lower or equal to that element` <= `(row * col) / 2` try more so go right. (mid + 1, end)
+- else go left (start, mid - 1)
+- `Finally when start > end start is my answer`
+
+Step3: Determine how many elements before a certain element in the matrix
+
+- Iterate each row and do BS on the given row for the element
+- Say, mid of the row is > the element, we need to check lesser in that row because we want such element which would be <= the element
+- So if matrix[row][mid] > element go left
+- else go right and store the index
+- finally the total number would be total += index + 1 because that many numbers are more than element
+
+```javascript
+const median = (matrix, R, C) => {
+    let min = Infinity, max = -Infinity, midCount = Math.floor((R * C) / 2)
+    for(var row =0; row< R; row++) {
+        if(matrix[row][0] < min) {
+            min = matrix[row][0];
+        }
+        if(matrix[row][C-1] > max) {
+            max = matrix[row][C-1];
+        }
+    }
+    const _start = min, _end = max;
+    let ans = Infinity;
+    const countElementsLowerThan = (element) => {
+        let total = 0, currentIndex = -1
+        const _findUpperBound = (row, start, end) => {
+            if(start> end) return currentIndex;
+            let mid = Math.floor((start + end) /2);
+            if(matrix[row][mid] > element) {
+                _findUpperBound(row, start, mid - 1);
+            } else {
+                currentIndex = mid;
+                _findUpperBound(row, mid + 1, end);
+            }
+        };
+        for(var i = 0; i < R; i++) {
+            currentIndex = -1
+            _findUpperBound(i, 0, C-1);
+            total += currentIndex + 1;
+        }
+        return total;
+    };
+    const _findMedian = (start, end) => {
+        if(start > end) {
+            ans = start;
+            return;
+        }
+        let mid = Math.floor((start + end) /2);
+        const _sm = countElementsLowerThan(mid);
+        if(_sm <= midCount) {
+            _findMedian(mid + 1, end);
+        } else {
+            _findMedian(start, mid-1);
+        }
+    };
+    _findMedian(_start, _end);
+    console.log(ans);
+}
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

@@ -936,3 +936,65 @@ const median = (matrix, R, C) => {
 
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 26. Revert a LL (recursive)
+
+We know how to reverse a LL in iterative approach
+
+```
+const next = pivot.next;
+pivot.next = previous;
+previous = pivot;
+pivot = next;
+```
+To reverse it in recursive approach :
+- we need to call the recursive function with pivot and pivot.next f(_prev, _pivot)
+- keep calling it till _pivot becomes null. when _pivot is null set head at _prev and return _prev
+- Whatever we return from the recursive function, we need to set the next of that node as current _prev
+- But we need to make sure to make _prev.next = null to avoid cycle in list
+
+```javascript
+var reverseList = function(head) {
+    const _reverse = (previous, pivot) => {
+        if(!pivot) {
+            head = previous;
+            return previous;
+        }
+        const retNode = _reverse(pivot, pivot.next);
+        if(previous) previous.next = null;
+        retNode.next = previous;
+        return retNode.next;
+    }
+    _reverse(null, head);
+    return head;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 27. Detect begining of a LL cycle
+
+- Idea is to start a slow and fast pointer
+- When they meet, we will reset the slow pointer to head and now slow and fast pointer will move in same pace
+- when they meet again is the begining of the cycle
+
+```javascript
+var detectCycle = function(head) {
+    if(!head || !head.next) return null;
+    let slow = head, fast = head;
+    while(slow  && fast && slow.next && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if(slow == fast) {
+            break;
+        }
+    }
+    if(slow != fast) return null;
+    slow = head;
+    while(slow != fast) {
+        slow = slow.next;
+        fast = fast.next;
+    }
+    return slow;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

@@ -82,6 +82,7 @@ A[i] = B[(i+k)%A.length]
 - arr[low….mid-1] contains 1.
 - arr[high+1….n-1] contains 2. [Extreme right part], n = size of the array
 - The middle part i.e. arr[mid….high] is the unsorted segment. 
+- The loop will run till mid <= high
 
 ```
 There can be three different values of mid pointer i.e. arr[mid]
@@ -937,7 +938,7 @@ const median = (matrix, R, C) => {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 26. Revert a LL (recursive)
+### 26. Reverse a LL (recursive)
 
 We know how to reverse a LL in iterative approach
 
@@ -995,6 +996,68 @@ var detectCycle = function(head) {
         fast = fast.next;
     }
     return slow;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 28. Find middle of LL (First middle and second middle)
+
+- We will use slow and fast pointer
+- When fast pointer reaches end, slow pointer will be on middle. In this case, we initialise slow = fast = head
+- But, if LL length is even, slow will be mid + 1 th position
+- To find the first middle we initialise slow = head, fast = head.next;
+
+```javascript
+const _findMid = (start) => {
+    let slow = start, fast = start.next;
+    while(fast && fast.next) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    return slow;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 29. Copy list with random pointer
+
+We need to deep copy a LL with a next and a random pointer. challenge is while copying we can't link the random pointers because those nodes might be created as well
+
+Approach1: Hashmap
+
+- Traverse the original LL, keep creating the copy LL nodes and remember the oldnode to new node map in a hashmap
+- After the new LL is created, iterate the original LL again and for randoms, just do map(oldnode.random) 
+
+Approach2: O(1) Approach
+- instead of hashmap store the new nodes in middle of the old nodes such that newNode = oldNode.next
+- Iterate the old LL and assign the random pointers as in for any copyNode (pivot.next) copyNode.random will be pivot.random.next;
+- Now link the new nodes to create the new LL by setting the next properly. 
+
+```javascript
+var copyRandomList = function(head) {
+    let pivot = head; newList = new Node(-1), newNodeP = newList;
+    while(pivot) {
+        const newNode = new Node(pivot.val, null, null);
+        let next = pivot.next;
+        pivot.next = newNode;
+        newNode.next = next;
+        pivot = next;
+    }
+    pivot = head;
+    while(pivot) {
+       let _random = pivot.random;
+       let copyNode = pivot.next;
+       copyNode.random = _random?.next;
+       pivot = pivot.next.next;
+    }
+    pivot = head;
+    while(pivot) {
+        newNodeP.next = pivot.next;
+        pivot.next = pivot.next.next;
+        pivot = pivot.next;
+        newNodeP = newNodeP.next;
+    }
+    return newList.next;
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

@@ -1061,3 +1061,74 @@ var copyRandomList = function(head) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+### 30. Pow(x, n)
+
+- We can do with simple recursion like n * f(n - 1) but for a long n it will give max call stack exceeded
+- So we will take a different approach
+- If n is even we can say x ^ n  = (x * x) ^ n/2 right?
+- similarly if n is odd can we say x ^ n = x * (x ^ n-1)?
+- So if we apply that in recursion we will have to return 1 if n == 0
+- if n is even return func(x * x, n/2) 
+- If n is off return func(x * n -1);
+
+```javascript
+var myPow = function(x, n) {
+    let n1 = n < 0 ? -1 * n : n;
+    const _calc = (_x, _n) => {
+        if(_n == 0) return 1;
+        let temp = _calc(_x, Math.floor(_n/2));
+        if(_n % 2 != 0) {
+           return _x * temp * temp;
+        } else {
+           return temp * temp
+        }
+    }
+    const jjj = _calc(x, n1);
+    return n > 0 ? jjj : 1/jjj
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+### 31. Count number of subsequence / unique subsequence
+
+- We know how to calculate all the possible subsequence of an array or string using "take/ notake" technique. It takes O(2^n) TC
+- but if we need to count the number of subseq do we need to calculate all the subseq? No, we don't
+
+Calculate count of subsequences for an array or string
+- We take a dp[] (1- indexed) and initialise `dp = [1]`
+- Iterate array/string from 1 to LEN 
+- For every element we do `dp[i] = 2 * dp[i-1]`
+- finally the total number of subsequence will be `dp[LEN]` or `dp[i-1]` (i will exit from loop as LEN+1)
+
+Now what if we need to find count of distinct subsequnce?
+- In addition to the above dp calculation we need to store the index of every element in a map (1-index) like `map[el] = i`
+- If we encounter the same element again in the sequence, then we subtract the `dp[i]` with `dp[map[el] -1]` -> `dp[i] -= dp[map[el] -1]`
+
+```javascript
+var betterString = function(str1, str2) {
+    let map = {}, count1 = 0 , count2 = 0, dp = [1];
+    for(var i = 1; i <= str1.length; i++)  {
+        dp[i] = 2* dp[i-1];
+        if(map[str1.charAt(i-1)]) {
+            dp[i] -= dp[map[str1.charAt(i-1)] -1];
+        }
+        map[str1.charAt(i-1)] = i;
+    }
+    count1 = dp[i-1] // 7
+    map = {}, dp =[1];
+    for(var i = 1; i <= str2.length; i++)  {
+        dp[i] = 2* dp[i-1];
+        if(map[str2.charAt(i-1)]) {
+            dp[i] -= dp[map[str2.charAt(i-1)] -1];
+        }
+        map[str2.charAt(i-1)] = i;
+    } 
+    count2 = dp[i-1] // 4
+   if(count1 >= count2) return str1;
+   return str2
+};
+
+betterString('gfg', 'ggg');
+```
+https://www.geeksforgeeks.org/problems/better-string/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=better-string
+
+--------------------------------------------------------------------------------------------------------------------------------

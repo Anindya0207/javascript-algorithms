@@ -1,55 +1,24 @@
-const median = (matrix, R, C) => {
-    let min = Infinity, max = -Infinity, midCount = Math.floor((R * C) / 2)
-    for(var row =0; row< R; row++) {
-        if(matrix[row][0] < min) {
-            min = matrix[row][0];
+var betterString = function(str1, str2) {
+    let map = {}, count1 = 0 , count2 = 0, dp = [1];
+    for(var i = 1; i <= str1.length; i++)  {
+        dp[i] = 2* dp[i-1];
+        if(map[str1.charAt(i-1)]) {
+            dp[i] -= dp[map[str1.charAt(i-1)] -1];
         }
-        if(matrix[row][C-1] > max) {
-            max = matrix[row][C-1];
-        }
+        map[str1.charAt(i-1)] = i;
     }
-    const _start = min, _end = max;
-    let ans = Infinity;
-    const countElementsLowerThan = (element) => {
-        let total = 0, currentIndex = -1
-        const _findUpperBound = (row, start, end) => {
-            if(start> end) return currentIndex;
-            let mid = Math.floor((start + end) /2);
-            if(matrix[row][mid] > element) {
-                _findUpperBound(row, start, mid - 1);
-            } else {
-                currentIndex = mid;
-                _findUpperBound(row, mid + 1, end);
-            }
-        };
-        for(var i = 0; i < R; i++) {
-            currentIndex = -1
-            _findUpperBound(i, 0, C-1);
-            total += currentIndex + 1;
+    count1 = dp[i-1]
+    map = {}, dp =[1];
+    for(var i = 1; i <= str2.length; i++)  {
+        dp[i] = 2* dp[i-1];
+        if(map[str2.charAt(i-1)]) {
+            dp[i] -= dp[map[str2.charAt(i-1)] -1];
         }
-        return total;
-    };
-    const _findMedian = (start, end) => {
-        if(start > end) {
-            ans = start;
-            return;
-        }
-        let mid = Math.floor((start + end) /2);
-        const _sm = countElementsLowerThan(mid);
-        if(_sm <= midCount) {
-            _findMedian(mid + 1, end);
-        } else {
-            _findMedian(start, mid-1);
-        }
-    };
-    _findMedian(_start, _end);
-    console.log(ans);
-}
+        map[str2.charAt(i-1)] = i;
+    } 
+    count2 = dp[i-1]
+   if(count1 >= count2) return str1;
+   return str2
+};
 
-const matrix = [
-[1, 3, 5], 
-[2, 6, 9], 
-[3, 6, 9]
-];
-const R = 3, C = 3
-median(matrix, R, C)
+betterString('gfg', 'ggg');

@@ -68,7 +68,7 @@ A[i] = B[(i+k)%A.length]
       if(map[sum - k] != undefined) {
         maxC = maxC + map[sum - k]
       }
-      if(map[sum] == undefined) map[sum] = i;
+      map[sum] = (map[sum] || 0) + 1;
     }
     console.log(maxLen)
   }
@@ -1131,4 +1131,82 @@ betterString('gfg', 'ggg');
 ```
 https://www.geeksforgeeks.org/problems/better-string/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=better-string
 
+--------------------------------------------------------------------------------------------------------------------------------
+### 32. Subset with Sum K (Finding existence, Count, Print all subset)
+
+Approach 1: 
+- We can use our plain take/notake technique for recursion to find all subset with sum K but it will give TLE bcz O(2^N)
+
+Approach 2: DP
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 33. Combination Sum I/ II
+
+Combination Sum I: to find all combinations (with infinity repeatation of one number) to make target
+Input: candidates = [2,3,6,7], target = 7
+Output: [[2,2,3],[7]]
+
+- We will use our plain take/notake technique for recursion
+- Only difference is, we will take an element but won't go to next element until the accumulated sum exceed target
+
+```javascript
+var combinationSum = function(candidates, target) {
+    let final = [];
+    const _calc = (index, arr, sum) => {
+        if(index >= candidates.length) {
+            if(sum == target) final.push(arr);
+            return;
+        }
+        _calc(index + 1, arr, sum);
+        if(sum + candidates[index] <= target) {
+            // calling method with same index and appending same number
+            _calc(index ,[...arr, candidates[index]], sum + candidates[index]);
+        }
+    };
+    _calc(0,[], 0);
+    return final
+};
+```
+
+Combination Sum II: to find all "unique" combinations from a duplicate array
+Input: [1,1,1,2,2] Output: [[1,1,2], [2,2]]
+
+- We can do this using take no take method and a hashset to check uniqueness but that will take O(2^N * k * logN)
+2^ N is for the recursions, k is for putting it in a datastucture (...arr, el) and extra logN because we will be taking a extra set to put the temp arr. This will give TLE for some cases.
+- To optimise we need to think of completely different solution
+
+Optimised approach 
+- Sort the array
+- We need to iterate over the array for any given index and call the recursive method for the non duplicate elements.
+- e.g lets say we call the recursive method with index 0, so i will be like 0 to n and it will call the next recursive call for i = 0 and i = 3 
+- for i= 0 the call will be with `i+1, [...arr, candidates[0]], sum + candidates[0]` and likewise
+- so our for loop will be like if `i > index && candidates[i] != candidates[i-1]` we just `i++` else we call the function again and do `i++`
+
+```javascript
+var combinationSum2 = function(candidates, target) {
+    let final = [];
+    candidates.sort((a, b) => a-b);
+    const _calc = (index, arr, sum) => {
+        if(sum == target) {
+            final.push(arr);
+            return;
+        }
+        let i = index;
+        while(i < candidates.length) {
+            if(i != index && candidates[i] == candidates[i-1]) {
+                i++;
+            } else {
+                if(sum + candidates[i] <= target) {
+                    _calc(i+1, [...arr, candidates[i]], sum + candidates[i]);
+                }
+                i++;
+            }
+        }
+    }
+    _calc(0, [], 0);
+    return final;
+}
+```
 --------------------------------------------------------------------------------------------------------------------------------

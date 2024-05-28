@@ -1142,7 +1142,7 @@ Approach 2: DP
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 33. Combination Sum I/ II
+### 33. Combination Sum I/ II OR Finding All Unique Subset 
 
 Combination Sum I: to find all combinations (with infinity repeatation of one number) to make target
 Input: candidates = [2,3,6,7], target = 7
@@ -1206,6 +1206,45 @@ var combinationSum2 = function(candidates, target) {
         }
     }
     _calc(0, [], 0);
+    return final;
+}
+```
+Similar problem https://leetcode.com/problems/subsets-ii/submissions/1269250768/
+- When we iterate in the for loop it will make sure it doesn't call the recursive method with a duplicate element
+- So, Push the arr everytime the recursive method is fired. It will give all unique subsets
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 34. Palindrome Partitioning
+
+TO output all valid palindrom paritions of a given str. E.g: for  "aab" -> [["a","a","b"],["aa","b"]]
+
+- We need to iterate over the string and whenever we will encounter a palindrom, we will put a partition over there and interate over the next part of the array till we find another valid palindrome.
+- Let's say we start with "a" which is a valid palindrome (*Remember), so put "a" in a temp array and call the recursion with "ab"
+- iterate over "ab" and see where we can put a parition, we can put after "a" so put "a" in the temp array again and call for "b"
+- once we reach index >= s.length put the temp array in final . so we got a combination "a", "a", "b"
+- Now remember the first loop (refer *Remember), it will go to next index and find "aa" also a valid palidrome. so it will call the recursion with "b" putting "aa" in a temp array. 
+- since "b" is also a valid palindrome and we reached end it will put "aa", "b" in the temp array
+- So finally we got two arrays in our final array => [["a","a","b"],["aa","b"]]
+
+```javascript
+const checkPalindrom = (str) => {
+    return str == str.split('').reverse().join('');
+}
+const partition = (str) => {
+    let final = [];
+    const _calc = (index, arr) => {
+        if(index >= str.length) {
+            final.push(arr);
+            return;
+        }
+        for(var i = index; i < str.length; i++) {
+            const left = str.substring(index, i + 1);
+            if(checkPalindrom(left)) {
+                _calc(i + 1, [...arr, left]);
+            }
+        }
+    }
+    _calc(0, [])
     return final;
 }
 ```

@@ -1,51 +1,72 @@
-var exist = function(board, word) {
-    let final = true, map = {}, current = false;
-    const _calc = (i, j, index) => {
-        if(index == word.length) {
-            return true
+var solveSudoku = function(board) {
+    const canBePlaced = (rowIndex, colIndex, num) => {
+        // check for the column
+        for(var i = 0; i < 9; i++) {
+            if(board[rowIndex][i] == num) {
+                return false;
+            }
         }
-        const target = word.charAt(index);
-        if(board[i+1] && board[i+1][j] == target && !map[`${i+1}${j}`]) {
-            map[`${i+1}${j}`] = true;
-            const res1 = _calc(i+1, j, index+1);
-            current = current || res1;
-            if(!res1)  map[`${i+1}${j}`] = false;
+        //check for the row
+        for(var i  = 0; i < 9; i++) {
+            if(board[i][colIndex] == num) {
+                return false;
+            }
         }
-        if(board[i-1] && board[i-1][j] == target && !map[`${i-1}${j}`]) {
-            map[`${i-1}${j}`] = true;
-            const res2 = _calc(i-1, j, index+1);
-            current = current || res2;
-            if(!res2) map[`${i-1}${j}`] = false;
+        //check for sub boxes
+        let rowsToCheck = [];
+        let colsToCheck = [];
+        if((rowIndex + 1)% 3 == 0) {
+            rowsToCheck = [rowIndex, rowIndex - 1, rowIndex - 2]
+        } else if((rowIndex + 1)% 3 == 1) {
+            rowsToCheck = [rowIndex, rowIndex + 1, rowIndex +2];
+        } else if((rowIndex + 1)% 3 == 2) {
+            rowsToCheck = [rowIndex, rowIndex - 1, rowIndex +1];
         }
-        if(board[i][j+1] == target && !map[`${i}${j+1}`]) {
-            map[`${i}${j+1}`] = true;
-            const res3 = _calc(i, j+1, index+1);
-            current = current || res3
-            if(!res3)  map[`${i}${j+1}`] = false;
+        if((colIndex + 1)% 3 == 0) {
+            colsToCheck = [colIndex, colIndex - 1, colIndex - 2]
+        } else if((colIndex + 1)% 3 == 1) {
+            colsToCheck = [colIndex, colIndex + 1, colIndex +2];
+        } else if((colIndex + 1)% 3 == 2) {
+            colsToCheck = [colIndex, colIndex - 1, colIndex +1];
         }
-        if(board[i][j-1] == target && !map[`${i}${j-1}`]) {
-            map[`${i}${j-1}`] = true;
-            const res4 = _calc(i, j-1, index+1);
-            current = current || res4
-            if(!res4)  map[`${i}${j-1}`] = false;
-        }
-       return current 
-    }
-    for(var i = 0; i< board.length; i++) {
-        for(var j = 0; j < board[i].length; j++) {
-            if(board[i][j] == word.charAt(0)) {
-                map = {}, current = false;
-                map[`${i}${j}`] = true;
-                final = _calc(i, j, 1);
-                if(final) {
-                    console.log(true); return;
+
+        for(var p = 0; p < rowsToCheck.length; p++) {
+            for(var q = 0; q < colsToCheck.length; q++) {
+                if(board[rowsToCheck[p]][colsToCheck[q]] == num) {
+                    return false
                 }
             }
         }
+        return true;
     }
-    console.log(false)
-};
+    const _calc = (rowIndex, colIndex) => {
+        if(rowIndex >= 9) return true;
+        if(board[rowIndex][colIndex] != '.') {
+            if(colIndex < 9) {
+                return _calc(rowIndex, colIndex + 1)
+            } else {
+                return _calc(rowIndex + 1, 0);
+            }
+        }
+        for (var num = 1; num <= 9; num++) {
+            if(!canBePlaced(rowIndex, colIndex, num)) continue;
+            board[rowIndex][colIndex] = `${num}`;
+            if(colIndex < 9) {
+                if(_calc(rowIndex, colIndex + 1)) {
+                    return true;
+                }
+            } else {
+                if(_calc(rowIndex + 1, 0)) {
+                    return true;
+                }
+            }
+            board[rowIndex][colIndex] = '.';
+        }
+        return false;
+    };
+    _calc(0, 0);
+    console.log(board)
+}
 
-exist([["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], "ABCD")
-// exist([["C","A","A"],["A","A","A"],["B","C","D"]], "AAB")
-// exist([["A","B","C","E"],["S","F","E","S"],["A","D","E","E"]], 'ABCESEEEFS')
+const board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]
+solveSudoku(board)

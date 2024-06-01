@@ -1249,3 +1249,42 @@ const partition = (str) => {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+### 35. M coloring problem
+
+To detect if M colors can be applied to color all verticer of a undirected graph such that no adjacent vertices have same color
+
+- We can iterate over the colors and we need to check if for any rowIndex we can assign any color or not
+- We initiate the recursion with row 0
+- We recrisvely call for row 1 onwards and expect a true/false value if any color could be applied or not
+- We have to assign a color before traversing to another row, if it's assigned return true, otherwise de-assign the color
+
+```javascript
+ graphColoring(graph, m, n) {
+    let map = {};
+    const canAssignColor = (rowIndex, color) => {
+        for(var col = 0; col < n; col++) {
+            const el=graph[rowIndex][col];
+            if(el && map[col] == color){
+                return false;
+            }
+        }
+        return true;
+    }
+    const _calc = (index) => {
+        if(index >= n) return true;
+        for(var i = 1; i <= m; i++) {
+            if(canAssignColor(index, i)) {
+                map[index] = i;
+                if(_calc(index+1)){
+                    return true;
+                }
+                delete map[index];
+            }
+        }
+        return false;
+    }
+    return _calc(0) ? 1: 0
+}
+```
+similar pattern :https://leetcode.com/problems/sudoku-solver/description/
+--------------------------------------------------------------------------------------------------------------------------------

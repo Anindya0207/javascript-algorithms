@@ -1287,4 +1287,50 @@ To detect if M colors can be applied to color all verticer of a undirected graph
 }
 ```
 similar pattern :https://leetcode.com/problems/sudoku-solver/description/
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 36. Expression Add Operators
+
+Given a string of numbers we need to find out all possible comb with +, - and * such that the expression evals to target
+num = "123", target = 6, -> ["1*2*3","1+2+3"]
+num = "105", target = 5 -> ["10+5", "1*0+5"]
+
+- Since we need to find all possible combinations we can run a loop from 0 to end and for every substr of the actual string, we can do the + , -, * operations
+- for every operation we can call the same recursive function like we were doing for combination sum 2 or palindrome partition
+- We need to call the reursion with index, calculated string, currentEvalutaed value and prev, why?
+- Because when we do + or - we can simply do so with the last evaluated value but not for *
+- For * we need to do `evaluatedval - prev + (prev * curentVal)`. let's say we had 1+2 so far now we need to do *3
+- so we need to actually do `1+2 -2 + (2*3)`
+- lets say we had 1-2 so far now we need to do * 3 so actually we need to do `1 - 2 -(-2) + (-2 * 3)`
+- to remove leading zero we need to do `if(i > index && num.charAt(index) == '0') break;`
+
+```javascript
+var addOperators = function(num, target) {
+    let final = [];
+    const _calc = (index, str, curr, prev) => {
+       if(index >= num.length) {
+        if(curr == target) {
+            final.push(str);
+            return;
+        }
+       }
+       for(var i = index; i < num.length; i++) {
+        if(i > index && num.charAt(index) == '0') break;
+        const substr = num.substring(index, i+1);
+        const currVal = Number(substr);
+        if(index == 0) {
+            _calc(i+1, substr, currVal, currVal);
+        } else {
+            _calc(i+1, `${str}+${substr}`, curr+currVal, currVal);
+            _calc(i+1, `${str}-${substr}`, curr-currVal, -currVal);
+            _calc(i+1, `${str}*${substr}`, curr-prev+(prev*currVal), (prev*currVal));
+        }
+       }
+    }
+    _calc(0, ``, 0, 0);
+    console.log(final)
+};
+addOperators("105", 5); 
+```
 --------------------------------------------------------------------------------------------------------------------------------

@@ -326,7 +326,6 @@ Approach 2: Gap method which is derived from shell sort
 --------------------------------------------------------------------------------------------------------------------------------
 ### 13. Bit Manipulation Main formulas
 
-```
 - 2 ^ i = 1 << i
 - to find setbit at i => num & (1 << i) == 1
 - to set bit at i => num = num | (1 << i)
@@ -336,6 +335,20 @@ Approach 2: Gap method which is derived from shell sort
 - n * ( a1 ^ a2 ^ a3) = (n * a1) ^ (n * a2) ^ (n * a3)
 - for Sum of XORs in a array sum = sum + (2 ^ i) * (setcount * unsetcount)
 - (a1 & a3) ^ (a1 & a4) ^ (a2 & a3) ^ (a2 & a4 )= (a1 & (a3 ^ a4)) ^ (a2 & (a3 ^ a4))
+- the formula to find xor of n natural numbers is - 
+```javascript
+findXorOfNNaturalNum(n) {
+    switch(n%4) {
+        case 0:
+            return n;
+        case 1:
+            return 1;
+        case 2:
+            return n+1;
+        case 3: 
+            return 0;
+    }
+}
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 ### 14. Missing and repeating numbers
@@ -1391,4 +1404,98 @@ var divide = function(dividend, divisor) {
 };
 ```
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 39. Unique prime factors of a number
+
+- There are 4 different approaches
+- Noob approach is to iterate from 1 to N and see if any number is a divisor, check if it's prime. TC - O(N * sqrt(N))
+- Better approach is to iterate from 1 to sqrt(N) and see if any number i is a divisor and is prime, push that number and also check if N / i is also a prime? then push that too. TC- O(sqrt(N) * 2 * sqrt(N))
+- Senior approach is to iterate from 2 to N, divide N by 2 and push it and keep doing it until its no more divisable by 2. Thus it will be never divisable by 4, then do with 3. TC- O(N) worst case because for a large number which is prime, it will still run till N
+- Pro approach is to iterate from 2 to sqrt(N), do whatever we are doing above and finally push N also in final (if N != 1). TC - O(sqrt(N) * log(N))
+
+```javascript
+const isPrime = (n) => {
+    if(n == 1) return false;
+    for(var i= 2; i <= Math.sqrt(n); i++){
+        if(n % i == 0) return false;
+    }
+    return true;
+}
+// Noob developer O(N*sqrt(N))
+const allPrimeFactors1 = (n) => {
+    let final = []
+    for(var i = 1; i <= n; i++) {
+        if(n%i == 0 && isPrime(i)) {
+            final.push(i);
+        }
+    }
+    return final
+}
+// Junior developer O(sqrt(N) * 2 * sqrt(N))
+const allPrimeFactors2 = (n) => {
+    let final = []
+    for(var i = 1; i <= Math.sqrt(n); i++) {
+        if(n%i == 0) {
+            if(isPrime(i)) final.push(i);
+            if(isPrime(n/i) && n/i != i) {
+                final.push(n/i);
+            }
+        }
+    }
+    return final
+}
+// senior developer O(N) because worst case for a large number which is prime, it will run till N
+const allPrimeFactors3 = (n) => {
+    let final = []
+    for(var i = 2; i <= n; i++) {
+        if(n%i == 0) {
+            final.push(i);
+            while(n %i == 0) {
+                n = n / i;
+            }
+        }
+    }
+    return final
+}
+// Kickass developer O(sqrt(N) * logN)
+const allPrimeFactors4 = (n) => {
+    let final = []
+    for(var i = 2; i <= Math.sqrt(n); i++) {
+        if(n%i == 0) {
+            final.push(i);
+            while(n %i == 0) {
+                n = n / i;
+            }
+        }
+    }
+    if(n != 1) final.push(n);
+    return final
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 40. Sieve of Eratosthenes
+
+To find if a number N is prime in O(1)
+
+- Idea is to create an array of N + 1 length and fill with 1
+- Iterate from 2 to sqrt(N) 
+- for each number iterate an inner loop of j which will run from i ^ 2 till N and mark all of the arr[j] as 0
+- Finally we will only end up with an array with primes marked as 1.
+- Now to get if a number is prime we can just do arr[num]
+
+```javascript
+
+// pre-computation
+const primeArray = new Array(limit + 1).fill(true);
+primeArray[0] = primaryArray[1] = false;
+for(var i = 2; i <= Math.sqrt(limit); i++) {
+    for(var j = i*i; j<= limit; j+=i) {
+        primeArray[j] = false
+    }
+}
+
+const isPrime = (num) => primeArray[num];
+```
 --------------------------------------------------------------------------------------------------------------------------------

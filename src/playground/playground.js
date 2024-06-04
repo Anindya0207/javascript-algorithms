@@ -1,18 +1,17 @@
-const bitManipulation = (n) =>  {
-    // for(var i = 0; i<32; i++) {
-    //     if(n < 1<<i) break
-    //     if(!(n & 1 << i)) {
-    //         console.log(n | 1 << i);return
-    //     }
-    // }
-    // console.log(n);
-    let i = 0, n1 = n;
-    while(n) {
-        if(!(n & 1)) return n1 | 1 << i;
-        i++;
-        n = n >> 1;
+
+
+var countPrimes = function(n) {
+    let prime = new Array(n + 1).fill(1);
+    let count = 0;
+    for(var i = 2; i <= Math.sqrt(n); i++) {
+        for(var j = i*i; j <= n; j+=i) {
+            prime[j] = 0;
+        }
     }
-    return n1
+    for(var i = 2; i <= n; i++) {
+        if(prime[i] == 1) count++;
+    }
+    return  count;
 }
 
-console.log(bitManipulation(5))
+console.log(countPrimes(2))

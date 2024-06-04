@@ -379,7 +379,7 @@ for 2, 4, 1, 3, 5 -> it is 3. [4,1] [2,1] [4,3]
 
 Other way to do is using merge sort - 
 - Do Normal merge sort and while merging two arrays arr1 and arr2 take two pointers i and j  = 0 
-- increment i and j such that if arr1[i] > arr2[j] count = count + arr.length - arr1[i] and j++ else i++
+- increment i and j such that if arr1[i] > arr2[j] count = count + arr.length - i and j++ else i++
 - Means if for a ith elemnt in arr1 if it's more than jth elemtn of arr2 that arr2[j] can be formed a pair with all the elements after i in arr1
 - so count of pairs will increase by arr.length - i
 - again check for j++ element till any ith element in arr1 beomes less than arr2[j]
@@ -1333,4 +1333,62 @@ var addOperators = function(num, target) {
 };
 addOperators("105", 5); 
 ```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 37. Just for fun - Swap two numbers
+
+```javascript
+    // method 1
+    b = a - b;
+    a = a - b;
+    b = a + b;
+    return [a,b]
+
+    // method 2
+    return [b, a]
+
+    // method 3
+    b = a * b;
+    a = b / a;
+    b = b / a;
+    return [a,b]
+    
+    // method 4
+    b = a ^ b;
+    a = a ^ b;
+    b = a ^ b;
+    return [a,b]
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 38. Divide two integers without dividing them
+
+- behat hi bekar ka problem hai. Agr interview me puche toh pehle do gaali dena man me
+- thought process is we need to subtract `divisor * 2^i` from `dividend` where i should be as large as possible
+- Means if we are dividing 22 by 3. we can subtract 3 * 2^2 at max from 22, let's do that. 22-12 = 10
+- Now we can subtract 3*2^1 at max from 10. 10-6 = 4
+- Now we can subtract 3*2^0 from 4. 4-3= 1
+- We can't subtract any more. so ans = 2^2 + 2^1 + 2^0 = 7
+
+```javascript
+var divide = function(dividend, divisor) {
+    if(dividend == divisor) return 1;
+    let signed = false;
+    if((dividend >0 && divisor < 0) || (dividend < 0 && divisor > 0)) signed = true;
+    let a = Math.abs(dividend), b = Math.abs(divisor), ans = 0;
+    while(a >= b) {
+        let count = 0;
+        // This is very important to start with count+1
+        while(a >= (b << (count + 1))) {
+            count++;
+        }
+        ans += 1 << count;
+        a = a - (b << count); 
+    }
+    if(ans == 1<<31 && signed) return -(1<<31)
+    if(ans == 1<<31 && !signed) return (1<<31) - 1;
+    return signed ? -ans : ans
+};
+```
+
 --------------------------------------------------------------------------------------------------------------------------------

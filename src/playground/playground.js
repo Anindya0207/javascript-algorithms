@@ -1,26 +1,18 @@
-var addOperators = function(num, target) {
-    let final = [];
-    const _calc = (index, str, curr, prev) => {
-       if(index >= num.length) {
-        if(curr == target) {
-            final.push(str);
-            return;
-        }
-       }
-       for(var i = index; i < num.length; i++) {
-        if(i > index && num.charAt(index) == '0') break;
-        const substr = num.substring(index, i+1);
-        const currVal = Number(substr);
-        if(index == 0) {
-            _calc(i+1, substr, currVal, currVal);
-        } else {
-            _calc(i+1, `${str}+${substr}`, curr+currVal, currVal);
-            _calc(i+1, `${str}-${substr}`, curr-currVal, -currVal);
-            _calc(i+1, `${str}*${substr}`, curr-prev+(prev*currVal), (prev*currVal));
-        }
-       }
+const bitManipulation = (n) =>  {
+    // for(var i = 0; i<32; i++) {
+    //     if(n < 1<<i) break
+    //     if(!(n & 1 << i)) {
+    //         console.log(n | 1 << i);return
+    //     }
+    // }
+    // console.log(n);
+    let i = 0, n1 = n;
+    while(n) {
+        if(!(n & 1)) return n1 | 1 << i;
+        i++;
+        n = n >> 1;
     }
-    _calc(0, ``, 0, 0);
-    console.log(final)
-};
-addOperators("105", 5); 
+    return n1
+}
+
+console.log(bitManipulation(5))

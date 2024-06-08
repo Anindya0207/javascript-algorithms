@@ -1499,3 +1499,96 @@ for(var i = 2; i <= Math.sqrt(limit); i++) {
 const isPrime = (num) => primeArray[num];
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 41. Min stack
+
+We need to implement a MinStack class where push(), pop(), top() and getMin() all should take TC - O(1)
+
+Approach 1: TC- O(1) SC - O(2N)
+
+- Instead of pushing a single value to the stach push [val_to_be_pushed, current_min]
+- If again pushing, just check with the arr[top][1] value if val_to_be_pushed <  arr[top][1] then push [val_to_be_pushed, val_to_be_pushed] else push [val_to_be_pushed, arr[top][1]]. idea is the top most element of the stack should hold the minimum always
+- at the time of pop just pop the top most element[0], no tension
+- getMin also return top most element[1], no tension
+
+```javascript
+var MinStack = function() {
+    this.head = -1;
+    this.arr = [];
+};
+
+MinStack.prototype.push = function(val) {
+    if(this.head == -1) {
+        this.arr[++this.head] = [val, val];
+    } else {
+        let lastel = this.arr[this.head];
+        this.arr[++this.head] = [val, Math.min(lastel[1], val)];
+    }
+};
+
+MinStack.prototype.pop = function() {
+    if(this.head == -1) return -1;
+    const retVal = this.arr[this.head][0];
+    this.head--;
+    return retVal;
+};
+
+MinStack.prototype.top = function() {
+     if(this.head == -1) return -1;
+     return this.arr[this.head][0];
+};
+```
+
+Approach 2: TC - O(1) SC - O(1)
+
+- Store the minimum in a variable min
+- if value_tobe_pushed > min no need to update min and push value_tobe_pushed
+- if `value_tobe_pushed < min` then dont push value_tobe_pushed, `Rather push 2*value_tobe_pushed - min`. We are pushing a modified value to the stack
+- For getMin just return min
+- For top just check if arr[top] < min => this means we have pushed some modified value in the stack return min else return arr[top]
+- For pop, if `arr[top] < min` => this means we have pushed a modified value, so `return min` and make `min = 2*min-arr[top]`
+
+```javascript
+var MinStack = function() {
+    this.head = -1;
+    this.arr = [];
+    this.min = Infinity
+};
+MinStack.prototype.push = function(val) {
+    if(this.head == -1) {
+        this.arr[++this.head] = val;
+        this.min = val;
+        return;
+    }
+    if(val < this.min) {
+        this.arr[++this.head] = 2 * val - this.min;
+        this.min = val;
+    } else {
+        this.arr[++this.head] = val
+    }
+};
+MinStack.prototype.pop = function() {
+    if(this.head == -1) return -1;
+    if(this.arr[this.head] < this.min) {
+       const retVal  = this.min;
+       this.min =  2 *  this.min - this.arr[this.head]
+       this.head--
+       return retVal;
+    } else {
+        const retVal = this.arr[this.head]
+        this.head--;
+        return retVal;
+    }
+   
+};
+MinStack.prototype.top = function() {
+     if(this.head == -1) return -1;
+     return this.arr[this.head] < this.min ? this.min : this.arr[this.head];
+};
+MinStack.prototype.getMin = function() {
+    if(this.head == -1) return -1;
+    return this.min;
+};
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

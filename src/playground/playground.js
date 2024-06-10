@@ -1,27 +1,46 @@
-const main = (N) => {
-    let prime = new Array(N + 1).fill(true);
-    const sieve = (n) => {
-        prime[0] = prime[1] = false;
-        for(var i = 2; i<= Math.sqrt(n); i++) {
-            for (var j = i* i ; j <=n; j+=i) {
-                prime[j] = false;
-            }
-        }
-    }
-    sieve(N);
-    console.log(prime)
-    let final = []
-    for (var i = 1; i<= Math.sqrt(N); i++) {
-        if(N % i == 0) {
-            if(prime[i]) {
-                final.push(i);
-            }
-            if(i != N/i && prime[N/i]) {
-                final.push(N/i);
-            }
-        }
-    }
-    return final
+var MyStack  = function() {
+    this.top = -1;
+    this.arr = [];
 }
 
-console.log(main(8))
+const precedenceMap = {
+    '^' : 2,
+    "*" : 1,
+    "/" : 1,
+    "+" : 0,
+    "-" : 0
+}
+MyStack.prototype.push = function(elem) {
+    this.arr[++this.top] = elem;
+}
+MyStack.prototype.pop = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top--];
+}
+MyStack.prototype.topp = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top];
+}
+MyStack.prototype.empty = function() {
+    return this.top == -1;
+}
+
+const postFixtoInfix = (s)  => {
+    let final = "";
+    const myStack = new MyStack();
+    for(var i = 0; i< s.length; i++) {
+        const char = s.charAt(i);
+        if(['+', '-', "*", "/", "^"].includes(char)) {
+           const s1 = myStack.pop();
+           const s2 = myStack.pop();
+           myStack.push(`(${s2}${char}${s1})`);
+        }
+        else {
+            myStack.push(char);
+        }
+    }
+    final = myStack.pop();
+    return final;
+}
+
+console.log(postFixtoInfix("ABC/-AK/L-*"))

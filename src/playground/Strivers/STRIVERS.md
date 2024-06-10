@@ -1592,3 +1592,53 @@ MinStack.prototype.getMin = function() {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 42. Infix/Prefix/Postfix -> Infix/Prefix/Postfix
+
+Infix -> Postfix : A * ( B + C ) / D -> A B C + * D /
+
+- If we get a operand (A,B, C etc) push in the string
+- If we get a operator push in a stack
+    - string =  "A" stack = [ * ]
+- If we get ( push in stack string =  "AB" stack = [ *, ( ]
+- If we get operand again and the stack top is ( push in stack string =  "ABC" stack = [ *, ( , +]
+- If we get ) pop until we get ( and push the operands in string string =  "ABC+" stack = [ * ]
+- If we get operand again and stack top is another operand whose precendece is lesser or equal to the current char, pop string =  "ABC+*" stack = [/]
+- end of string, pop every thing from stack and append Hence final string is ABC+*D/
+
+Infix -> Prefix : A * ( B + C ) / D -> * A / + B C D
+
+- Reverse the string -> D / ( C + B ) * A. notice that we have considered '(' for ')' and ')' for '(' while reversing
+- Convert to Postfix -> D C B + / A * How? check Infix -> Postfix conversion
+- Reverse the output string -> * A / + B C D
+
+Prefix -> Infix : * - A / B C - / A K L -> ( ( A - ( B / C ) ) * ( ( A / K ) - L ) )
+
+- Prefix to any conversion traverse from last to first of the input string
+- For Any operand (A,B,C etc) push in the stack
+- Any operator, pop last two string from stack and apply the operator in between and enclose in bracket and push it back in the stack
+- Note that here after each pop,if s1 pops before and s2 pops after we will apply the operator like s1 operator s2
+
+Prefix -> Postfix : * - A / B C - / A K L -> A B C / - A K / L - *
+
+- Prefix to any conversion traverse from last to first of the input string
+- For Any operand (A,B,C etc) push in the stack
+- Any operator, pop last two string from stack and apply the operator at last and push it back in the stack
+- Note that here after each pop,if s1 pops before and s2 pops after we will apply the operator like s1 operator s2
+
+Postfix -> Infix:  A B C / - A K / L - * ->  ( ( A - ( B / C ) ) * ( ( A / K ) - L ) )
+
+- Postfix to any conversion traverse from first to last of the input string
+- For Any operand (A,B,C etc) push in the stack
+- Any operator, pop last two string from stack and apply the operator in middle enclosed by bracket and push it back in the stack
+- Note that here after each pop,if s1 pops before and s2 pops after we will apply the operator like s2 operator s1
+
+
+Postfix -> Prefix:  A B C / - A K / L - * -> * - A / B C - / A K L 
+
+- Postfix to any conversion traverse from first to last of the input string
+- For Any operand (A,B,C etc) push in the stack
+- Any operator, pop last two string from stack and apply the operator in first and push it back in the stack
+- Note that here after each pop,if s1 pops before and s2 pops after we will apply the operator like s2 operator s1
+
+--------------------------------------------------------------------------------------------------------------------------------

@@ -1642,3 +1642,132 @@ Postfix -> Prefix:  A B C / - A K / L - * -> * - A / B C - / A K L
 - Note that here after each pop,if s1 pops before and s2 pops after we will apply the operator like s2 operator s1
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 43. Next greater element
+
+NGE for flat array
+
+- take a stack and traverse from right to left in the array
+- For any element, keep popping from stack till stack.topp() is bigger than the current element 
+- then the stack.topp() is the NGE for the curent element
+- Push the current element in the stack
+
+```javascript
+var nextGreaterElement = function(nums) {
+    let nge = {};
+    let myStack = new MyStack();
+    for(var i = nums.length - 1; i >=0 ; i--) {
+        while(!myStack.empty() && myStack.topp() <= nums[i]) {
+            myStack.pop();
+        }
+        if(myStack.empty()) {
+            nge[nums[i]] = -1;
+        }
+        else {
+            nge[nums[i]] = myStack.topp();
+        }
+        myStack.push(nums[i])
+    }   
+};
+```
+
+NGE for circular array
+
+- We can consider the circular array a repetition of the same array 2n tims
+- So we will run from 2n - 1 to 0 and instead of i we will check with i% n element
+- we will only push nge till i < n
+
+```javascript
+var nextGreaterElement = function(nums) {
+    let nge = {};
+    let myStack = new MyStack();
+    for(var i = nums.length - 1; i >=0 ; i--) {
+        while(!myStack.empty() && myStack.topp() <= nums[i % nums.length]) {
+            myStack.pop();
+        }
+        if(i < nums.length) {
+            if(myStack.empty()) {
+                nge[nums[i]] = -1;
+            }
+            else {
+                nge[nums[i]] = myStack.topp();
+            }
+        }
+        myStack.push(nums[i % nums.length])
+    }   
+};
+```
+similar pattern: https://www.interviewbit.com/problems/nearest-smaller-element/
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 44. Trapping Rain water
+
+Approach 1: Prefix and Suffix Max - TC - O(3N) Sc - O(2N)
+
+- We know that we need to calculate the rain water trapped at each index
+- To calculate the rain water that can be trapped at each index we need the maxLeft and maxRight block heights from the current index i
+- Then the rain water trapped at index i will be `Min(maxLeft, maxRight) - height[i]` right?
+- To find maxLeft and maxRight we can use prefix and suffix max arrays
+
+```javascript
+
+var trap = function(height) {
+    let prefixMax = [], final = 0;
+    prefixMax[0] = height[0];
+    for(var i = 1; i < height.length; i++) {
+        prefixMax[i] = Math.max(prefixMax[i-1], height[i]);
+    }
+    let suffixMax = [];
+    suffixMax[height.length - 1] = height[height.length - 1];
+    for(var i = height.length - 2; i >= 0; i--) {
+        suffixMax[i] = Math.max(suffixMax[i+1], height[i]);
+    }
+    for(var i = 0; i< height.length; i++) {
+        final += Math.min(prefixMax[i], suffixMax[i]) - height[i];
+    }
+    return final
+};
+
+trap([0,1,0,2,1,0,1,3,2,1,2,1]) // 6
+```
+
+Approach 2: Two pointer - TC - O(N) SC - O(1)
+
+- We will initiate two pointers left and right at 0 and n-1 respectively
+- We will initiate two variable maxLeft and maxRight (bth initialised at 0)
+- If `height[left] <= height[right]` we have to check two things - 
+    - If `height[left] >= maxLeft` we can not pour any water. So we update maxLeft - `maxLeft = height[left]`
+    - Else we calculate water and pour -> `maxLeft - height[left]` unit of water can be added to final 
+- If `height[left] > height[right]` do similar operation on right -
+    - If `height[right] >= maxRight` we can not pour any water. so we update maxRight - `maxRight = height[right]`
+    - Else we pour water -> `maxRight - height[right]`
+
+```javascript
+var trap = function(height) {
+    let left = 0, right = height.length-1, leftMax = rightMax = 0;
+    let final = 0;
+    while(left <= right) {
+        if(height[left] <= height[right]) {
+            //check left
+            if(height[left] >= leftMax) {
+                leftMax = height[left];
+            } else {
+                final += leftMax - height[left];
+            }
+            left++;
+        }
+        else {
+            //check right
+            if(height[right] >= rightMax) {
+                rightMax = height[right];
+            } else {
+                final += rightMax - height[right];
+            }
+            right--;
+        }
+    }
+    console.log(final)
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

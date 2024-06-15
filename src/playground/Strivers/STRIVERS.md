@@ -1648,8 +1648,8 @@ Postfix -> Prefix:  A B C / - A K / L - * -> * - A / B C - / A K L
 NGE for flat array
 
 - take a stack and traverse from right to left in the array
-- For any element, keep popping from stack till stack.topp() is bigger than the current element 
-- then the stack.topp() is the NGE for the curent element
+- For any element, keep popping from stack till the current element is bigger than stack.topp()
+- the NGE for the curent element is stack.topp() is the stack is not empty, otherwise NGe of the current element is -1
 - Push the current element in the stack
 
 ```javascript

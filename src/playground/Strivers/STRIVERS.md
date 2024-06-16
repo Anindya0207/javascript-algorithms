@@ -1645,7 +1645,12 @@ Postfix -> Prefix:  A B C / - A K / L - * -> * - A / B C - / A K L
 
 ### 43. NGE / PGE/ NSE / PSE
 
-NGE
+Very important concept: Monotonic stack
+Stack can be either in decreasing order or in increasing order
+For NGE and PGE Stack will be in increasing order top down
+For NSe and PSE stack will be in decreasing order top down
+
+NGE 
 
 - take a stack and traverse from right to left in the array
 - For any element, keep popping from stack till the current element is bigger than stack.topp()
@@ -1854,4 +1859,35 @@ var trap = function(height) {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 45.
+### 45. Sum of subarray minimum
+
+- We need to find the "being minimum" contribution of each member of the array.
+- For that we need to find that being minimum how many total number of subarray combinations any element is making, both to its left and right
+- For any pattern where we need to find leftMax or rightMax or leftMin or rightMin we use NGE, PGE, PSE, NSE pattern using monotonic stack 
+- Here we need to deduce the NSE and PSE becuase we want the controbution of any elemtn being minimum
+- After getting NSe ang PSE, for any element, "the number of Subarrays it is contributing being minimum to the left" = `i - pse[i]`
+- And "the number of subarrays it is contributing being minimum to the right" = `nse[i] - i`
+- Then total number of subarray combinations where arr[i] is minimum is `i-pse[i] * nse[i] -i`
+- Then total contribution of arr[i] being minimum is `arr[i] * i-pse[i] * nse[i] -i`
+- Note that: here the array may contain duplicates, For `NSE do not check for equal, only check for less`
+- For PSE check for equal and lesser both.
+
+```javascript
+var sumSubarrayMins = function(arr) {
+    const pse = previousSmallerElementIndex(arr);
+    const nse = nextSmallerElementIndex(arr);
+    console.log(pse, nse)
+    let final = 0;
+    for(var i  = 0; i<arr.length; i++) {
+        const leftSubarrayCountWhereArrIisMinimum = i - pse[i];
+        const rightSubarrayCountWhereArrIisMinimum = nse[i] - i;
+        const totalSubArrayCombinationsPossibleWhereArrIisMinimum = leftSubarrayCountWhereArrIisMinimum * rightSubarrayCountWhereArrIisMinimum;
+        const totalContributionOfArrIWhileBeingMinimum = arr[i] * totalSubArrayCombinationsPossibleWhereArrIisMinimum;
+        final +=totalContributionOfArrIWhileBeingMinimum
+    }
+    return final
+};
+```
+https://leetcode.com/problems/sum-of-subarray-minimums/description/
+
+--------------------------------------------------------------------------------------------------------------------------------

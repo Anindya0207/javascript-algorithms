@@ -1643,14 +1643,16 @@ Postfix -> Prefix:  A B C / - A K / L - * -> * - A / B C - / A K L
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 43. Next greater element
+### 43. NGE / PGE/ NSE / PSE
 
-NGE for flat array
+NGE
 
 - take a stack and traverse from right to left in the array
 - For any element, keep popping from stack till the current element is bigger than stack.topp()
 - the NGE for the curent element is stack.topp() is the stack is not empty, otherwise NGe of the current element is -1
+- If we need to store the index of the NGE then if the stack is not empty then the nge of current element if the topIndex - 1 otherwise arr.length - 1
 - Push the current element in the stack
+- For NGE we go from `n-1 to 0` and we pop if `curr >= top` Remember 
 
 ```javascript
 var nextGreaterElement = function(nums) {
@@ -1669,19 +1671,99 @@ var nextGreaterElement = function(nums) {
         myStack.push(nums[i])
     }   
 };
+var nextGreaterElementIndex = function(nums) {
+    let nge = new Array(nums.length).fill(nums.length - 1)
+    let myStack = new MyStack();
+    for(var i = nums.length - 1; i >=0 ; i--) {
+        while(!myStack.empty() &&  nums[i] >= nums[myStack.topp()]) {
+            myStack.pop();
+        }
+        if(!myStack.empty()) {
+            nge[i] = myStack.topp() - 1;
+        }
+        myStack.push(i)
+    } 
+    return nge
+};
 ```
 
-NGE for circular array
+PGE
+
+- For Previous greater element/ index we need to traverse from `0 to n-1` 
+- And still we need to pop if `curr >= top`
+
+```javascript
+var previousGreaterElementIndex = function(nums) {
+    let pge = new Array(nums.length).fill(0)
+    let myStack = new MyStack();
+    for(var i = 0; i < nums.length ; i++) {
+        while(!myStack.empty() &&  nums[i] >= nums[myStack.topp()]) {
+            myStack.pop();
+        }
+        if(!myStack.empty()) {
+            pge[i] = myStack.topp() + 1;
+        }
+        myStack.push(i)
+    } 
+    return pge
+};
+```
+
+NSE
+
+- For next smaller element / index we need to traverse from `n-1 to 0`
+- And we need to pop if `curr <= top`
+
+```javascript
+var nextSmallerElementIndex = function(nums) {
+    let nse = new Array(nums.length).fill(nums.length - 1)
+    let myStack = new MyStack();
+    for(var i = nums.length - 1; i >=0 ; i--) {
+        while(!myStack.empty() &&  nums[i] <= nums[myStack.topp()]) {
+            myStack.pop();
+        }
+        if(!myStack.empty()) {
+            nse[i] = myStack.topp() - 1;
+        }
+        myStack.push(i)
+    } 
+    return nse
+};
+```
+
+PSE
+
+- For next smaller element / index we need to traverse from `0 to n-1`
+- And we need to pop if `curr <= top`
+
+```javascript
+var previousSmallerElementIndex = function(nums) {
+    let pse = new Array(nums.length).fill(0)
+    let myStack = new MyStack();
+    for(var i = 0; i < nums.length ; i++) {
+        while(!myStack.empty() &&  nums[i] <= nums[myStack.topp()]) {
+            myStack.pop();
+        }
+        if(!myStack.empty()) {
+            pse[i] = myStack.topp() + 1;
+        }
+        myStack.push(i)
+    } 
+    return pse
+};
+```
+
+NGE etc for circular array
 
 - We can consider the circular array a repetition of the same array 2n tims
-- So we will run from 2n - 1 to 0 and instead of i we will check with i% n element
+- So we will run from `2n - 1` to 0 and instead of i we will check with `i% n` element
 - we will only push nge till i < n
 
 ```javascript
 var nextGreaterElement = function(nums) {
     let nge = {};
     let myStack = new MyStack();
-    for(var i = nums.length - 1; i >=0 ; i--) {
+    for(var i = 2 * nums.length - 1; i >=0 ; i--) {
         while(!myStack.empty() && myStack.topp() <= nums[i % nums.length]) {
             myStack.pop();
         }
@@ -1771,3 +1853,5 @@ var trap = function(height) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 45.

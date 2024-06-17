@@ -1888,6 +1888,60 @@ var sumSubarrayMins = function(arr) {
     return final
 };
 ```
+
 https://leetcode.com/problems/sum-of-subarray-minimums/description/
+
+Similar patterns:
+https://leetcode.com/problems/largest-rectangle-in-histogram/submissions/1291127448/
+https://leetcode.com/problems/sum-of-subarray-ranges/description/
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 46. Maximal Rectangle
+
+Given a rows x cols binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
+
+- We just to need to find out the histogram arrays upto each row
+- We already know to find the maximum rectangle of a histogram using PSE and NSE pattern
+- We can feed the histogram array to the same method to find maximum rectangle area
+
+```javascript
+
+var largestRectangleArea = function(heights) {
+    const pse = previousSmallerElementIndex(heights);
+    const nse = nextSmallerElementIndex(heights);
+    let final = -Infinity
+    for(var i  = 0; i <heights.length; i++) {
+        const curr = heights[i];
+        const leftWidthWhereImin = i - pse[i];
+        const rightWidthWhereIMin = nse[i] - i;
+        const totalWidthwhereImin = leftWidthWhereImin + rightWidthWhereIMin + 1;
+        const totalAreaWhereIMin = totalWidthwhereImin * curr;
+        final = Math.max(final, totalAreaWhereIMin);
+    }
+    return final;
+};
+
+var maximalRectangle = function(matrix) {
+    const histo = new Array(matrix.length);
+    histo[0] = matrix[0].map(n => Number(n));
+    for(var i = 1; i < matrix.length; i++) {
+        histo[i] = []
+        for(var j = 0; j < matrix[i].length; j++) {
+            if(matrix[i][j] == 1) {
+                histo[i][j]= histo[i-1][j] + Number(matrix[i][j]);
+            } else {
+                histo[i][j]= 0
+            }
+        }
+    }
+    let final = -Infinity;
+    for(var h = 0; h < histo.length; h++) {
+        final = Math.max(final, largestRectangleArea(histo[h]))
+    }
+    return final;
+};
+
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

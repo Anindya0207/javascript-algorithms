@@ -38,7 +38,7 @@ function shuffleArray(array) {
   playground();
   
 
-  var MyStack  = function() {
+var MyStack  = function() {
     this.top = -1;
     this.arr = [];
 }

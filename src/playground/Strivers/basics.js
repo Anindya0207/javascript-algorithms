@@ -1,26 +1,119 @@
+//Stack
+var MyStack  = function() {
+    this.top = -1;
+    this.arr = [];
+}
 
-var isPalindrome = function(s) {
-    let final = true;
-    const _isPalindrome = (l, r) => {
-        if(l >= r) return final;
-        const lc = s.charCodeAt(l);
-        const rc = s.charCodeAt(r);
-        if(!(lc > 64 && lc < 91) && !(lc > 47 && lc < 58)) return _isPalindrome(l+1, r);
-        if(!(rc > 64 && rc < 91) && !(rc > 47 && rc < 58)) return _isPalindrome(l, r-1);
-        console.log(s.charAt(l), s.charAt(r))
-        final = final && lc == rc && _isPalindrome(l+1, r-1)
-        return final
-    }
-   s = s.toUpperCase();
-   const len = s.length;
-   console.log(_isPalindrome(0, len-1))
+MyStack.prototype.push = function(elem) {
+    this.arr[++this.top] = elem;
+}
+MyStack.prototype.pop = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top--];
+}
+MyStack.prototype.topp = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top];
+}
+MyStack.prototype.empty = function() {
+    return this.top == -1;
+}
+
+// Queue
+var MyQueuee = function () {
+    this.array = [];
+    this.front = -1;
+    this.rear = -1;
   };
   
-  
-  var fib = function(n) {
-    const _fib = _n => {
-         if(_n == 0 || _n == 1) return _n;
-         return  _fib(_n-1) + _fib(_n-2)
-    }
-    console.log(_fib(3))
+  MyQueuee.prototype.enqueue = function (el) {
+    if (this.front == -1) this.front = 0;
+    this.array[++this.rear] = el;
   };
+  
+  MyQueuee.prototype.dequeue = function () {
+    if (this.front == -1 || this.rear == -1) return;
+    return this.array[this.front++];
+  };
+  
+  MyQueuee.prototype.frontt = function () {
+    if (this.front == -1 || this.rear == -1) return -1;
+    return this.array[this.front];
+  };
+
+
+//DQueue
+
+var Node = function(val) {
+    this.value = val;
+    this.next = null
+    this.prev = null
+}
+
+var DQueue = function() {
+    this.front = null;
+    this.rear = null;
+}
+
+DQueue.prototype.pushFront = function(el) {
+    const newNode = new Node(el);
+    if(this.rear == null) {
+        this.rear = newNode;
+    }
+    if(this.front == null) {
+        this.front = newNode;
+    } else {
+        newNode.next = this.front;
+        this.front.prev = newNode;
+        this.front = newNode;
+    }
+}
+
+DQueue.prototype.pushBack = function(el) {
+    const newNode = new Node(el);
+    if(this.front == null) {
+        this.front = newNode;
+    }
+    if(this.rear == null) {
+        this.rear = newNode;
+    } else {
+        newNode.prev = this.rear;
+        this.rear.next = newNode;
+        this.rear = newNode;
+    }
+}
+
+DQueue.prototype.popFront = function() {
+    if(this.front == null) {
+        return;
+    }
+    if(this.front == this.rear) {
+        const ret = this.front;
+        this.front = null;
+        this.rear = null;
+        return ret.value
+    }
+    const ret = this.front;
+    const next  = this.front.next;
+    next.prev = null;
+    this.front = next;
+    return ret.value;
+}
+
+
+DQueue.prototype.popBack = function() {
+    if(this.rear == null) {
+        return;
+    }
+    if(this.front == this.rear) {
+        const ret = this.front;
+        this.front = null;
+        this.rear = null;
+        return ret.value
+    }
+    const ret = this.rear;
+    const prev  = this.rear.prev;
+    prev.next = null;
+    this.rear = prev;
+    return ret.value;
+}

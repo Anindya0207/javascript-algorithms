@@ -1865,7 +1865,7 @@ var trap = function(height) {
 - For that we need to find that being minimum how many total number of subarray combinations any element is making, both to its left and right
 - For any pattern where we need to find leftMax or rightMax or leftMin or rightMin we use NGE, PGE, PSE, NSE pattern using monotonic stack 
 - Here we need to deduce the NSE and PSE becuase we want the controbution of any elemtn being minimum
-- After getting NSe ang PSE, for any element, "the number of Subarrays it is contributing being minimum to the left" = `i - pse[i]`
+- After getting NSE and PSE, for any element, "the number of Subarrays it is contributing being minimum to the left" = `i - pse[i]`
 - And "the number of subarrays it is contributing being minimum to the right" = `nse[i] - i`
 - Then total number of subarray combinations where arr[i] is minimum is `i-pse[i] * nse[i] -i`
 - Then total contribution of arr[i] being minimum is `arr[i] * i-pse[i] * nse[i] -i`
@@ -1944,4 +1944,50 @@ var maximalRectangle = function(matrix) {
 
 ```
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 47. Silding Window maximum
+
+To find the max of all the sliding windows of a given array
+Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Output: [3,3,5,5,6,7]
+
+- Extreme brute force can be where we run a loop i 0 - n-k+1
+- Run a inner loop 0 - k and find max and keep pushing in a final array. Total TC - O ( n * k )
+- To optimise, we need to use a Monotonic DQueue (using Doubly LL) where the queue should be always sorted increasing order from rear to front
+- Main idea is to push indices of the array in the Queue from back and looking from front to get the max because the Queue is always increasing order sorted from rear to back
+- There are some steps to this :
+    - Step1: `Pop from front any index which is out of bound i.e. < i - k + 1`
+    - Step2: `Pop from back until arr[i] >= arr[rear]` to make sure from rear there is no element which is smaller than arr[i]
+    - Step3: `Push the current index from back`
+    - Step4: `Once i crosses the k mark i.e. i > k-1 start checking from front for max`
+
+```javascript
+var maxSlidingWindow = function(nums, k) {
+    let final = [];
+    const dq = new DQueue();
+    for(var i =0; i<nums.length; i++) {
+        // Step1: Always check if there is any element in the front of dq which is out of boundary
+        while(dq.getFront() < i - k + 1) {
+            dq.popFront();
+        }
+        // Step2: pop back till nums[i] >= rear value. We need to always maintain a increasing order from rear to front (Monotonic Queue)
+        while(nums[i] >= nums[dq.getRear()] ) {
+            dq.popBack();
+        }
+        // Step3: Push back current index to queue
+        dq.pushBack(i);
+        // Step4: Get Max when i (0 index) crosses k window
+        if(i >= k - 1) {
+            const currMax = dq.getFront();
+            if(currMax) {
+                final.push(nums[currMax])
+            } 
+        }
+    }
+    return final
+};
+
+console.log(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3)) 
+```
 --------------------------------------------------------------------------------------------------------------------------------

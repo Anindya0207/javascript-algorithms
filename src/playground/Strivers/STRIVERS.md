@@ -1968,11 +1968,11 @@ var maxSlidingWindow = function(nums, k) {
     const dq = new DQueue();
     for(var i =0; i<nums.length; i++) {
         // Step1: Always check if there is any element in the front of dq which is out of boundary
-        while(dq.getFront() < i - k + 1) {
+        while(dq.getFront() != undefined && dq.getFront() < i - k + 1) {
             dq.popFront();
         }
         // Step2: pop back till nums[i] >= rear value. We need to always maintain a increasing order from rear to front (Monotonic Queue)
-        while(nums[i] >= nums[dq.getRear()] ) {
+        while(dq.getRear() != undefined && nums[i] >= nums[dq.getRear()] ) {
             dq.popBack();
         }
         // Step3: Push back current index to queue
@@ -1980,7 +1980,7 @@ var maxSlidingWindow = function(nums, k) {
         // Step4: Get Max when i (0 index) crosses k window
         if(i >= k - 1) {
             const currMax = dq.getFront();
-            if(currMax) {
+            if(currMax != undefined) {
                 final.push(nums[currMax])
             } 
         }

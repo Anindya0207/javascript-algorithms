@@ -1,110 +1,85 @@
-var Node = function(val) {
-    this.value = val;
-    this.next = null
-    this.prev = null
+// const celebrity = (M, n) => {
+//   let map = {};
+//   for (var i = 0; i < n; i++) {
+//     for (var j = 0; j < n; j++) {
+//       if (i == j) continue;
+//       if (M[i][j] == 1 && M[j][i] != 1 ) {
+//         if(map[j] == undefined) {
+//             map[j] = true;
+//         }
+//       } else {
+//         map[j] = false
+//       }
+//       if (map[j] == true && M[i][j] != 1) {
+//         map[j] = false;
+//       }
+//     }
+//   }
+//   for(var i in map) {
+//     if(map[i] == true) return i;
+//   }
+//   return -1
+// };
+
+
+var MyStack  = function() {
+    this.top = -1;
+    this.arr = [];
 }
 
-var DQueue = function() {
-    this.front = null;
-    this.rear = null;
+MyStack.prototype.push = function(elem) {
+    this.arr[++this.top] = elem;
 }
-
-DQueue.prototype.pushFront = function(el) {
-    const newNode = new Node(el);
-    if(this.rear == null) {
-        this.rear = newNode;
-    }
-    if(this.front == null) {
-        this.front = newNode;
-    } else {
-        newNode.next = this.front;
-        this.front.prev = newNode;
-        this.front = newNode;
-    }
+MyStack.prototype.pop = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top--];
 }
-
-DQueue.prototype.pushBack = function(el) {
-    const newNode = new Node(el);
-    if(this.front == null) {
-        this.front = newNode;
-    }
-    if(this.rear == null) {
-        this.rear = newNode;
-    } else {
-        newNode.prev = this.rear;
-        this.rear.next = newNode;
-        this.rear = newNode;
-    }
+MyStack.prototype.topp = function() {
+    if(this.top == -1) return;
+    return this.arr[this.top];
 }
-
-DQueue.prototype.popFront = function() {
-    if(this.front == null) {
-        return;
-    }
-    if(this.front == this.rear) {
-        const ret = this.front;
-        this.front = null;
-        this.rear = null;
-        return ret.value
-    }
-    const ret = this.front;
-    const next  = this.front.next;
-    next.prev = null;
-    this.front = next;
-    return ret.value;
+MyStack.prototype.empty = function() {
+    return this.top == -1;
 }
-
-
-DQueue.prototype.popBack = function() {
-    if(this.rear == null) {
-        return;
+MyStack.prototype.size = function() {
+    return this.top + 1;
+}
+const celebrity = (M, n) => {
+    if(n == 1 && M[0][0] == 0) return 0;
+    const stack = new MyStack();
+    for(var i = 0; i < n; i++) {
+        stack.push(i);
     }
-    if(this.front == this.rear) {
-        const ret = this.front;
-        this.front = null;
-        this.rear = null;
-        return ret.value
-    }
-    const ret = this.rear;
-    const prev  = this.rear.prev;
-    prev.next = null;
-    this.rear = prev;
-    return ret.value;
-}
-
-DQueue.prototype.getRear = function() {
-    if(this.rear == null) return;
-    return this.rear.value;
-}
-
-DQueue.prototype.getFront = function() {
-    if(this.front == null) return;
-    return this.front.value;
-}
-
-var maxSlidingWindow = function(nums, k) {
-    let final = [];
-    const dq = new DQueue();
-    for(var i =0; i<nums.length; i++) {
-        // Always check if there is any element in the front of dq which is out of boundary
-        while(dq.getFront() < i - k + 1) {
-            dq.popFront();
-        }
-        // pop back till nums[i] >= rear value. We need to always maintain a increasing order from rear to front (Monotonic Queue)
-        while(nums[i] >= nums[dq.getRear()] ) {
-            dq.popBack();
-        }
-        //Push back current index to queue
-        dq.pushBack(i);
-        // Get Max when i (0 index) crosses k window
-        if(i >= k - 1) {
-            const currMax = dq.getFront();
-            if(currMax) {
-                final.push(nums[currMax])
-            } 
+    while(stack.size() > 1) {
+        const a = stack.topp();
+        stack.pop();
+        const b = stack.topp()
+        stack.pop();
+        if(M[a][b] == 1) {
+            stack.push(b);
+        } else {
+            stack.push(a);
         }
     }
-    return final
-};
+    if(stack.empty()) return -1;
+    const possibleCelebrity = stack.topp();
+    for(var i = 0; i < n; i++) {
+        if(M[possibleCelebrity][i] != 0) {
+            return -1;
+        }
+        if(i != possibleCelebrity &&  M[i][possibleCelebrity] != 1) {
+            return -1;
+        }
+    }
+    return possibleCelebrity
+}
 
-console.log(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3))
+// const M = [[0,1,0],
+// [0,0,0], 
+// [0,1,0]]
+
+// const M = [[0,1],
+// [1,0]]
+
+const M = [[0]]
+console.log(celebrity(M,1))

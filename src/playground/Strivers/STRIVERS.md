@@ -1991,3 +1991,81 @@ var maxSlidingWindow = function(nums, k) {
 console.log(maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3)) 
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 48. Celebrity problem
+
+To find the single celebrity (if present) from a N*N matrix such that the celbrity index doesn't know anyone else and everyone else knows the celebrity
+
+Approach 1: bruteforce TC - O(N*N) 
+
+- We can iterate through all rows and columns and push the possible celebrities in a map 
+- Keep modifying the map when we get M[i][j] == 1 and M[j][i] != 1
+
+```javascript
+const celebrity = (M, n) => {
+  let map = {};
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      if (i == j) continue;
+      if (M[i][j] == 1 && M[j][i] != 1 ) {
+        if(map[j] == undefined) {
+            map[j] = true;
+        }
+      } else {
+        map[j] = false
+      }
+      if (map[j] == true && M[i][j] != 1) {
+        map[j] = false;
+      }
+    }
+  }
+  for(var i in map) {
+    if(map[i] == true) return i;
+  }
+  return -1
+};
+```
+
+Approach 2: Stackbased TC - O(N)
+
+- Idea is to put all index in the stack first
+- Then pop two from the top of the stack, Say A and B
+- If A knows B that is M[A][B] == 1 then discard A and push back B. because to be a celebrity it's a must that you should not know anyone
+- Else discard B and push back A. At this point B might or might not know A. We dont know. But we know at least A is not a celeb. So it's ok to discard A
+- Now again pop two elements and check the same until there is only one element in the stack
+- At this point we know that the single element in the stack `might` be a celeb
+- Verify it, check it's row (everything should be 0) and column (every thing apart from it's own index should be 1)
+- If yes, return that index, else return -1
+
+```javascript
+const celebrity = (M, n) => {
+    if(n == 1 && M[0][0] == 0) return 0;
+    const stack = new MyStack();
+    for(var i = 0; i < n; i++) {
+        stack.push(i);
+    }
+    while(stack.size() > 1) {
+        const a = stack.topp();
+        stack.pop();
+        const b = stack.topp()
+        stack.pop();
+        if(M[a][b] == 1) {
+            stack.push(b);
+        } else {
+            stack.push(a);
+        }
+    }
+    if(stack.empty()) return -1;
+    const possibleCelebrity = stack.topp();
+    for(var i = 0; i < n; i++) {
+        if(M[possibleCelebrity][i] != 0) {
+            return -1;
+        }
+        if(i != possibleCelebrity &&  M[i][possibleCelebrity] != 1) {
+            return -1;
+        }
+    }
+    return possibleCelebrity
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

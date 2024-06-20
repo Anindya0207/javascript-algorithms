@@ -2069,3 +2069,170 @@ const celebrity = (M, n) => {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 49. LRU Cache
+
+We need to create a datastructure which will:
+
+- get(key) in O(1)
+- put(key, value) and if the datastructure capacity is reached then it will remove the least recently used and then push
+- when updating an existing key with a new value that becomes recently used
+- if capacity is not reached then the first pushed is the least recently used
+
+Approach:
+
+- We will take an hashmap to store key: LL node pair in the map
+- We will have a DQueue to push the elements from front. Whenever a new element is coming we will `pushFront` 
+- If cpacity is reached then `popBack` because if we see from back, we will get the least recently used element
+- If we get(key) just lookup from the map and get the node value
+- if we update any value do `shiftFront` to shift that node to front. Ofcourse we will get the node from the map in o(1)
+- For `shiftFront`
+    - if `front==node` do nothing as the node is already in the front
+    - if node.prev is there then `node.prev.next = node.next`
+    - if node.next is there then `node.next.prev = node.prev`
+    - if rear =node then `rear = node.prev`
+    - make `node.prev = null`. `front.prev = node` `node.next = front` and `front = node`
+
+```javascript
+var Node = function(val) {
+    this.value = val;
+    this.next = null
+    this.prev = null
+}
+
+var DQueue = function() {
+    this.front = null;
+    this.rear = null;
+    this.size = 0;
+}
+
+DQueue.prototype.createNode = function(el) {
+    const newNode = new Node(el);
+    return newNode;
+}
+DQueue.prototype.pushFront = function(newNode) {
+    if(this.rear == null) {
+        this.rear = newNode;
+    }
+    if(this.front == null) {
+        this.front = newNode;
+    } else {
+        newNode.next = this.front;
+        this.front.prev = newNode;
+        this.front = newNode;
+    }
+    this.size++;
+}
+
+
+DQueue.prototype.shiftToFront = function(node)  {
+    if (node === this.front) return;  // Node is already at the front
+
+    if(node.prev) {
+        node.prev.next = node.next;
+    }
+    if(node.next) {
+        node.next.prev = node.prev;
+    } 
+
+    if(this.rear == node) {
+        this.rear = node.prev;
+    }
+    
+    node.prev = null;
+    if(this.front) {
+        this.front.prev = node;
+    }
+    node.next = this.front;
+    this.front = node;
+}
+
+DQueue.prototype.pushBack = function(newNode) {
+    if(this.front == null) {
+        this.front = newNode;
+    }
+    if(this.rear == null) {
+        this.rear = newNode;
+    } else {
+        newNode.prev = this.rear;
+        this.rear.next = newNode;
+        this.rear = newNode;
+    }
+    this.size++;
+}
+
+DQueue.prototype.popFront = function() {
+    if(this.front == null) {
+        return;
+    }
+    this.size--;
+    if(this.front == this.rear) {
+        const ret = this.front;
+        this.front = null;
+        this.rear = null;
+        return ret.value
+    }
+    const ret = this.front;
+    const next  = this.front.next;
+    next.prev = null;
+    this.front = next;
+    return ret.value;
+}
+
+
+DQueue.prototype.popBack = function() {
+    if(this.rear == null) {
+        return;
+    }
+    this.size--;
+    if(this.front == this.rear) {
+        const ret = this.front;
+        this.front = null;
+        this.rear = null;
+        return ret.value
+    }
+    const ret = this.rear;
+    const prev  = this.rear.prev;
+    prev.next = null;
+    this.rear = prev;
+    return ret.value;
+}
+
+DQueue.prototype.getSize = function() {
+    return this.size;
+}
+
+var LRUCache = function(capacity) {
+    this.dq = new DQueue();
+    this.map= {};
+    this.capacity = capacity;
+};
+
+LRUCache.prototype.get = function(key) {
+    if(!this.map[key]) {
+        return -1;
+    }
+    let node = this.map[key];
+    const retVal = node.value.value;
+    this.dq.shiftToFront(node);
+    return retVal;
+};
+
+LRUCache.prototype.put = function(key, value) {
+    if(!!this.map[key]) {
+        let node = this.map[key];
+        node.value = { key, value};
+        this.dq.shiftToFront(node);
+        return;
+    }
+    if(this.dq.getSize() == this.capacity) {
+        const leastUsed = this.dq.popBack();
+        delete this.map[leastUsed.key];
+    }
+    const newNode = this.dq.createNode({key, value});
+    this.map[key] = newNode;
+    this.dq.pushFront(newNode);
+};
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

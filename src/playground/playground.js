@@ -10,11 +10,7 @@ var DQueue = function() {
     this.size = 0;
 }
 
-DQueue.prototype.createNode = function(el) {
-    const newNode = new Node(el);
-    return newNode;
-}
-DQueue.prototype.pushFront = function(newNode, dontIncrementSize) {
+DQueue.prototype.pushFront = function(newNode) {
     if(this.rear == null) {
         this.rear = newNode;
     }
@@ -25,24 +21,36 @@ DQueue.prototype.pushFront = function(newNode, dontIncrementSize) {
         this.front.prev = newNode;
         this.front = newNode;
     }
-    if(!dontIncrementSize) this.size++;
+    this.size++;
 }
 
-DQueue.prototype.shiftToFront = function(node)  {
-    if (node === this.front) return;  // Node is already at the front
+
+DQueue.prototype.dLinkNode = function(node)  {
+    if(this.front == this.rear && this.front == node) {
+        this.front = null;
+        this.rear = null;
+        this.size--;
+        return
+    }
+    if(this.front == node) {
+       node.next.prev = null;
+       this.front = node.next;
+       this.size--;
+       return;
+    }
+    if(this.rear == node) {
+        node.prev.next = null;
+        this.rear = node.prev;
+        this.size--;
+        returnl
+    }
     if(node.prev) {
         node.prev.next = node.next;
-        if(node.next) {
-            node.next.prev = node.prev;
-        } else {
-            this.rear = node.prev;
-            let _front = this.front;
-            node.next = _front;
-            node.prev = null;
-            _front.prev = node;
-            this.front = node;
-        }
     }
+    if(node.next) {
+        node.next.prev = node.prev;
+    }
+    this.size--;
 }
 
 DQueue.prototype.pushBack = function(newNode) {
@@ -100,42 +108,71 @@ DQueue.prototype.getSize = function() {
     return this.size;
 }
 
-var LRUCache = function(capacity) {
-    this.dq = new DQueue();
-    this.map= {};
+var LFUCache = function(capacity) {
+    this.leastFreq = 1;
     this.capacity = capacity;
+    this.currentCapacity = 0;
+    this.map = {};
+    this.freqMap = {};
 };
 
-LRUCache.prototype.get = function(key) {
+LFUCache.prototype.insertToOne = function(key, value) {
+    const newNode = new Node({key, value, frequency: 1});
+    let oneFreqDq = this.freqMap[1];
+    if(oneFreqDq) {
+        oneFreqDq.pushFront(newNode);
+    } else {
+        oneFreqDq = new DQueue();
+        oneFreqDq.pushFront(newNode);
+    }
+    this.freqMap[1] = oneFreqDq;
+    this.map[key] = newNode;
+    this.currentCapacity++;
+    this.leastFreq = 1;
+}
+
+LFUCache.prototype.shiftToNextFreq = function(key, value) {
+    const node = this.map[key];
+    const existingFreq = node.value.frequency;
+    const existingFreqDq = this.freqMap[existingFreq];
+    existingFreqDq.dLinkNode(node);
+    const newFreq = existingFreq + 1;
+    node.value = { key, value, frequency: newFreq};
+    let newFreqDq = this.freqMap[newFreq];
+    if(newFreqDq) {
+        newFreqDq.pushFront(node);
+    } else {
+        newFreqDq = new DQueue();
+        newFreqDq.pushFront(node);
+    }
+    this.freqMap[newFreq] = newFreqDq;
+    if(existingFreqDq.getSize() == 0) {
+        this.leastFreq = newFreq;
+    }
+}
+
+LFUCache.prototype.get = function(key) {
     if(!this.map[key]) {
         return -1;
     }
-    let node = this.map[key];
-    const retVal = node.value.value;
-    this.dq.shiftToFront(node);
-    return retVal;
+    const node = this.map[key];
+    this.shiftToNextFreq(key, node.value.value);
+    return node.value.value;
 };
 
-LRUCache.prototype.put = function(key, value) {
+
+LFUCache.prototype.put = function(key, value) {
     if(!!this.map[key]) {
-        let node = this.map[key];
-        node.value = { key, value};
-        this.dq.shiftToFront(node);
-        return;
+        this.shiftToNextFreq(key, value);
+    } else {
+        if(this.currentCapacity == this.capacity) {
+            const leastFreqDq = this.freqMap[this.leastFreq];
+            if(leastFreqDq) {
+              const popped = leastFreqDq.popBack();
+              this.currentCapacity--;
+              delete this.map[popped.key]
+            }
+         }
+         this.insertToOne(key, value);     
     }
-    if(this.dq.getSize() == this.capacity) {
-        const leastUsed = this.dq.popBack();
-        delete this.map[leastUsed.key];
-    }
-    const newNode = this.dq.createNode({key, value});
-    this.map[key] = newNode;
-    this.dq.pushFront(newNode);
 };
-
-const lRUCache = new LRUCache(2);
-lRUCache.put(2, 1); // cache is {1=1}
-lRUCache.put(1, 1); // cache is {1=1, 2=2}
-lRUCache.put(2, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
-lRUCache.put(4, 1); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
-console.log(lRUCache.get(1));    // return -1 (not found)
-console.log(lRUCache.get(2));    // return 3

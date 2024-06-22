@@ -2444,3 +2444,33 @@ LFUCache.prototype.put = function(key, value) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 51. Largest consective 1s after fliping at most k zeros 
+
+- We need to use teo pointers and sliding window here
+- We can take left and right initially set as 0.
+- we will take `conovertedZeroCount` as the number of 0 which we converted to 1.
+- If nums[r] == 0 we increment `conovertedZeroCount` thus by expanding the window
+- if `conovertedZeroCount > k` then we increment l and if nums[l] == 0 we i decrement `conovertedZeroCount` thus by shrinking the window
+
+```javascript
+var longestOnes = function(nums, k) {
+    let l = 0, r = 0, maxC = -Infinity;
+    let currConversationC = 0;
+    while(r < nums.length) {
+        if(nums[r] === 0) {
+            currConversationC++
+        };
+        while(currConversationC > k) {
+            if(nums[l] === 0) {
+                currConversationC--;
+            }
+            l++;
+        }
+        maxC = Math.max(maxC, r - l + 1);
+        r++;
+    }
+    return maxC ;
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

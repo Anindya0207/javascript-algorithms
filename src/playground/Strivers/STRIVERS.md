@@ -2448,29 +2448,97 @@ LFUCache.prototype.put = function(key, value) {
 ### 51. Largest consective 1s after fliping at most k zeros 
 
 - We need to use teo pointers and sliding window here
-- We can take left and right initially set as 0.
-- we will take `conovertedZeroCount` as the number of 0 which we converted to 1.
-- If nums[r] == 0 we increment `conovertedZeroCount` thus by expanding the window
-- if `conovertedZeroCount > k` then we increment l and if nums[l] == 0 we i decrement `conovertedZeroCount` thus by shrinking the window
+- Always take l, r, map and maxD
+- Increment r always and if map[0] is < = k which is a valid window condition (we can do max k conversion right? so map[0] has to be les than equal to k) calc maxD
+- Increment map[0] if s[r] is 0
+- if map[0] > k which is an invalid window condition always shrink l means - map[0]-- if s[l] ==0 and l++ (always)
 
 ```javascript
 var longestOnes = function(nums, k) {
-    let l = 0, r = 0, maxC = -Infinity;
-    let currConversationC = 0;
-    while(r < nums.length) {
-        if(nums[r] === 0) {
-            currConversationC++
-        };
-        while(currConversationC > k) {
-            if(nums[l] === 0) {
-                currConversationC--;
-            }
-            l++;
-        }
-        maxC = Math.max(maxC, r - l + 1);
-        r++;
+   let l =0, r = 0, map = {}, maxD = 0;
+   map[0] = 0;
+   while(r < nums.length) {
+    while(map[0] > k) {
+        if(nums[l] == '0') map[0]--;
+        l++;
     }
-    return maxC ;
+    if(nums[r] == '0') {
+        map[0]++;
+    } 
+    if(map[0] <= k) {
+        maxD = Math.max(maxD, r - l+ 1)
+    }
+    r++;
+   }
+   return maxD
 };
 ```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 52. Fruit into baskets
+
+We need to put different types of truit in two baskets such that we can collect maximum fruits 
+
+- maximum fruit means we need to maximise the window size
+- as sliding window pattern we always take l, r, map, maxD
+- We will run r till length of array and always increment r
+- If our map will say that it has less than or equal to 2 types of fruit we will always calc the maxD
+- if our map will say that it has more than 2 types of fruit (map.size > 2) we will shift left until map.size <= 2 
+- We need to decrement one fruit type ka count until it reaches 0 for each l shift. if it reaches zero we can remove that key from the map
+
+```javascript
+const sumSubarrayMins = (fruits) => {
+  if (s.length < 1) return 1;
+    let l = 0, r = 0, map = new Map(), maxD = -Infinity;
+    while(r < s.length) {
+        while(map.size > 2) {
+            let countL = map.get(s[l]);
+            countL--;
+            if(countL == 0) map.delete(s[l]);
+            else map.set(s[l],countL);
+            l++
+        }
+        map.set(s[r], (map.get(s[r]) || 0 ) + 1);
+        if(map.size <= 2) {
+            maxD = Math.max(maxD, r - l +1)
+        }
+        r++;
+    }
+    return maxD
+};
+
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 53. Largest repeating character replacement
+
+we are given a string, we need to find the largest substring after changing any character atmost k times
+
+- Let's solve it with sliding window l, r = 0, map = {}, maxD
+- We will run till r < s.length
+- We will always increment r at last. 
+- Here what is our valid window condition? let's see. Let's say in a substr (r- l+1) our majority element is occuring x times (MAX frequency is x). Can we say that other characters has to be changed (r - l + 1) - x times? so till `(r - l + 1) - x <= k`  can we say that the window is valid? YES, we can
+- while (r - l + 1) - x > k just increment reduce the count of map[s[l]]. and l++.
+- We don't need to change x, why? if we are reducing count of elements to shrink will it ever reduce the maxCount of a element? Never. so no need to change x
+
+```
+var characterReplacement = function(s, k) {
+    let l = 0, r = 0, maxD = -Infinity, map = {}, maxFreq = 0;
+    while(r < s.length) {
+        map[s.charAt(r)] = (map[s.charAt(r)] || 0) + 1;
+        maxFreq = Math.max(maxFreq, map[s.charAt(r)]);
+        while((r - l + 1) - maxFreq > k) {
+            map[s.charAt(l)]--;
+            l++;
+        }
+        if((r - l + 1) - maxFreq <= k) {
+            maxD = Math.max(maxD, r - l+ 1);
+        }
+        r++;
+    }
+    return maxD
+};
+```
+
 --------------------------------------------------------------------------------------------------------------------------------

@@ -1,21 +1,22 @@
-var maxScore = function(cardPoints, k) {
-    let total = cardPoints.reduce((acc, curr) => acc+ curr, 0);
-    if(k == cardPoints.length) return total;
-    let max = -Infinity;
-    let prefixSum = new Array(cardPoints.length + 1);
-    prefixSum[0] = 0;
-    for(var i = 1; i<= cardPoints.length; i++) {
-        prefixSum[i] = prefixSum[i-1] + cardPoints[i-1];
+var subarraysWithKDistinctComp = function(nums, k) {
+    let l =0, r = 0, map= new Map(), maxC = 0;
+    while(r < nums.length) {
+        map.set(nums[r], (map.get(nums[r]) || 0) +1)
+        while(map.size > k) {
+            let countL = map.get(nums[l]);
+            countL--;
+            if(!countL) map.delete(nums[l]);
+            else map.set(nums[l], countL);
+            l++;
+        }
+        maxC += (r - l + 1);
+        r++;
     }
-    const subArrayLengthToRmove = cardPoints.length - k;
-    let l = 0, r = l + subArrayLengthToRmove -1;
-    while(l <= k) {
-        r = l + subArrayLengthToRmove - 1;
-        const sum = prefixSum[r + 1] - prefixSum[l];
-        const diff = total - sum;
-        max = Math.max(max, diff);
-        l++;
-    }
-    return max
+    return maxC
+}
+
+var subarraysWithKDistinct = function(nums, k) {
+    return subarraysWithKDistinctComp(nums, k) - subarraysWithKDistinctComp(nums, k-1)
 };
-console.log(maxScore( [1,79,80,1,1,1,200,1], 3));
+
+console.log(subarraysWithKDistinct([1,2,1,2,3], 2))

@@ -2509,6 +2509,8 @@ const sumSubarrayMins = (fruits) => {
 
 ```
 
+similar pattern: https://www.geeksforgeeks.org/problems/longest-k-unique-characters-substring0853/1?itm_source=geeksforgeeks&itm_medium=article&itm_campaign=bottom_sticky_on_article
+
 --------------------------------------------------------------------------------------------------------------------------------
 
 ### 53. Largest repeating character replacement
@@ -2568,7 +2570,6 @@ var numberOfSubstrings = function(s) {
         }
         if(ac > -1 && bc > -1 && cc > -1) {
             maxC += Math.min(ac, Math.min(bc, cc)) + 1
-
         }
         r++;
     }
@@ -2616,3 +2617,42 @@ var maxScore = function(cardPoints, k) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 56. Subarray with K distinct integer
+
+to find all Subarray from an integer array nums with "exactly" k distinct integers
+
+- Was approaching this problem with the technique which we applied for #54.  Number of substring consisting all three strings
+- We can solve that also in that technique of storing the last seen of all nums and finding minimum last seen
+- But overall TC will be O(n*k)
+- Optimised approach would be to calculate no of subarray with <= k distinct numbers --- (1)
+- And no of subarrays with <= k - 1 distinct numbers --- (2)
+- Our ans will be (1) - (2)
+- To find no of subarray with <= k distinct number we can simply use two pointer and keep on increasing r and add the windwo length to count
+- If my map has more than k distinct numbers we can shrink l
+
+```javascript
+var subarraysWithKDistinctComp = function(nums, k) {
+    let l =0, r = 0, map= new Map(), maxC = 0;
+    while(r < nums.length) {
+        map.set(nums[r], (map.get(nums[r]) || 0) +1)
+        while(map.size > k) {
+            let countL = map.get(nums[l]);
+            countL--;
+            if(!countL) map.delete(nums[l]);
+            else map.set(nums[l], countL);
+            l++;
+        }
+        maxC += (r - l + 1);
+        r++;
+    }
+    return maxC
+}
+
+var subarraysWithKDistinct = function(nums, k) {
+    return subarraysWithKDistinctComp(nums, k) - subarraysWithKDistinctComp(nums, k-1)
+};
+
+```
+--------------------------------------------------------------------------------------------------------------------------------
+

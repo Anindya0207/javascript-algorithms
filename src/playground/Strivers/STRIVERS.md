@@ -2542,3 +2542,37 @@ var characterReplacement = function(s, k) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 54. Number of substring consisting all three strings
+
+Given a string s we need to find all substr with all "a", "b", "c" included
+
+- Trick is to store the last seen index of "a", "b" and "c" 
+- Whenever we get all the last seen indexes as valid (0 - n-1), we can add minimum of these three last seen indexes + 1 to my ans
+- means lets say bbcaba is the string when I reach first a. then all the characters are seen. So we will see what was last seen. Obvly b? it was seen at index 1
+- so we can say two substrings possible at a. "bbca" and "bca" ? that is nothing but lastseen(b) + 1
+
+```javascript
+var numberOfSubstrings = function(s) {
+    const arr = s.split('')
+    let ac = -1, bc = -1, cc = -1, r = 0, maxC = 0
+    while(r < arr.length) {
+        if(arr[r] == 'a') {
+            ac = r;
+        }
+        else  if(arr[r] == 'b') {
+            bc = r;
+        }
+        else if(arr[r] == 'c') {
+            cc = r;
+        }
+        if(ac > -1 && bc > -1 && cc > -1) {
+            maxC += Math.min(ac, Math.min(bc, cc)) + 1
+
+        }
+        r++;
+    }
+    return maxC
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

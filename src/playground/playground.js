@@ -1,23 +1,21 @@
-var numberOfSubstrings = function(s) {
-    const arr = s.split('')
-    let ac = -1, bc = -1, cc = -1, r = 0, maxC = 0
-    while(r < arr.length) {
-        if(arr[r] == 'a') {
-            ac = r;
-        }
-        else  if(arr[r] == 'b') {
-            bc = r;
-        }
-        else if(arr[r] == 'c') {
-            cc = r;
-        }
-        if(ac > -1 && bc > -1 && cc > -1) {
-            maxC += Math.min(ac, Math.min(bc, cc)) + 1
-
-        }
-        r++;
+var maxScore = function(cardPoints, k) {
+    let total = cardPoints.reduce((acc, curr) => acc+ curr, 0);
+    if(k == cardPoints.length) return total;
+    let max = -Infinity;
+    let prefixSum = new Array(cardPoints.length + 1);
+    prefixSum[0] = 0;
+    for(var i = 1; i<= cardPoints.length; i++) {
+        prefixSum[i] = prefixSum[i-1] + cardPoints[i-1];
     }
-    return maxC
+    const subArrayLengthToRmove = cardPoints.length - k;
+    let l = 0, r = l + subArrayLengthToRmove -1;
+    while(l <= k) {
+        r = l + subArrayLengthToRmove - 1;
+        const sum = prefixSum[r + 1] - prefixSum[l];
+        const diff = total - sum;
+        max = Math.max(max, diff);
+        l++;
+    }
+    return max
 };
-
-console.log(numberOfSubstrings("abcabc"))
+console.log(maxScore( [1,79,80,1,1,1,200,1], 3));

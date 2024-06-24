@@ -2522,7 +2522,7 @@ we are given a string, we need to find the largest substring after changing any 
 - while (r - l + 1) - x > k just increment reduce the count of map[s[l]]. and l++.
 - We don't need to change x, why? if we are reducing count of elements to shrink will it ever reduce the maxCount of a element? Never. so no need to change x
 
-```
+```javascript
 var characterReplacement = function(s, k) {
     let l = 0, r = 0, maxD = -Infinity, map = {}, maxFreq = 0;
     while(r < s.length) {
@@ -2573,6 +2573,46 @@ var numberOfSubstrings = function(s) {
         r++;
     }
     return maxC
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 55. Maximum Points You Can Obtain from Cards 
+
+We can pick wither first or last element from an array k times and we need to maximise the sum
+
+Approach 1:
+
+- Find all combinations if we pick from left or right in recursive way 
+- when we reach k calc max. 
+- TC will be 2^k
+
+Approach 2:
+
+- Create a prefix sum array
+- We know that if we need to pick k elements we need to discard n-k subarray with minimum sum, right?
+- so our job is to find the minimum sum subarray with n-k length. Total Sum - minimum sum is our ans
+
+```javascript
+var maxScore = function(cardPoints, k) {
+    let total = cardPoints.reduce((acc, curr) => acc+ curr, 0);
+    if(k == cardPoints.length) return total;
+    let max = -Infinity;
+    let prefixSum = new Array(cardPoints.length + 1);
+    prefixSum[0] = 0;
+    for(var i = 1; i<= cardPoints.length; i++) {
+        prefixSum[i] = prefixSum[i-1] + cardPoints[i-1];
+    }
+    const subArrayLengthToRmove = cardPoints.length - k;
+    let l = 0, r = l + subArrayLengthToRmove -1;
+    while(l <= k) {
+        r = l + subArrayLengthToRmove - 1;
+        const sum = prefixSum[r + 1] - prefixSum[l];
+        const diff = total - sum;
+        max = Math.max(max, diff);
+        l++;
+    }
+    return max
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------

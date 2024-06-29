@@ -2656,3 +2656,56 @@ var subarraysWithKDistinct = function(nums, k) {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
+### 57. Task scheduler
+
+We need to complete tasks so that indentical tasks are n intervals apart
+
+- We need to get the most frequent task ( tasks which appears more in the tasks array) on top of the queue. So we will use Priority queue to get the most frequent task whenever we dequeue
+- So first, we will have to push all the tasks in the priority queue where the priority will bethe frequency of the tasks based on which the queue will build the max heap
+- Until the queue is empty we need to pop out the most frequent tasks and execute them
+    - here let's say we pop out task1 from the queue, now till n intervals we won't be able to execute task1 again
+    - So we have to run a loop from `i = 1 to n+ 1` and within this, we will keep popping from the Priority queue
+    - For the popped tasks let's put them in a temp array after reducing their frequency, because they are executed once
+    - Once the counter reaches n+1, ie. n+1 tasks have been executed/n+1 intervals have been spent, may be tasks were not executed but we sat idle till n+1 instant reaches
+- Once we come out of the `1 to n+1` loop, we put back all the items from temp array to the original priority queue if the tasks still have frequency
+- Now if the priority queue is not empty then we still have tasks to execute, right? So we add n+1 unit of time to the final ans
+- If the priority queue is now empty, that means there is no more tasks to be executed, so we add temp.length to the final ans as they are the only tasks pending to be executed in one unit of time each.
+
+```javascript
+var leastInterval = function(tasks, n) {
+    let map = {};
+    // Step1: create a frequency map
+    for(var i  = 0; i <  tasks.length; i++) {
+        map[tasks[i]] = (map[tasks[i]] || 0) +1;
+    }
+    //Step2: Put the frequency in Priority queue here the frequency of the tasks is their priority
+    let pq = new PriorityQueue(Math.pow(10, 5)), final = 0
+    for(var p in map) {
+        pq.enqueue({value: p, priorty: map[p]});
+    }
+    //Step3: Run a loop till pq is empty
+    while(!pq.empty()) {
+        //Step3.1: run a inner loop from 0 to n+1 unit of time, i.e we will keep non ideantical tasks or Idle states in between of 0 and n+1 time
+        let  temp = [];
+        for(var i = 0; i <= n; i++) {
+            const popped = pq.dequeue();
+            popped.priority--;
+            temp.push(popped);
+        }
+        //Step3.2 push the popped tasks back to the pq with reduced frequency (>0)
+        for(var j = 0; j <temp.length; j++) {
+            if(temps[j].priority >0) {
+                pq.enqueue(temp[j])
+            }
+        }
+        //Step3.3 calculate the final time taken
+        if(pq.empty()) {
+            final += temp.length
+        } else {
+            final += n+1
+        }
+    }
+    return final
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

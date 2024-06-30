@@ -85,8 +85,12 @@ function shuffleArray(array) {
       return;
     }
     if(this.front == -1) this.front = 0;
-    const newItem = new Item(++this.rear, item.priority, item.value);
-    this.arr[this.rear] = newItem;
+    if(item.index != undefined) {
+      this.arr[this.rear] = item;
+    } else {
+      const newItem = new Item(++this.rear, item.priority, item.value);
+      this.arr[this.rear] = newItem;
+    }
   }
   
   

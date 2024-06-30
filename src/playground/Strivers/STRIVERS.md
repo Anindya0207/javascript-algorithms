@@ -2707,5 +2707,110 @@ var leastInterval = function(tasks, n) {
     }
     return final
 }
+
 ```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 58. Han d of straights
+
+- here we need to pick the minimum three consecuive numbers where groupSize is three
+- so we can use minPriorityqueue to pop three elements. 
+- We will decrease their value in the occuranceMap and put them back in the queue if they still occur.
+
+```javascript
+var isNStraightHand = function(hand, groupSize) {
+    if(hand.length % groupSize != 0) return false;
+    let map = {};
+    for(var i =0; i < hand.length; i++) {
+        map[hand[i]] = (map[hand[i]] || 0) +1
+    }
+    let pq = new PriorityQueue1(Math.pow(10, 5))
+    for(let m in map) {
+        pq.enqueue({
+            value: m,
+            priority:Number(m)
+        })
+    };
+    while(!pq.empty()) {
+        let temp = [];
+        for(var i =0 ; i< groupSize; i++) {
+            if(!pq.empty()) {
+                let popped = pq.dequeue();
+                if(temp.length > 0 && popped.priority != temp[temp.length-1].priority +1){
+                    return false;
+                }
+                temp.push(popped);
+                map[popped.priority]--;
+            }
+        }
+        for(var i =0; i< temp.length; i++){
+            if(temp[i].priority > 0 && map[temp[i].priority] > 0) {
+                pq.enqueue(temp[i])
+            }
+        }
+        if(temp.length < groupSize) return false;
+    }
+    return true;
+};
+```
+https://leetcode.com/problems/hand-of-straights/
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 59. Design Twitter
+
+We need to design twitter where we need to implement `postTweet` `getTweet` `follow` and `unfollow` methods
+
+- follow and unfollow will just be stored in a followerMap `{[follower] : Array<followees>}`
+- For post tweet just enqueue the tweets in the PQ
+- For getTweet pop from queue and push it back (without changing the index which is pretty important because we don't want to change it's precendence)
+- While popping check if the popped tweet belongs to the current user of one of it's followees, if it is then add it in the feed. Allow until 10 tweets
+
+```javascript
+var Twitter = function() {
+    this.followMap = {};
+    this.pq = new PriorityQueue1(Math.pow(10, 5))
+};
+Twitter.prototype.postTweet = function(userId, tweetId) {
+    if(this.pq) {
+        this.pq.enqueue({
+            value: {userId, tweetId}
+        })
+    }
+};
+Twitter.prototype.getNewsFeed = function(userId) {
+    const followees = this.followMap[userId] || [];
+    let count = 0, final = [], temp = [];
+    
+    while(count < 10 && !this.pq.empty()) {
+        let popped = this.pq.dequeue();
+        if(popped.value.userId == userId || followees.indexOf(popped.value.userId) > -1) {
+            count++;
+            final.push(popped.value.tweetId);
+        }
+       temp.push(popped);
+    }
+    for(var i  =0; i <temp.length; i++) {
+        this.pq.enqueue(temp[i])
+    }
+    return final;
+};
+Twitter.prototype.follow = function(followerId, followeeId) {
+    this.followMap[followerId] = [
+        ...(this.followMap[followerId] || []), followeeId
+    ]
+};
+Twitter.prototype.unfollow = function(followerId, followeeId) {
+    if(this.followMap[followerId] && this.followMap[followerId].length > 0 ) {
+        for(var i = 0; i< this.followMap[followerId]; i++) {
+            if(this.followMap[followerId][i] == followeeId) {
+                this.followMap[followerId].splice(i, 1)
+            }
+        }
+    }
+};
+```
+
+https://leetcode.com/problems/design-twitter/
+
 --------------------------------------------------------------------------------------------------------------------------------

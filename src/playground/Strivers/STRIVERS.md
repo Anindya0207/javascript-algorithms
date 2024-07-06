@@ -2711,7 +2711,7 @@ var leastInterval = function(tasks, n) {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 58. Han d of straights
+### 58. Hand of straights
 
 - here we need to pick the minimum three consecuive numbers where groupSize is three
 - so we can use minPriorityqueue to pop three elements. 
@@ -2812,5 +2812,174 @@ Twitter.prototype.unfollow = function(followerId, followeeId) {
 ```
 
 https://leetcode.com/problems/design-twitter/
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 60. Minimum coins
+
+We need to use minimum coins from the available denominations to meet a target
+
+Approach 1: using Greedy
+
+- This approach will only work if two of the coin denominations sum up to less than the next denomination like [1,2,5,10,20,50,100,500]
+- This approach will not work otherwise like [9,6,5,1] target 11
+
+```javascript
+const minCoins = (coins, V) => 
+{
+    let target = V;
+    let map = {}, final = 0;
+    coins.sort((a,b) => b-a);
+    for(var i =0 ;i <coins.length; i++) {
+        map[coins[i]] = true;
+    }
+    for(var i =0; i<coins.length; i++){
+        let deno = target % coins[i];
+        final += Math.floor(target / coins[i]);
+        target = deno;
+    }
+    return target == 0 ? final : -1;
+}
+```
+
+Approach 2: using Recursion
+
+- We already did this pattern of infinite combination sum (Check combination sum 1) using take and no take approach
+- But this will give TLE since TC is more than O(2^n)
+
+Approach 3: Using DP
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 61. Valid Parenthesis check
+
+We need to find string validity which contains only '(', ')' and '*'.
+
+Approach 1: Recursive TC - O(3^N) SC - O(N) 
+
+- call recursive function with take and no take approach
+- Here we take always, no scene of no take. 
+- For '(' we increase count, for ')' we decrease count
+- For '*' we have three options. 
+    - If we take it as '(' we increase count
+    - If we take it as '' we don't change count
+    - If we take it as ')' we decrease count
+- At any time if `final = true` or `count< 0` we can break fast because if any path has given final as true it means the string is valid, why to chec further?
+- Also if count < 0 for any substring path, why to traverse further? the string is already invalid
+
+```javascript
+var checkValidString = function(s) {
+  let final = false;
+  const _calc = (index, count) => {
+    if(final || count < 0) return 
+    if(index>= s.length) {
+        if(count == 0) {
+            final = true;
+        }
+        return;
+    }
+
+    const curr = s.charAt(index);
+    if(curr == '(') {
+        _calc(index + 1, count+1);
+    } else if(curr == ')') {
+        _calc(index + 1, count-1);
+    } else {
+        _calc(index + 1, count+1);
+        _calc(index + 1, count);
+        _calc(index + 1, count-1);
+    }
+  }
+  _calc(0, 0);
+  return final
+}
+```
+
+But again, this will given you TLE as TC is O(3^N) (we are having three branches per N). Optimal solve is with DP
+
+Approach 2: Using DP 
+
+// TODO
+
+Approach 3: Stack based TC - O(N) SC - O(2N)
+
+- In valid parenthesis we generally go with stack
+- we push if we encounter '(' and pop when we encounter ')'
+- At last we check if top == -1 
+- Here, the catch is we can have '*' also. 
+- So , we will take two stacks. one for the parenthesis where we will store the index of the parenthesis and another for *,
+- We push and pop for parenthesis the same way
+- At the time of pop, check if `parenthesisStack.empty()` if not then pop, else check `starStack.empty()` if not then pop. If both empty `return false`
+- After string is ended, we will check in the parenthesis stack until it is empty
+- If there are items in the star stack, we will check the top from both stacks, if the `parenthesisStack.top() < starStack.top()` which means, the star on top appears after the parenthesis on top, that means we can cancel that out. Something like '( *'
+- But if the top of parenthesis stack have index > star stack top '* (' then we can't cancel out. 
+
+```javascript
+var checkValidString = function(s) {
+  const parenthesisStack = new MyStack();
+  const starStack = new MyStack();
+  for(var i = 0; i < s.length; i++) {
+    const curr = s.charAt(i);
+    if(curr == '(') {
+      parenthesisStack.push(i);
+    } else if(curr == ')') {
+      if(!parenthesisStack.empty()) {
+        parenthesisStack.pop();
+      } else if(!starStack.empty()) {
+        starStack.pop();
+      }
+      else {
+        return false
+      }
+    } else {
+      starStack.push(i);
+    }
+  }
+  while(!parenthesisStack.empty()) {
+    if(starStack.empty()) return false;
+    if(starStack.topp() < parenthesisStack.topp()) return false;
+    starStack.pop();
+    parenthesisStack.pop();
+  }
+  return true;
+};
+```
+
+Approach 4: Greedy
+
+- In recursive approach we were looking for all the combinations that is possible with stars and that too we were doing for all the stars
+- But we can just look for the minimum number of '(' possible in a substring and maximum number of '(' possible in a substring
+- Minimum number of '(' will happen if all the stars in that substring is replaced by ')' 
+- and Max will happen if all stars are replaced by '('
+- If at any time `maxCount < 0` then `return false`
+- If at any time `minCount <0` then reset `minCount = 0`
+- At last return true if `minCount==0`. 
+
+```javascript
+var checkValidString = function(s) {
+    let minC = 0, maxC = 0;
+    for(var i =0 ;i < s.length; i++) {
+        let curr = s.charAt(i);
+        if(curr === '(') {
+            minC++;
+            maxC++;
+        } else if(curr === ')') {
+            minC--;
+            maxC--;
+        } else {
+            minC--;
+            maxC++
+        }
+        if(minC < 0) {
+            minC = 0
+        }
+        if(maxC < 0) {
+            return false
+        }
+    }
+    return minC == 0;
+}
+
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

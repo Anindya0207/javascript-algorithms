@@ -2951,9 +2951,9 @@ Approach 4: Greedy
 - But we can just look for the minimum number of '(' possible in a substring and maximum number of '(' possible in a substring
 - Minimum number of '(' will happen if all the stars in that substring is replaced by ')' 
 - and Max will happen if all stars are replaced by '('
-- If at any time `maxCount < 0` then `return false`
-- If at any time `minCount <0` then reset `minCount = 0`
-- At last return true if `minCount==0`. 
+- If at any time `maxCount < 0` then `return false` why? let's see. if in any substr there is more ')' than '(' even after considering stars, doesn't it mean that the substr is invalid? no matter how many '(' we append after that, that substring will never be valid. isn't maxC says the same thing? maxC < 0 means max count of '(' is negative even after considering all stars to be '('
+- If at any time `minCount <0` then reset `minCount = 0`. Why? let's see, if any substr contains less '(' than ')' after considering all stars to be ')' we might not consider more stars to be ')'. so we reset it to 0.
+- At last return true if `minCount==0` because if all '(' is neutralised, minCount will becmoe zero after end of string right?
 
 ```javascript
 var checkValidString = function(s) {

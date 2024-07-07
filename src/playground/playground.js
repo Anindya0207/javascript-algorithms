@@ -1,51 +1,36 @@
-//Stack
-var MyStack  = function() {
-  this.top = -1;
-  this.arr = [];
-}
+// var canJump = function(nums) {
+//   debugger;
+//   let i = nums.length - 1;
+//   while(i >= 0) {
+//     let j = i-1, canJump = false;
+//     while(j >= 0) {
+//       let jump = nums[j] + j;
+//       if(jump >= i) {
+//         canJump = true;
+//         i = j; break;
+//       }
+//       j--;
+//     }
+//     if(canJump && i == 0) {
+//       return true;
+//     }
+//     if(!canJump) {
+//       return false;
+//     }
+//   }
+// };
 
-MyStack.prototype.push = function(elem) {
-  this.arr[++this.top] = elem;
-}
-MyStack.prototype.pop = function() {
-  if(this.top == -1) return;
-  return this.arr[this.top--];
-}
-MyStack.prototype.topp = function() {
-  if(this.top == -1) return;
-  return this.arr[this.top];
-}
-MyStack.prototype.empty = function() {
-  return this.top == -1;
-}
-
-var checkValidString = function(s) {
-  const parenthesisStack = new MyStack();
-  const starStack = new MyStack();
-  for(var i = 0; i < s.length; i++) {
-    const curr = s.charAt(i);
-    if(curr == '(') {
-      parenthesisStack.push(i);
-    } else if(curr == ')') {
-      if(!parenthesisStack.empty()) {
-        parenthesisStack.pop();
-      } else if(!starStack.empty()) {
-        starStack.pop();
+var canJump = function(nums) {
+  let maxJump = -Infinity;
+  if(nums.length == 1) return true;
+  for(var i = 0; i < nums.length; i++) {
+      let jump = nums[i] + i;
+      if(maxJump != -Infinity && i > maxJump) {
+          return false;
+      } else {
+          maxJump = Math.max(maxJump, jump);
       }
-      else {
-        return false
-      }
-    } else {
-      starStack.push(i);
-    }
+      if(maxJump >= nums.length -1) return true
   }
-  while(!parenthesisStack.empty()) {
-    if(starStack.empty()) return false;
-    if(starStack.topp() < parenthesisStack.topp()) return false;
-    starStack.pop();
-    parenthesisStack.pop();
-  }
-  return true;
-};
-
-console.log(checkValidString('(((((()*)(*)*))())())(()())())))((**)))))(()())()'))
+}
+console.log(canJump([2,3,1,1,4]))

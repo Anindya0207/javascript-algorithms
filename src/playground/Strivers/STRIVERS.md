@@ -2983,3 +2983,91 @@ var checkValidString = function(s) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 62. Max meeting in a room
+
+We are given intervals of meetings, we need to maximise the number of meetings held in the room
+
+- We can sort all the meetings basis their end time
+- Now take two pointer like any sliding window problem, l = 0, r = 0
+- We will check if `arr[r][0] > arr[l][1]` which means this meeting is starting after the previous meeting, so we will increase count and shift `l = r` and increase `r++`. This is the greedy pattern. we are greedily checking for more meeting to be scheduled
+- If `arr[r][0] <= arr[l][1]` this means overlap. We just increment `r++` to check the next valid meeting which can be scheduled after `l` 
+
+```javascript
+const maxMeetings = (start, end) => {
+  let final = new Array(start.length);
+  for (var i = 0; i < start.length; i++) {
+    final.push([start[i], end[i]]);
+  }
+  final.sort((a, b) => a[1] - b[1]);
+  let count = 1;
+  let j = 1,
+    k = j - 1;
+  while (j < final.length) {
+    if (final[j] && final[j][0] > final[k][1]) {
+      count++;
+      k = j;
+      j++;
+    } else {
+      j++;
+    }
+  }
+
+  return count;
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 63. Jump Game I
+
+We are given an array with arr[i] is max jump possible from index i. We need to figure out if we can reach the end
+
+- We can measure maxJumps from each index -` maxJump = Math.max(maxJump, arr[i] + i)`
+- If at any point `i > maxJump` this means we came to such an index until which we haven't been able to jump from prev indexes. so return false
+- If `maxJump >= arr.length- 1` return true
+
+```javascript
+ var canJump = function(nums) {
+  let maxJump = -Infinity;
+  if(nums.length == 1) return true;
+  for(var i = 0; i < nums.length; i++) {
+      let jump = nums[i] + i;
+      if(maxJump != -Infinity && i > maxJump) {
+          return false;
+      } else {
+          maxJump = Math.max(maxJump, jump);
+      }
+      if(maxJump >= nums.length -1) return true
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 64. Jump Game II
+
+We are given an array where it's guranteed that it is possible to jump from start to end somehow. We need to find minimum jumps
+
+- We can find all jumps from each index by recursive approach but it will be O(N^N) at worst case which can be optimised to O(N^2) by DP
+- But we can apply Greedy approach like we did in valid parenthesis problem check ###61
+- So in greedy approach we are interest in all the combinations but we will keep track of the minimum and maximum only i.e a range
+- here our range is minimum index to reach by jump from an index and maximum index which can be reached by jump from the index
+- If the maxPointer reaches last, we stop
+- For each jump we increase jump conunter
+
+```javascript
+var jump = function(nums) {
+    let minC = 0, maxC = 0, jump = 0
+    while(maxC < nums.length -1 ) {
+        let max = -Infinity;
+        for(var i = minC; i <= maxC; i++) {
+            max = Math.max(max, nums[i] + i);
+        }
+        minC = maxC+1;
+        maxC = max;
+        jump++;
+    }
+    return jump;
+};
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

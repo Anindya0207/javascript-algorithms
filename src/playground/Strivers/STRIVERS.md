@@ -2815,43 +2815,66 @@ https://leetcode.com/problems/design-twitter/
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 60. Minimum coins
+### 60. Max meeting in a room
 
-We need to use minimum coins from the available denominations to meet a target
+We are given intervals of meetings, we need to maximise the number of meetings held in the room
 
-Approach 1: using Greedy
-
-- This approach will only work if two of the coin denominations sum up to less than the next denomination like [1,2,5,10,20,50,100,500]
-- This approach will not work otherwise like [9,6,5,1] target 11
+- We can sort all the meetings basis their end time
+- Now take two pointer like any sliding window problem, l = 0, r = 0
+- We will check if `arr[r][0] > arr[l][1]` which means this meeting is starting after the previous meeting, so we will increase count and shift `l = r` and increase `r++`. This is the greedy pattern. we are greedily checking for more meeting to be scheduled
+- If `arr[r][0] <= arr[l][1]` this means overlap. We just increment `r++` to check the next valid meeting which can be scheduled after `l` 
 
 ```javascript
-const minCoins = (coins, V) => 
-{
-    let target = V;
-    let map = {}, final = 0;
-    coins.sort((a,b) => b-a);
-    for(var i =0 ;i <coins.length; i++) {
-        map[coins[i]] = true;
+const maxMeetings = (start, end) => {
+  let final = new Array(start.length);
+  for (var i = 0; i < start.length; i++) {
+    final.push([start[i], end[i]]);
+  }
+  final.sort((a, b) => a[1] - b[1]);
+  let count = 1;
+  let j = 1,
+    k = j - 1;
+  while (j < final.length) {
+    if (final[j] && final[j][0] > final[k][1]) {
+      count++;
+      k = j;
+      j++;
+    } else {
+      j++;
     }
-    for(var i =0; i<coins.length; i++){
-        let deno = target % coins[i];
-        final += Math.floor(target / coins[i]);
-        target = deno;
-    }
-    return target == 0 ? final : -1;
-}
+  }
+
+  return count;
+};
 ```
-
-Approach 2: using Recursion
-
-- We already did this pattern of infinite combination sum (Check combination sum 1) using take and no take approach
-- But this will give TLE since TC is more than O(2^n)
-
-Approach 3: Using DP
-
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 61. Valid Parenthesis check
+### 61. Jump Game I
+
+We are given an array with arr[i] is max jump possible from index i. We need to figure out if we can reach the end
+
+- We can measure maxJumps from each index -` maxJump = Math.max(maxJump, arr[i] + i)`
+- If at any point `i > maxJump` this means we came to such an index until which we haven't been able to jump from prev indexes. so return false
+- If `maxJump >= arr.length- 1` return true
+
+```javascript
+ var canJump = function(nums) {
+  let maxJump = -Infinity;
+  if(nums.length == 1) return true;
+  for(var i = 0; i < nums.length; i++) {
+      let jump = nums[i] + i;
+      if(maxJump != -Infinity && i > maxJump) {
+          return false;
+      } else {
+          maxJump = Math.max(maxJump, jump);
+      }
+      if(maxJump >= nums.length -1) return true
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 62. Valid Parenthesis check
 
 We need to find string validity which contains only '(', ')' and '*'.
 
@@ -2984,66 +3007,7 @@ var checkValidString = function(s) {
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 62. Max meeting in a room
-
-We are given intervals of meetings, we need to maximise the number of meetings held in the room
-
-- We can sort all the meetings basis their end time
-- Now take two pointer like any sliding window problem, l = 0, r = 0
-- We will check if `arr[r][0] > arr[l][1]` which means this meeting is starting after the previous meeting, so we will increase count and shift `l = r` and increase `r++`. This is the greedy pattern. we are greedily checking for more meeting to be scheduled
-- If `arr[r][0] <= arr[l][1]` this means overlap. We just increment `r++` to check the next valid meeting which can be scheduled after `l` 
-
-```javascript
-const maxMeetings = (start, end) => {
-  let final = new Array(start.length);
-  for (var i = 0; i < start.length; i++) {
-    final.push([start[i], end[i]]);
-  }
-  final.sort((a, b) => a[1] - b[1]);
-  let count = 1;
-  let j = 1,
-    k = j - 1;
-  while (j < final.length) {
-    if (final[j] && final[j][0] > final[k][1]) {
-      count++;
-      k = j;
-      j++;
-    } else {
-      j++;
-    }
-  }
-
-  return count;
-};
-```
---------------------------------------------------------------------------------------------------------------------------------
-
-### 63. Jump Game I
-
-We are given an array with arr[i] is max jump possible from index i. We need to figure out if we can reach the end
-
-- We can measure maxJumps from each index -` maxJump = Math.max(maxJump, arr[i] + i)`
-- If at any point `i > maxJump` this means we came to such an index until which we haven't been able to jump from prev indexes. so return false
-- If `maxJump >= arr.length- 1` return true
-
-```javascript
- var canJump = function(nums) {
-  let maxJump = -Infinity;
-  if(nums.length == 1) return true;
-  for(var i = 0; i < nums.length; i++) {
-      let jump = nums[i] + i;
-      if(maxJump != -Infinity && i > maxJump) {
-          return false;
-      } else {
-          maxJump = Math.max(maxJump, jump);
-      }
-      if(maxJump >= nums.length -1) return true
-  }
-}
-```
---------------------------------------------------------------------------------------------------------------------------------
-
-### 64. Jump Game II
+### 63. Jump Game II
 
 We are given an array where it's guranteed that it is possible to jump from start to end somehow. We need to find minimum jumps
 

@@ -3035,3 +3035,29 @@ var jump = function(nums) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 64. Minimum platform to accomodate N train
+
+- Trick is as the day pass by, we just increase the count of platform if we get arrival and we decrease the platform if it's departure
+- Whatever maximum count of platform we got, is the minimum platform required to accomodate all trains 
+
+```javascript
+findPlatform(arr, dep, n)
+    {
+        arr.sort((a, b) => a-b);
+        dep.sort((a, b) => a-b);
+        let i = 0, j = 0, count = 0, maxC = -Infinity;
+        while(i < arr.length) {
+            if(arr[i] <= dep[j]) {
+                count++;
+                i++;
+                maxC = Math.max(maxC, count);
+            } else {
+                count--;
+                j++;
+            }
+        }
+        return maxC;
+    }
+```
+--------------------------------------------------------------------------------------------------------------------------------

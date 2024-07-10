@@ -1,36 +1,18 @@
-// var canJump = function(nums) {
-//   debugger;
-//   let i = nums.length - 1;
-//   while(i >= 0) {
-//     let j = i-1, canJump = false;
-//     while(j >= 0) {
-//       let jump = nums[j] + j;
-//       if(jump >= i) {
-//         canJump = true;
-//         i = j; break;
-//       }
-//       j--;
-//     }
-//     if(canJump && i == 0) {
-//       return true;
-//     }
-//     if(!canJump) {
-//       return false;
-//     }
-//   }
-// };
-
-var canJump = function(nums) {
-  let maxJump = -Infinity;
-  if(nums.length == 1) return true;
-  for(var i = 0; i < nums.length; i++) {
-      let jump = nums[i] + i;
-      if(maxJump != -Infinity && i > maxJump) {
-          return false;
-      } else {
-          maxJump = Math.max(maxJump, jump);
-      }
-      if(maxJump >= nums.length -1) return true
-  }
+const findPlatform = (arr, dep, n) => {
+    arr.sort((a, b) => a-b);
+    dep.sort((a, b) => a-b);
+    let i = 0, j = 0, count = 0, maxC = -Infinity;
+    while(i < arr.length) {
+        if(arr[i] < dep[j]) {
+            count++;
+            i++;
+        } else {
+            count--;
+            j++;
+        }
+        maxC = Math.max(maxC, count);
+    }
+    return maxC;
 }
-console.log(canJump([2,3,1,1,4]))
+
+console.log(findPlatform([0900, 0940, 0950, 1100, 1500, 1800], [0910, 1200, 1120, 1130, 1900, 2000]))

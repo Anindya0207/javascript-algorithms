@@ -2838,10 +2838,8 @@ const maxMeetings = (start, end) => {
     if (final[j] && final[j][0] > final[k][1]) {
       count++;
       k = j;
-      j++;
-    } else {
-      j++;
     }
+    j++
   }
 
   return count;
@@ -3059,5 +3057,39 @@ findPlatform(arr, dep, n)
         }
         return maxC;
     }
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 65. Job Sequencing Problem
+
+We need to perform jobs within deadline to maximise profit
+
+- We need to perform top profit jobs first so we will sort it by profit 
+- We need to delay a job as much as possible till it's deadline such that more jobs can be performed before that
+- So we will try to perform a job in it's deadline date, if some other job already performed in that day we will perform it in a earlier day
+- But we will first perform the max profit job first
+
+```javascript
+JobScheduling(arr, n)
+{
+    let maxDead = -Infinity, jobC = 0, maxC = 0
+    arr.sort((a, b) => b.profit - a.profit);
+    for(var i  = 0; i<arr.length; i++) {
+        maxDead = Math.max(maxDead, arr[i].dead);
+    }
+    let deadLineArr = new Array(maxDead).fill(-1);
+    for(var i =0; i < arr.length; i++) {
+        let dead = arr[i].dead;
+        for(let k = dead-1; k >=0 ;k--) {
+            if(deadLineArr[k] == -1) {
+                deadLineArr[k] = arr[i].id;
+                maxC += arr[i].profit;
+                jobC++;
+                break;
+            }
+        }
+    }
+    return [jobC, maxC]
+}
 ```
 --------------------------------------------------------------------------------------------------------------------------------

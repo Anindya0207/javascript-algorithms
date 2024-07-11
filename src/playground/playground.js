@@ -1,18 +1,30 @@
-const findPlatform = (arr, dep, n) => {
-    arr.sort((a, b) => a-b);
-    dep.sort((a, b) => a-b);
-    let i = 0, j = 0, count = 0, maxC = -Infinity;
-    while(i < arr.length) {
-        if(arr[i] < dep[j]) {
-            count++;
-            i++;
-        } else {
-            count--;
-            j++;
-        }
-        maxC = Math.max(maxC, count);
+const JobScheduling = (arr) =>{
+    let maxDead = -Infinity, jobC = 0, maxC = 0
+    arr.sort((a, b) => b.profit - a.profit);
+    for(var i  = 0; i<arr.length; i++) {
+        maxDead = Math.max(maxDead, arr[i].dead);
     }
-    return maxC;
-}
+    let deadLineArr = new Array(maxDead).fill(-1);
+    for(var i =0; i < arr.length; i++) {
+        let dead = arr[i].dead;
+        for(let k = dead-1; k >=0 ;k--) {
+            if(deadLineArr[k] == -1) {
+                deadLineArr[k] = arr[i];
+                maxC += arr[i].profit;
+                jobC++;
+                break;
+            }
+        }
+    }
+    return [jobC, maxC]
+  }
 
-console.log(findPlatform([0900, 0940, 0950, 1100, 1500, 1800], [0910, 1200, 1120, 1130, 1900, 2000]))
+  console.log(JobScheduling(
+    [
+        {dead: 2, profit: 100},
+        {dead: 1, profit: 19},
+        {dead: 2, profit: 27},
+        {dead: 1, profit: 25},
+        {dead: 1, profit: 15}
+    ]
+  ))

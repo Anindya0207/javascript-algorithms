@@ -3093,3 +3093,85 @@ JobScheduling(arr, n)
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 66. Candy
+
+We need to give minimum candies to children such that 
+- All child get atleast 1 candy
+- Children with more need factor than neighbouring children get more candies
+
+Approach 1: Recursion: O(N) SC O(N)
+
+- We can recursively go over the array and when we encounter arr[i] < arr[i+1] we know that the current guy will get less candy than it's right neighbour
+    - If the current guy has more need than it's left neighbour like arr[i] > arr[i-1] then we will give  arr[i-1] + 1 candy to that guy
+    - Else we will give him 1 candy
+    - We call the recursion method for the next index
+- If we encount arr[i] > arr[i+1] we know that the current guy will get more candy than it's right neighbour 
+    - Now we will call the recursive method to get the candy of it's right neighbour 
+    - If the current guy has more need than it's left neighbour as well, like arr[i] > arr[i-1] then we take max of it's left neghbour and right neighbout and give him 1 candy extra. means we give `Math.max(candy[i-1], calc(i+1)) +1`
+
+```javascript
+const candy = (arr) => {
+    let candy = new Array(arr).fill(0);
+    const _calc = (index) => {
+        if(index >= arr.length) return
+        if(arr[index] > arr[index+1]) {
+            if(arr[index] > arr[index-1]) {
+                candy[index] = Math.max(candy[index-1], _calc(index+1)) +1;
+            } else {
+                candy[index] = _calc(index+1) + 1
+            }
+        } else{
+            if(arr[index] > arr[index-1]) {
+               candy[index] = candy[index-1] +1;
+            } else {
+               candy[index] =  1
+            }
+            _calc(index+1)
+        }
+        return candy[index]
+    };
+    _calc(0);
+    return candy.reduce((acc, curr) => acc + curr, 0);
+}
+```
+
+Approach 2: Slope approach Tc O(N) SC O(1)
+
+- Here we will run a while loop till arr.length
+- If we get arr[i] == arr[i-1] we just keep adding 1 candy to ans and continue
+- As soon as we get arr[i] > arr[i-1] we initiate a peak `peak = 1` variable and keep incrementing till arr[i] > arr[i-1]. 
+    - Point to note here is first we increment peak++ then we add peak to ans
+- As soon as this while loop breaks, we initiate a down variable `down = 1` and keep incrementing down till arr[i] < arr[i-1]
+    - Point to note here is first we add down and then we do down++
+- Once this while loop ends. if the `down > peak` we add the delta to the ans `ans += down-peak`
+
+```javascript
+const candy = (arr) => {
+    let peak, down, ans = 1, i=1;
+    while(i < arr.length) {
+        if(arr[i] == arr[i-1]) {
+            ans += 1;
+            i++;
+            continue;
+        }
+        peak = 1;
+        while(i < arr.length && arr[i] > arr[i-1]) {
+            peak++;
+            ans+= peak;
+            i++;
+        }
+        down = 1;
+        while(i < arr.length && arr[i] < arr[i-1]) {
+            ans += down;
+            down++;
+            i++;
+        }
+        if(down > peak) {
+            ans += (down - peak);
+        }
+    }
+    return ans;
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

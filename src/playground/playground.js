@@ -1,30 +1,33 @@
-const JobScheduling = (arr) =>{
-    let maxDead = -Infinity, jobC = 0, maxC = 0
-    arr.sort((a, b) => b.profit - a.profit);
-    for(var i  = 0; i<arr.length; i++) {
-        maxDead = Math.max(maxDead, arr[i].dead);
-    }
-    let deadLineArr = new Array(maxDead).fill(-1);
-    for(var i =0; i < arr.length; i++) {
-        let dead = arr[i].dead;
-        for(let k = dead-1; k >=0 ;k--) {
-            if(deadLineArr[k] == -1) {
-                deadLineArr[k] = arr[i];
-                maxC += arr[i].profit;
-                jobC++;
-                break;
-            }
+var candy = function (ratings) {
+    let i = 0, j = i+1, total = 1, peak;
+    while(j < ratings.length) {
+        debugger
+        if(ratings[j] != undefined && ratings[j] == ratings[i]) {
+            total += 1;
+            i++;
+            j++;
+            continue;
+        }
+        peak = 1
+        while(ratings[j] != undefined && ratings[j] > ratings[i]) {
+            peak++;
+            total += peak;
+            i++;
+            j++;
+        }
+        down = 1; 
+        while(ratings[j] != undefined && ratings[j] < ratings[i]) {
+            total += down;
+            down++;
+            i++;
+            j++;
+        }
+        if(down > peak) {
+            total = total + (down - peak);
         }
     }
-    return [jobC, maxC]
-  }
+    return total;
+};
 
-  console.log(JobScheduling(
-    [
-        {dead: 2, profit: 100},
-        {dead: 1, profit: 19},
-        {dead: 2, profit: 27},
-        {dead: 1, profit: 25},
-        {dead: 1, profit: 15}
-    ]
-  ))
+// console.log(candy([0, 2, 4, 7, 6, 5, 4, 3,2, 1,1,1,2,3,4, 2,1,1,1]))
+console.log(candy([1,0,2]))

@@ -3175,3 +3175,98 @@ const candy = (arr) => {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 67. Pre order traversal for Binary tree (Iterative)
+
+- We will take a stack 
+- We will push the root
+- WE will pop the root and push Right and Left if present
+- We will continue this till stack is not empty
+
+```javascript
+var preorderTraversal = function (root) {
+    if(root == null) return [];
+    let final = [];
+    let stack = new MyStack();
+    // Push the root first
+    stack.push(root);
+    while(!stack.empty()) {
+        //Pop the root
+        let poped = stack.pop();
+        final.push(poped.val);
+        // Push right and left in order so that first left gets popped and then right
+        if(poped.right) {
+            stack.push(poped.right);
+        }
+        if(poped.left) {
+            stack.push(poped.left);
+        }
+    }
+    return final
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 68. Inorder traversal of Binary tree (Iterative)
+
+- we will continue till stack is empty
+- We will go as much left as we can and push in the stack
+- When we get left child as null then we pop the root and and we go right
+
+```javascript
+var inorderTraversal = function(root) {
+    if(root == null) return [];
+    let stack = new MyStack();
+    let final = [];
+    let pivot = root;
+    while(!stack.empty() || pivot) {
+        // Go left as much as poisslbe 
+        while(pivot) {
+            stack.push(pivot);
+            pivot = pivot.left;
+        }
+        // Once left child is over pop last 
+        let poped = stack.pop();
+        final.push(poped.val);
+        // Go right
+        pivot = poped.right;
+    }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 69. Post order traversal of Binary Tree (Iterative)
+
+- Here Also we will continue till stack is empty
+- We will try to go to extreme left
+- Once reached we will peek, instead of pop.
+- If the top element has right children, we will go right (only if the right children are not visited)
+- If not, We will push the peeked elemenet which is root
+
+```javascript
+var postOrderTraversal = function(root) {
+    if(root== null) return [];
+    let stack = new MyStack();
+    let pivot = root, lastVisited = null;
+    while(!stack.empty() || pivot) {
+        if(pivot) {
+            // Go as much left
+            stack.push(pivot);
+            pivot = pivot.left;
+        } else {
+            // peek the top element and see if it has right child
+            let top = stack.topp();
+            if(top.right && top.right != lastVisited) {
+                //Go right
+                pivot = top.right;
+            } else {
+                // Pop
+                let pop = stack.pop();
+                final.push(pop.val);
+                lastVisited = pop;
+            }
+        }
+    }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

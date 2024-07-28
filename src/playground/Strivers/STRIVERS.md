@@ -3270,3 +3270,35 @@ var postOrderTraversal = function(root) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 70. LCA of a tree between two nodes
+
+LCA (Lowest common ancestor) “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+
+- Traverse the tree using recursion
+- When we get any of the two nodes return that node
+- Lets say we get `retLeft` and `retRight` from left traversal and right traversal
+- if `retLeft` and `retRight` both are null `return null`
+- If any of these are not null return which ever is not null
+- If both of these are not null, which will only be true if the current pivot is LCA, return the pivot itself
+
+```javascript
+var lowestCommonAncestor = function (root, p, q) {
+    const _calc = (pivot) => {
+        if(!pivot) {
+            return null;
+        }
+        if(pivot == p || pivot == q){
+            return pivot;
+        }
+        let retLeft = _calc(pivot.left);
+        let retRight = _calc(pivot.right);
+        if(!retLeft && !retRight) return null;
+        if(retLeft && !retRight) return retLeft;
+        if(!retLeft && retRight) return retRight;
+        if(retLeft && retRight) return pivot;
+    };
+    return _calc(root);
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

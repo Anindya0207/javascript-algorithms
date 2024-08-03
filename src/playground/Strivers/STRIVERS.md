@@ -3302,3 +3302,37 @@ var lowestCommonAncestor = function (root, p, q) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 71. Max width of a binary tree
+
+We need to find the max width of all level of binary tree
+
+- To find width we can do level order traversal and get the maximum numbers of nodes at any level
+- But do we really need to? probably not. We can just do some indexing of the nodes and calculate the difference between the max and min index of a level
+- So for any node the left and right child can be called with index 2 * i + 1 and 2* 1 + 2 like we do in heap sort
+- but since the index can grow exponentially, this will go out of bound
+- Hence we need to normalise the index at each level
+- To normalise, we need to subtract the index with the minimum index at the curent level. 
+- width at any node will be nothing but the distance of the current nodes index to the minimum node index, which is nothing but normalisedIndex + 1
+- we will have to return the max of the current node width, it's left width and the right width
+
+```javascript
+var widthOfBinaryTree = function(root) {
+    if(root == null) return 0;
+    let minIndices = []
+    const _traverse = (pivot, level, index) => {
+        if(!pivot) return 0;
+        if(!minIndices[level]) {
+            minIndices[level] = index;
+        }
+        let normalizedIndex = index - minIndices[level];
+        let leftChildWidth = _traverse(pivot.left, level+1, 2 * normalizedIndex + 1);
+        let rightChildWidth = _traverse(pivot.right, level+1, 2 * normalizedIndex + 2);
+
+        let maxWidthAtThisLevel = normalizedIndex + 1;
+        return Math.max(maxWidthAtThisLevel, leftChildWidth, rightChildWidth)
+    }
+    return _traverse(root, 0, 0);
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

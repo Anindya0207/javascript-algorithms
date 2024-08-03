@@ -3336,3 +3336,43 @@ var widthOfBinaryTree = function(root) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 72. All nodes at K distance
+
+- We need to find all nodes from a target node at K distance
+- Trick is to assign the parent node as well because in tree we can;t go upward.
+- Now we can move in all direction and calculate distance
+
+```javascript
+var distanceK = function(root, target, k) {
+    let final = [];
+    let visitedMap = {};
+    const _appendParent = (pivot, prev) => {
+        if(!pivot) return;
+        pivot.parent = prev;
+        _appendParent(pivot.left, pivot);
+        _appendParent(pivot.right, pivot);
+    }
+    _appendParent(root, null);
+    
+    const _traverse = (pivot, dist) => {
+        if(!pivot) return;
+        if(dist == k) {
+            final.push(pivot.val);
+        }
+        visitedMap[pivot.val] = true;
+        if(pivot.left && !visitedMap[pivot.left.val]) {
+            _traverse(pivot.left, dist+1)
+        }
+        if(pivot.right && !visitedMap[pivot.right.val]) {
+            _traverse(pivot.right, dist+1)
+        }
+        if(pivot.parent && !visitedMap[pivot.parent.val]) {
+            _traverse(pivot.parent, dist+1)
+        }
+    }
+    _traverse(target, 0);
+    return final
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

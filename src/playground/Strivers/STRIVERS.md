@@ -3375,4 +3375,146 @@ var distanceK = function(root, target, k) {
     return final
 };
 ```
+same pattern: https://www.geeksforgeeks.org/problems/burning-tree/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=burning-tree
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 73. Count nodes of complete binary tree
+
+Approach 1: TC O(N) SC O(logN) where N is number of nodes in the tree
+
+- Just do any traversal - inorder, preorder etc to count all nodes
+
+```javascript
+var countNodes = function(root) {
+    if(!root) return 0;
+    const _calc = (pivot) => {
+        if(!pivot) return 0;
+        return 1 + _calc(pivot.left) + _calc(pivot.right);
+    };
+    return _calc(root)
+}
+```
+
+Approach 2: TC O(logN * logN) SC - O(2logN)
+
+- So we can calculate the leftHeight and rightHeight of the root. If they are same, we can simply say that the count of nodes is 2^H -1
+- But if these heights are different, go left and go right from root, 
+- calculate the left subtree height and right subtree height using same technique
+- If again they are same, return 2 ^H -1
+- If not, again traverse to left and right and return `1 +  calculated nodes from left subtree + calculated nodes from right subtree`
+
+```javascript
+var countNodes = function(root) {
+    if(!root) return null;
+    const _calc = (pivot) => {
+        if(!pivot) return 0;
+        let lH = _getLeftHeight(pivot, 0);
+        let rH = _getRightheight(pivot, 0);
+        if(lH == rH) {
+            return (1 << lH) -1;
+        }
+        return 1 + _calc(pivot.left) + _calc(pivot.right);
+    }
+    const _getLeftHeight = (pivot, height) => {
+        if(!pivot) return height;
+        return _getLeftHeight(pivot.left, height + 1)
+    }
+    const _getRightheight = (pivot, height) => {
+        if(!pivot) return height;
+        return _getRightheight(pivot.right, height + 1)
+    }
+    return _calc(root)
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 74. Unique binary tree
+
+- We can always construct a unique binary tree if we are given either `Inorder + Preorder` or `Inorder + postorder` traversal
+
+Now we need to costruct unique binary tree from `Inorder + Preorder`
+
+- We know that Preorder will always have the root at front
+- Split the inorder by that root, which will give us the left and right subtree
+- Now basis the length of the left and right subtree, get the pre order notation of the left and right subtree from the preorder array
+- Repeat the same thing as in, take the first element as root, split inorder to get left and right subtree
+
+```javascript
+var buildTree = function(preorder, inorder) {
+    const _build = (_preorder, _inorder) => {
+        if(!_preorder.length && !_inorder.length) return null;
+        let pivot = new TreeNode(_preorder[0], null, null);
+        // inorder notation of left and right subtree
+        let [left, right] = _split(_inorder, _preorder[0]); 
+        // Get the preorder notation of the left and right subtree by help of the length
+        let preLeft = _preorder.slice(1, left.length + 1); // Notice, we are splicing from 1 till the left length + 1, why? because 0th index has the root. so from 1st index if we split left length, we will get the left subtree's pre-order notation
+        let preRight = _preorder.slice(left.length + 1) // rest part is the right subtree's pre-order notation
+        pivot.left = _build(preLeft,left );
+        pivot.right = _build(preRight, right);
+        return pivot;
+    }
+    
+    // Split the inorder array to get the left and right subtree
+    const _split = (_inorder, elem) => {
+        let left = [];
+        let i = 0
+        for(; i < _inorder.length; i++) {
+            if(_inorder[i] == elem) {
+                i++;
+                break
+            } else {
+                left.push(_inorder[i]);
+            }
+        }
+        let right = [];
+        while(i< _inorder.length) {
+            right.push(_inorder[i]);
+            i++;
+        }
+        return [left, right];
+    }
+    return _build(preorder, inorder)
+};
+```
+
+-Similarly we can do for `Inortder + Postorder`
+
+```javascript
+var buildTree = function(postorder, inorder) {
+    const _build = (_postorder, _inorder) => {
+        if(!_postorder.length && !_inorder.length) return null;
+        let pivot = new TreeNode(_postorder[_postorder.length - 1], null, null); // why? in post order notation, last elem is the root
+        // inorder notation of left and right subtree
+        let [left, right] = _split(_inorder, _postorder[_postorder.length - 1]); 
+        // Get the postorder notation of the left and right subtree by help of the length
+        let postLeft = _postorder.slice(0, left.length); // Notice, we are splicing from 0 till the left length, why? because. so from 0th index if we split left length, we will get the left subtree's pre-order notation
+        let postRight = _postorder.slice(left.length, _postorder.length - 1) // rest part is the right subtree's pre-order notation till last index. we have to omit the last element as it is the root
+        pivot.left = _build(preLeft,left );
+        pivot.right = _build(preRight, right);
+        return pivot;
+    }
+    
+    // Split the inorder array to get the left and right subtree
+    const _split = (_inorder, elem) => {
+        let left = [];
+        let i = 0
+        for(; i < _inorder.length; i++) {
+            if(_inorder[i] == elem) {
+                i++;
+                break
+            } else {
+                left.push(_inorder[i]);
+            }
+        }
+        let right = [];
+        while(i< _inorder.length) {
+            right.push(_inorder[i]);
+            i++;
+        }
+        return [left, right];
+    }
+    return _build(preorder, inorder)
+};
+```
 --------------------------------------------------------------------------------------------------------------------------------

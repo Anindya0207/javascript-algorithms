@@ -3478,7 +3478,7 @@ var buildTree = function(preorder, inorder) {
 };
 ```
 
--Similarly we can do for `Inortder + Postorder`
+- Similarly we can do for `Inortder + Postorder`
 
 ```javascript
 var buildTree = function(postorder, inorder) {
@@ -3516,5 +3516,85 @@ var buildTree = function(postorder, inorder) {
     }
     return _build(preorder, inorder)
 };
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 75. Morris algorithm: Inorder and Preorder traversal
+
+- We have already seen Inorder and post order traversal using recursive and iterative approach (using stack)
+- Morris algo uses "Threaded binary tree" concept. Threaded mean: there are certain connection which will be created from leaf to root node
+
+Inorder: TC:O(N) Sc: O(1)
+
+- we will take a pivot at root firstly and run a loop till pivot is truthy
+- if `pivot.left ==null` we will push the pivot value to the final array and we will move `pivot = pivot.right`
+- else, we will have to find out the right most leaf node of pivot's immiediate left child
+    - we will run a loop till we find the right most leaf node of the left child, such that the leaf node is neither pointed to the current pivot nor it has any right child
+    - once the while loop breaks, we will check if the right most node doesn't actually have a right child, 
+        - if so, assign pivot as it's right (create the thread)
+        - move `pivot = pivot.left`
+    - if it already has a right child, that means the thred already exists, 
+        - then break the thread 
+        - push the pivot 
+        - move right `pivot = pivot.right`
+
+```javascript
+var inorderTraversal = function (root) {
+    let pivot = root;
+    let inorder = [];
+    while(pivot) {
+        if(!pivot.left) {
+            inorder.push(pivot.val);
+            pivot = pivot.right;
+        } else {
+            let temp = pivot.left;
+            while(temp.right && temp.right != pivot) {
+                temp = temp.right;
+            }
+            if(!temp.right) {
+                temp.right = pivot;
+                pivot = pivot.left;
+            } else {
+                temp.right = null;
+                // pushing while breaking the thread
+                inorder.push(pivot.val);
+                pivot = pivot.right;
+            }
+        }
+    }
+    return inorder;
+}
+```
+
+Preorder: TC:O(N) Sc: O(1)
+
+- same as above, except we will push the pivot when we create the thread rather than when we break the thread 
+
+```javascript
+var preorderTraversal = function (root) {
+    let pivot = root;
+    let preorder = [];
+    while(pivot) {
+        if(!pivot.left) {
+            preorder.push(pivot.val);
+            pivot = pivot.right
+        } else {
+            let temp = pivot.left;
+            while(temp.right && temp.right != pivot) {
+                temp = temp.right;
+            }
+            if(!temp.right) {
+                temp.right = pivot;
+                // pushing while creating the thread
+                preorder.push(pivot.val);
+                pivot = pivot.left;
+            } else {
+                temp.right = null;
+                pivot = pivot.right;
+            }
+        }
+    }
+    return preorder;
+}
 ```
 --------------------------------------------------------------------------------------------------------------------------------

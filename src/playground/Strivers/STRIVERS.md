@@ -3656,3 +3656,100 @@ var deleteNode = function (root, key) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 77. BST Iterator
+
+In most of the BST problems we need to find the inorder traversal to get the sorted array. which will take TC of O(N) and SC of O(N)
+One good way to traverse in BST is BST iterator which consist of 
+next() and previous() method. next will give the values in ascending order while previous() will give values in descending order
+
+Approach 1: Using inorder DFS traversal
+
+- We can calculate the inorder DFS traversal and store in a array or list 
+- next() will return the `inorder[pointer++]` 
+
+```javascript
+var BSTIterator = function(root) {
+    this.inorder = [];
+    this.pointer = 0;
+    const _traverse = pivot => {
+        if(!pivot) return;
+        _traverse(pivot.left);
+        this.inorder.push(pivot.val);
+        _traverse(pivot.right);
+    }
+    if(root) _traverse(root)
+};
+
+BSTIterator.prototype.next = function() {
+    return this.inorder[this.pointer++]
+};
+
+BSTIterator.prototype.hasNext = function() {
+    return this.pointer < this.inorder.length
+};
+
+```
+
+Approach 2: Using stack TC O(N) Sc: O(H)
+
+- Here firstly we will push all the left children of root from root to leaf to the stack
+- while next() is called, we will just pop the top element from the stack 
+- And we will push the left subtree of the right element of the poped node
+
+```javascript
+var BSTIterator = function (root) {
+    this.st1 = new MyStack();
+    this.st2 = new MyStack();
+    let pivot = root;
+    while(pivot) {
+        this.st1.push(pivot);
+        pivot = pivot.left;
+    }
+    while(pivot) {
+        this.st2.push(pivot);
+        pivot = pivot.right;
+    }
+};
+
+BSTIterator.prototype.next = function () {
+    if(this.st1.empty()) return -1
+    let poped = this.st1.pop();
+    let right = poped.right;
+    if(right) {
+        let pivot = right;
+        while(pivot) {
+            this.st1.push(pivot);
+            pivot = pivot.left;
+        }
+    }
+    return poped.val;
+};
+
+BSTIterator.prototype.hasNext = function () {
+    return !this.st1.empty()
+};
+
+BSTIterator.prototype.previous = function () {
+    if(this.st2.empty()) return -1
+    let poped = this.st2.pop();
+    let left = poped.left;
+    if(left) {
+        let pivot = left;
+        while(pivot) {
+            this.st2.push(pivot);
+            pivot = pivot.right;
+        }
+    }
+    return poped.val;
+};
+
+BSTIterator.prototype.hasPrevious = function () {
+    return !this.st2.empty()
+};
+
+```
+
+Now this pattern can be easily applied in 2Sum in BST problem where we need a left and right pointer
+
+--------------------------------------------------------------------------------------------------------------------------------

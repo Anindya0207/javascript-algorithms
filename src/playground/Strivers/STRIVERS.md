@@ -3598,3 +3598,61 @@ var preorderTraversal = function (root) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 76. BST Delete
+
+- find the node by normal BST inorder traversal
+- Once we find the node to delete 
+    - Check if the node doesn't have any left or right, return null then
+    - If it only has left and no right, then return the left child
+    - If it only has right and no left, then return the right child
+    - If it has both left and right, then the game begins-
+        - keep the left and right of the node to delete in two var.
+        - We need to find the leftmostchild of the right subtree of the node to delete
+        - It may be the immediate right of the node to delete as well
+        - If it is, then just assign the left to the right child of node and return that
+        - If it is not, then delete the leftmostchild from the right subtree, 
+            - and while doing so, assign the right tree of the leftmostchild to the left of it's immidiate parent
+        - finally, assign the updated right (where the leftmostchild is deleted from it's tree node) to the leftmostchild's right and return leftmostchild
+
+```javascript
+var deleteNode = function (root, key) {
+    if(!root) return null;
+    const deleteDuplicate = (leftPivot, rightPivot) => {
+        if(rightPivot.left == leftPivot) {
+             rightPivot.left = leftPivot.right;
+             return rightPivot;
+        }
+        rightPivot.left = deleteDuplicate(leftPivot, rightPivot.left);
+        return rightPivot
+    }
+    const _delete = (pivot) => {
+        if(!pivot) return null;
+        if(pivot.val == key) {
+            if(!pivot.left && !pivot.right) return null;
+            if(pivot.left && !pivot.right) return pivot.left;
+            if(!pivot.left && pivot.right) return pivot.right;
+            if(pivot.left && pivot.right) {
+                let left = pivot.left;
+                let right = pivot.right;
+                let leftMostChild = right;
+                while(leftMostChild.left) {
+                    leftMostChild = leftMostChild.left;
+                }
+                if(leftMostChild != right) {
+                    right = deleteDuplicate(leftMostChild, right);
+                    leftMostChild.right = right;
+                }
+                leftMostChild.left = left;
+                return leftMostChild;
+            }
+        } else if(pivot.val > key) {
+            pivot.left = _delete(pivot.left)
+        } else if(pivot.val < key) {
+            pivot.right = _delete(pivot.right)
+        }
+    }
+    return _delete(root);
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

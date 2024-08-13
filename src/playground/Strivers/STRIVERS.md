@@ -3753,3 +3753,104 @@ BSTIterator.prototype.hasPrevious = function () {
 Now this pattern can be easily applied in 2Sum in BST problem where we need a left and right pointer
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 78. Recover BST
+
+We need to swap two wrongly positioned nodes in a otherwise perfect BST
+
+Approach 1: Inorder
+
+- We can find the inorder traversal and detect the nodes which are wrongly positioned by comparing it with it's sorted version
+- Change those nodes in the tree and we are done
+
+Approach 2: No extra space
+
+- We can traverse inorder and find the first, middle and last violation. Why?
+- There can be two cases of swap possible
+    - It may so happen that the wrongly positioned elements are not adjacent. then we will get first, middle and last violation and we will have to swap first and last vilation
+    - It may so happen that the wronlgy positioned elements are  adjacent, then we will get first and middle violations and we will have to swap first and middle 
+
+```javascript
+var recoverTree = function (root) {
+    let firstViolation, secondViolation, thirdViolation, previous = null
+    const _traverse = (pivot) => {
+        if (!pivot) return;
+        _traverse(pivot.left);
+        if (previous && previous.val > pivot.val) {
+            if (!firstViolation) {
+                firstViolation = previous;
+                secondViolation = pivot;
+            } else {
+                thirdViolation = pivot;
+            }
+        }
+        previous = pivot;
+        _traverse(pivot.right);
+    }
+    _traverse(root);
+    if (!!thirdViolation && !!firstViolation) {
+        let temp = firstViolation.val;
+        firstViolation.val = thirdViolation.val
+        thirdViolation.val = temp
+    }
+    else if (!!secondViolation && !!firstViolation) {
+        let temp = firstViolation.val;
+        firstViolation.val = secondViolation.val
+        secondViolation.val = temp
+    }
+};
+``` 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 79. Largest BST
+
+We need to find the largest BST(BSt with the most number of nodes) in a BT
+
+Approach 1: O(N ^ 2)
+
+- We can do isValidBSt on each node and do this for all the nodes
+- We can calculate the number of nodes if it's a valid BST on each node. 
+- This will take O(N^2) TC
+
+Approach 2: O(N)
+
+- We need to carry forward an object of `{size, min, max}` from bottoms up
+- For a Valid BST `Max(Left subtree) < Root < Min(Right subtree)` this is very important.
+- If the pivot is a null returrn `{size: 0, min: Infinity, max - Infinity}` so that the above validation works fine for a null node
+- If a pivot doesn't have left or right node return `{size:1, min: pivot.val, max: pivot.val}`. It should itself be the min and max and size is 1
+- If a pivot is a valid BST as per the condition above, then return `size: 1+ sizeLeft + sizeRight, min: Min(left.min, pivot.val), max: Max(pivot.val, right.max)`
+    - For a valid BST, the size adds up, that's why 1+ leftSize + rightSize
+    - for a valid bst, the root is obvly bigger than all left nodes. so minimum might be the minimum of the root and all left nodes i.e. `Min(root, left.min)`
+    - similarly the max would be maximum between the root and all right nodes as the root is smaller than all right nodes. i.e. `Max(root, right. ax)`
+- For a invalid BST return `size: Max(sizeLeft, rightSize), min: -Infinity, max: Intinify`
+    - we need to carry up the max size so far from this opint on, as we got a invalid BST, now all BST above this will be invalid. so at least lets carry the max size we got so far
+    - setting min of this subtree as -Infinity as no root above this will be lesser than -Infinity if this invalid node is right subtree of any node
+    - setting max as +Infinity as no root will be more than Infinity if this invalid BST is left subtree of any node.
+
+```javascript
+const largestBST = (root) => {
+    const _calc = (pivot) => {
+        if(!pivot) return { size: 0, min: Infinity, max: -Infinity };
+        if(!pivot.left && !pivot.right) return {size: 1, min: pivot.val, max: pivot.val};
+        let retL = _calc(pivot.left);
+        let retR = _calc(pivot.right);
+        if(retL.max < pivot.val && pivot.val < retR.min) {
+            // Valid BST
+            return {
+                size: 1 + retL.size + retR.size,
+                min: Math.min(retL.min, pivot.val),
+                max: Math.max(pivot.val, retR.max)
+            }
+        }
+        // Invalid BST
+        return {
+            size: Math.max(retL.size, retR.size),
+            min: -Infinity,
+            max: Infinity
+        }
+    }
+    const final = _calc(root)
+    return final.size
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

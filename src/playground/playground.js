@@ -1,4 +1,3 @@
-
 var MyQueuee = function () {
   this.array = [];
   this.front = -1;
@@ -24,24 +23,58 @@ MyQueuee.prototype.empty = function() {
 }
 
 
-const bfsOfGraph= (V, adj) => {
-  let final = [];
+var orangesRotting = function (grid) {
+  let visitedMap = {};
+  let maxTime = 0
   let queue = new MyQueuee();
-  let visitedArr = Array.from({length: V}, () => 0);
-  queue.enqueue(0);
-  visitedArr[0] = 1;
-  while(!queue.empty()) {
-      let popped = queue.dequeue();
-      let neighbours = adj[popped] || []
-      for(let i =0 ; i< neighbours.length; i++) {
-          if(!visitedArr[neighbours[i]]) {
-              queue.enqueue(neighbours[i]);
-              visitedArr[neighbours[i]] = 1
-          }
+  let freshOranges = 0;
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] == 2) {
+        queue.enqueue([i, j, 0]);
       }
-      final.push(popped)
+      if (grid[i][j] == 1) {
+        freshOranges++;
+      }
+    }
   }
-  return final;
-}
+  while (!queue.empty()) {   
+    let pop = queue.dequeue();
+    if (pop) {
+      let [u, v, time] =  pop;
+      visitedMap[`${u}${v}`] = true;
+      if (grid[u + 1] && grid[u + 1][v] == 1 && !visitedMap[`${u + 1}${v}`]) {
+        grid[u + 1][v] = 2;
+        freshOranges--;
+        queue.enqueue([u + 1, v, time+1]);
+      }
+      if (grid[u - 1]&& grid[u - 1][v] == 1 && !visitedMap[`${u - 1}${v}`]) {
+        grid[u - 1][v] = 2;
+        freshOranges--;
+        queue.enqueue([u - 1, v, time+1]);
+      }
+      if (grid[u][v + 1] == 1 && !visitedMap[`${u}${v + 1}`]) {
+        grid[u][v + 1] = 2;
+        freshOranges--;
+        queue.enqueue([u, v + 1, time+1]);
+      }
+      if (grid[u][v - 1] == 1 && !visitedMap[`${u}${v - 1}`]) {
+        grid[u][v - 1] = 2;
+        freshOranges--;
+        queue.enqueue([u, v - 1, time+1]);
+      }
+      maxTime = Math.max(time, maxTime)
+    }
+   
+  }
+  if(freshOranges > 0) return -1
+  return maxTime;
+};
 
-console.log(bfsOfGraph(5, [[1,2,3],[],[4],[],[]]))
+console.log(
+  orangesRotting([
+    [2, 1, 1],
+    [1, 1, 1],
+    [0, 1, 2],
+  ])
+);

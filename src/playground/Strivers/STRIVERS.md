@@ -3855,4 +3855,79 @@ const largestBST = (root) => {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 80.
+### 80. Rotting Oranges
+
+We need to find the minimum time needed to rot all fresh oranges where the rotting happens up/down/left/right
+
+- we need to measure the time taken to rot oranges
+- So obviously we need to start the traversal from the rotten oranges at the begining 
+- We also need to keep a visitedArr where we can keep `${i}{j}` as true or false.
+- now for the traversal, let's say we go with DFS, we will start with one rotten orange and try to go deep to all the levels 
+- We will have to keep track of the minute taken for each rotten node for it's traversal (DFS) 
+- But there's a problem.Let's say the grid is like  -
+```
+[2, 1, 1],
+[1, 1, 1],
+[0, 1, 2]
+```
+- In DFS, the first rotten node to try to go as much deep and calculate the time. so it will take 3 unit time to rot all nodes.
+- But in reality if we closely observe, in t=1, the two corner nodes can start rotting simultaneously, and in t=2 all the oranges will rot.
+- So the answer is not 3, it is 2.
+- If we consider all the 2 nodes initially as level 0, and all their neighbours as the level 1, then we can say that we need to traverse level wise, right? So we need to go with BFS
+
+How?
+
+- We can take a Queue and put the rotten oranges first, put [i, j, 0] in the queue where i and j is the row and col and 0 is the time
+- Also need to take a visitedArr  where we can keep `${i}{j}` as true or false.
+- While the queue is not empty, dequeue from it, and enqueue the neighbours of the dequeued node if they are not visited yet with an incremented time. 
+- Since we will be operatong in FIFO, all the level 0 rotten oranges will be processed first with time = 0
+- then second level oranges with time= 1 and so on.
+- Just keep a maxTime to track the maxtime
+
+```javascript
+var orangesRotting = function (grid) {
+    let visitedMap = {};
+    let totalTime = 0, freshOranges = 0;
+    let queue = new MyQueuee();
+    for(let i =0; i<grid.length; i++) {
+        for(let j  = 0; j < grid[i].length; j++) {
+            if(grid[i][j] == 2) {
+                queue.enqueue([i, j, 0]);
+            }
+            if(grid[i][j] == 1) {
+                freshOranges++;
+            }
+        }
+    }
+    while(!queue.empty()) {
+        let pop = queue.dequeue();
+        if(pop) {
+            let [u, v, time] = pop;
+            visitedMap[`${u}${v}`] = true;
+            if (grid[u + 1] && grid[u + 1][v] == 1 && !visitedMap[`${u + 1}${v}`]) {
+                grid[u + 1][v] = 2;
+                freshOranges--;
+                queue.enqueue([u + 1, v, time+1]);
+            }
+            if (grid[u - 1]&& grid[u - 1][v] == 1 && !visitedMap[`${u - 1}${v}`]) {
+                grid[u - 1][v] = 2;
+                freshOranges--;
+                queue.enqueue([u - 1, v, time+1]);
+            }
+            if (grid[u][v + 1] == 1 && !visitedMap[`${u}${v + 1}`]) {
+                grid[u][v + 1] = 2;
+                freshOranges--;
+                queue.enqueue([u, v + 1, time+1]);
+            }
+            if (grid[u][v - 1] == 1 && !visitedMap[`${u}${v - 1}`]) {
+                grid[u][v - 1] = 2;
+                freshOranges--;
+                queue.enqueue([u, v - 1, time+1]);
+            }
+            totalTime = Math.max(time, totalTime);
+        }
+    }
+    return freshOranges > 0 ? -1 : totalTime
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

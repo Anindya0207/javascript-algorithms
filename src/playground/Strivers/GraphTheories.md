@@ -130,3 +130,90 @@ TC: O(V) SC: O(2*E)
 
 --------------------------------------------------------------------------------------------------------------------------------
 
+### Connected Components in Graph
+
+- There may be multiple connected components in a grapjh which are not inter connected. That also is a valid graph
+- But We can not traverse all nodes of this kind of graph with any traversal techniques by starting from any node.
+- For traversing this kind of graph we need to take a `visitedArr` data structure of Size Node +1 or V+ 1
+- We need to run a loop in that visitedArr and check if `!visitedArr[node]` then `traverse(node)` 
+- traverse method will have to mark visitedArr[node] as true for the connected nodes with the starting node.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### BFS Traversal
+
+- BFS (Breadth first search) is equivalent to level order traversal of a BT
+- We need to make sure that the traversed nodes are sorted in the order of level. i.e. Level 1 nodes should be traversed first, then level 2 and so on.
+- The order of the nodes traversed in a level does not matter
+- To ensure this, we need to take a data structure which pops in the same way it is puhed inside. i.e the first thing which got inserted will be poipped first. So we will take a Queue data structure which operates as FIFO.
+
+How?
+
+- We will be given a starting node from where we will start the traversal
+- We will initially take a visited array of V+1 length and fill it with 0 (all are non visited) 
+- We will put the starting node in the queue and mark it as 1 in the visited array
+- From this point on, we will dequeue from the queue one by one and get the adjacent nodes for the popeed node by the adjacency list notation
+- We will put the neighbours in the queue (in any order, does not matter) and mark them as visited also, But only if they are not previously visited
+- We will continue this until the queue is empty
+
+```javascript
+const bfsOfGraph= (V, adj) => {
+  let final = [];
+  let queue = new MyQueuee();
+  let visitedArr = Array.from({length: V}, () => 0);
+  queue.enqueue(0);
+  visitedArr[0] = 1;
+  while(!queue.empty()) {
+      let popped = queue.dequeue();
+      let neighbours = adj[popped] || []
+      for(let i =0 ; i< neighbours.length; i++) {
+          if(!visitedArr[neighbours[i]]) {
+              queue.enqueue(neighbours[i]);
+              visitedArr[neighbours[i]] = 1
+          }
+      }
+      final.push(popped)
+  }
+  return final;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### DFS Traversal
+
+- DFS (Depth First Search) is equivalent to inorder or preorder or postorder traversal of trees
+- We need to go deep in depth for a node and come back
+- The approach which is suited best for this is recursion and backtracking
+- So difference between DFS and BFS is DFS is stack based approach (recursion works on top of callstacks) and BFS is queue based approach
+
+How?
+
+- We will take a visitedArr of length V as we did in BFS
+- We will be given a node to start with
+- We will call the traversal with that node where we will do two things
+    - We will mark the node as visited in visitedArr
+    - We will push it in the final 
+- Post this, we will check it's neighbours from adjacency list and iterate over them
+- For those neighbours which are not yet "visited" we will call the same traversal function
+- Since we are calling the function recursively, one node will complete traversal of it's child nodes recursively and come back
+
+```javascript
+dfsOfGraph(V, adj) {
+    let visitedArr = Array.from({length: V}, () => 0);
+    let final = [];
+    const _traverse = (node) => {
+        visitedArr[node] = 1;
+        final.push(node);
+        let neighbours = adj[node] || [];
+        for(let i = 0; i<neighbours.length; i++) {
+            if(!visitedArr[neighbours[i]]) {
+                _traverse(neighbours[i]);
+            }
+        }
+    }
+    _traverse(0)
+    return final;
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

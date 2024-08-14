@@ -1,11 +1,47 @@
-const printGraph = (V, edges) => {
-  let arr = Array.from({length: V}, () => Array.from({length: V}).fill(0));
-      for(let i =0; i<edges.length; i++) {
-         let [u, v] = edges[i];
-         arr[u][v] = 1;
-         arr[v][u] = 1;
-      }
-      return arr
+
+var MyQueuee = function () {
+  this.array = [];
+  this.front = -1;
+  this.rear = -1;
+};
+
+MyQueuee.prototype.enqueue = function (el) {
+  if (this.front == -1) this.front = 0;
+  this.array[++this.rear] = el;
+};
+
+MyQueuee.prototype.dequeue = function () {
+  if (this.front == -1 || this.rear == -1) return;
+  return this.array[this.front++];
+};
+
+MyQueuee.prototype.frontt = function () {
+  if (this.front == -1 || this.rear == -1) return -1;
+  return this.array[this.front];
+};
+MyQueuee.prototype.empty = function() {
+    return (this.front == -1 || this.rear == -1 || this.front > this.rear) 
 }
 
-console.log(printGraph(5,[[0,1],[0,4],[4,1],[4,3],[1,3],[1,2],[3,2]]))
+
+const bfsOfGraph= (V, adj) => {
+  let final = [];
+  let queue = new MyQueuee();
+  let visitedArr = Array.from({length: V}, () => 0);
+  queue.enqueue(0);
+  visitedArr[0] = 1;
+  while(!queue.empty()) {
+      let popped = queue.dequeue();
+      let neighbours = adj[popped] || []
+      for(let i =0 ; i< neighbours.length; i++) {
+          if(!visitedArr[neighbours[i]]) {
+              queue.enqueue(neighbours[i]);
+              visitedArr[neighbours[i]] = 1
+          }
+      }
+      final.push(popped)
+  }
+  return final;
+}
+
+console.log(bfsOfGraph(5, [[1,2,3],[],[4],[],[]]))

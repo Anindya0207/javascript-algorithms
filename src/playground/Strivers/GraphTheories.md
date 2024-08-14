@@ -61,9 +61,25 @@ Similarly, the number of edges outgoing from a node in a graph is called outdegr
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-## Graph represetation
+### No of graphs with N nodes
+
+- n nodes can form edges with n-1 other nodes except itself, right?
+- so total edge possible is n * (n-1)
+- if we remove the duplicate countings, then no of connections possible is n * (n -1) / 2
+- each connection can have a edge or not have a edge, right? each for all possibilities, either connection or no connection that becomes a graph
+- so total number of graph would be `Math.pow(2, ( n * (n -1) / 2))`
+
+```javascript
+ count(n)
+    {
+        return Math.pow(2, (n * (n - 1) / 2))
+    }
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
 
 ### Adj Matrix (2D array) O(n^2) complexity
+
        V1 V2 V3 V4
     V1 0   
     V2
@@ -74,6 +90,20 @@ Similarly, the number of edges outgoing from a node in a graph is called outdegr
 Scarse graph/Null graph - no of edges less (If no of edges are less, lot of places will be 0, which will be a disadvantage)
 Dense graph - no of edges more
 
+TC: O(V) SC: O(V*V)
+
+```javascript
+    printGraph(V, edges) {
+      let arr = Array.from({length: V}, () => Array.from({length: V}).fill(0));
+      for(let i =0; i<edges.length; i++) {
+         let [u, v] = edges[i];
+         arr[u][v] = 1;
+         arr[v][u] = 1;
+      }
+      return arr
+    }
+```
+
 --------------------------------------------------------------------------------------------------------------------------------
 
 ### Adj List 
@@ -83,6 +113,20 @@ Dense graph - no of edges more
     - insert of a edge is o(1) deletion of a edge is o(n) 
     - initialisation is o(n)
 No disadvantage if there is a connection there wil be a node available
+
+TC: O(V) SC: O(2*E)
+
+```javascript
+    printGraph(V, edges) {
+      let arr =  Array.from({length: V}, () => new Array());
+      for(let i =0; i<edges.length; i++) {
+         let [u, v] = edges[i];
+         arr[u].push(v);
+         arr[v].push(u);
+      }
+      return arr
+    }
+```
 
 --------------------------------------------------------------------------------------------------------------------------------
 

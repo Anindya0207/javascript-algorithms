@@ -1,29 +1,11 @@
-function TreeNode(val, left, right) {
-  this.val = val === undefined ? 0 : val;
-  this.left = left === undefined ? null : left;
-  this.right = right === undefined ? null : right;
+const printGraph = (V, edges) => {
+  let arr = Array.from({length: V}, () => Array.from({length: V}).fill(0));
+      for(let i =0; i<edges.length; i++) {
+         let [u, v] = edges[i];
+         arr[u][v] = 1;
+         arr[v][u] = 1;
+      }
+      return arr
 }
 
-var bstFromPreorder = function (preorder) {
-  let root = null;
-  const _build = (arr) => {
-    if (!arr.length) return;
-    let left = [],
-      right = [];
-    let pivot = new TreeNode(arr[0]);
-    for (let i = 1; i < arr.length; i++) {
-      if (arr[i] < arr[0]) {
-        left.push(arr[i]);
-      } else {
-        right.push(arr[i]);
-      }
-    }
-    pivot.left = _build(left);
-    pivot.right = _build(right);
-    return pivot;
-  };
-  root = _build(preorder);
-  return root;
-};
-
-console.log(bstFromPreorder([8, 5, 1, 7, 10, 12]));
+console.log(printGraph(5,[[0,1],[0,4],[4,1],[4,3],[1,3],[1,2],[3,2]]))

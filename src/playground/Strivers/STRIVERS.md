@@ -4000,3 +4000,48 @@ isCycle(V, adj) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 82. 01 Matrix
+
+- Same pattern as rotten oranges. we need to find the minimum distance from all 1 nodes to it's nearest 0
+- As we were putting all rotten oranges in queue, we will put all 0s to the queue
+- Now we will run till queue is not empty
+- Pop and move in all the directions where it's not visited with a incremented dist
+
+```javascript
+var updateMatrix = function (mat) {
+    let final = Array.from({ length: mat.length }, () => Array.from({ length: mat[0].length }, () => 0));
+    let visitedMap = {};
+    let queue = new MyQueuee();
+    for (let i = 0; i < mat.length; i++) {
+        for (let j = 0; j < mat[i].length; j++) {
+            if (mat[i][j] == 0) {
+                queue.enqueue([i, j, 0]);
+                visitedMap[`${i},${j}`] = true
+            }
+        }
+    }
+    while (!queue.empty()) {
+        const [i, j, dist] = queue.dequeue();
+        final[i][j] = dist;
+        if (mat[i - 1] && mat[i - 1][j] != undefined && !visitedMap[`${i - 1},${j}`]) {
+            queue.enqueue([i - 1, j, dist + 1]);
+            visitedMap[`${i - 1},${j}`] = true
+        }
+        if (mat[i + 1] && mat[i + 1][j] != undefined && !visitedMap[`${i + 1},${j}`]) {
+            queue.enqueue([i + 1, j, dist + 1]);
+            visitedMap[`${i + 1},${j}`] = true
+        }
+        if (mat[i][j - 1] != undefined && !visitedMap[`${i},${j - 1}`]) {
+            queue.enqueue([i, j - 1, dist + 1]);
+            visitedMap[`${i},${j - 1}`] = true
+        }
+        if (mat[i][j + 1] != undefined && !visitedMap[`${i},${j + 1}`]) {
+            queue.enqueue([i, j + 1, dist + 1]);
+            visitedMap[`${i},${j + 1}`] = true
+        }
+    }
+    return final
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

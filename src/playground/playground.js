@@ -23,30 +23,38 @@ MyQueuee.prototype.empty = function() {
 }
 
 
-
-const isCycle = (V, adj) => {
-  let visitedArr = Array.from({length: V}, () => 0);
-  let nextLevelneighbours = {};
+var updateMatrix = function(mat) {
+  let final = Array.from({length: mat.length}, () => Array.from({length: mat[0].length}, () => 0));
+  let visitedMap = {};
   let queue = new MyQueuee();
-  queue.enqueue(0);
-  visitedArr[0] = 1;
-  while(!queue.empty()) {
-      let pop = queue.dequeue();
-      visitedArr[pop] = 1;
-      if(pop != undefined) {
-          let neighbours = adj[pop];
-          for(let i  =0; i< neighbours.length; i++) {
-              if(nextLevelneighbours[neighbours[i]] != pop) {
-                  return true;
-              }
-              if(!visitedArr[i]) {
-                  queue.enqueue(neighbours[i]);
-                  nextLevelneighbours[neighbours[i]] = pop;
-              }
+  for(let i = 0; i < mat.length; i++) {
+      for (let j = 0; j < mat[i].length; j++) {
+          if(mat[i][j] == 0) {
+              queue.enqueue([i, j, 0]);
+              visitedMap[`${i},${j}`] = true
           }
       }
   }
-  return false
-}
-
-console.log(isCycle(5, [[1], [0, 2, 4], [1, 3], [2, 4], [1, 3]] ))
+  while(!queue.empty()) {
+      const [i, j, dist] = queue.dequeue();
+      final[i][j] = dist;
+      if(mat[i-1] && mat[i-1][j] == 1 && !visitedMap[`${i-1},${j}`]){
+          queue.enqueue([i-1, j, dist+1]);
+          visitedMap[`${i-1},${j}`] = true
+      }
+      if(mat[i+1] && mat[i+1][j] == 1 && !visitedMap[`${i+1},${j}`]){
+          queue.enqueue([i+1, j, dist+1]);
+          visitedMap[`${i+1},${j}`] = true
+      }
+      if(mat[i][j-1] == 1 && !visitedMap[`${i},${j-1}`]){
+          queue.enqueue([i, j-1, dist+1]);
+          visitedMap[`${i},${j-1}`] = true
+      }
+      if(mat[i][j+1] == 1 && !visitedMap[`${i},${j+1}`]){
+          queue.enqueue([i, j+1, dist+1]);
+          visitedMap[`${i},${j+1}`] = true
+      }
+  }
+  return final
+};
+console.log(updateMatrix([[0,0,0],[0,1,0],[1,1,1]]))

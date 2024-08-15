@@ -23,58 +23,30 @@ MyQueuee.prototype.empty = function() {
 }
 
 
-var orangesRotting = function (grid) {
-  let visitedMap = {};
-  let maxTime = 0
-  let queue = new MyQueuee();
-  let freshOranges = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] == 2) {
-        queue.enqueue([i, j, 0]);
-      }
-      if (grid[i][j] == 1) {
-        freshOranges++;
-      }
-    }
-  }
-  while (!queue.empty()) {   
-    let pop = queue.dequeue();
-    if (pop) {
-      let [u, v, time] =  pop;
-      visitedMap[`${u}${v}`] = true;
-      if (grid[u + 1] && grid[u + 1][v] == 1 && !visitedMap[`${u + 1}${v}`]) {
-        grid[u + 1][v] = 2;
-        freshOranges--;
-        queue.enqueue([u + 1, v, time+1]);
-      }
-      if (grid[u - 1]&& grid[u - 1][v] == 1 && !visitedMap[`${u - 1}${v}`]) {
-        grid[u - 1][v] = 2;
-        freshOranges--;
-        queue.enqueue([u - 1, v, time+1]);
-      }
-      if (grid[u][v + 1] == 1 && !visitedMap[`${u}${v + 1}`]) {
-        grid[u][v + 1] = 2;
-        freshOranges--;
-        queue.enqueue([u, v + 1, time+1]);
-      }
-      if (grid[u][v - 1] == 1 && !visitedMap[`${u}${v - 1}`]) {
-        grid[u][v - 1] = 2;
-        freshOranges--;
-        queue.enqueue([u, v - 1, time+1]);
-      }
-      maxTime = Math.max(time, maxTime)
-    }
-   
-  }
-  if(freshOranges > 0) return -1
-  return maxTime;
-};
 
-console.log(
-  orangesRotting([
-    [2, 1, 1],
-    [1, 1, 1],
-    [0, 1, 2],
-  ])
-);
+const isCycle = (V, adj) => {
+  let visitedArr = Array.from({length: V}, () => 0);
+  let nextLevelneighbours = {};
+  let queue = new MyQueuee();
+  queue.enqueue(0);
+  visitedArr[0] = 1;
+  while(!queue.empty()) {
+      let pop = queue.dequeue();
+      visitedArr[pop] = 1;
+      if(pop != undefined) {
+          let neighbours = adj[pop];
+          for(let i  =0; i< neighbours.length; i++) {
+              if(nextLevelneighbours[neighbours[i]] != pop) {
+                  return true;
+              }
+              if(!visitedArr[i]) {
+                  queue.enqueue(neighbours[i]);
+                  nextLevelneighbours[neighbours[i]] = pop;
+              }
+          }
+      }
+  }
+  return false
+}
+
+console.log(isCycle(5, [[1], [0, 2, 4], [1, 3], [2, 4], [1, 3]] ))

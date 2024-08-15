@@ -3931,3 +3931,72 @@ var orangesRotting = function (grid) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 81. Detecting cycle in a Undirected graph
+
+- Main trick is for a cycle to be present in a graph, a neighbour of a node must have been visited before (maybe from some other node) but not the parent of the node.
+- This can be either achieved by BFS or DFS.
+
+BFS?
+- We will simply apply BFS where we will push the starting vertex and do level wise traversal by queue and dequeue from a queue.
+- We will have to push the node and it;'s parent both in the queue for tracking
+- If we get any node which has a neighbour which is not it's parent but it's already visited, return true.
+- One thing to remember is, we need to run a loop from 0 to all vertices of the graph to make sure we are not leaving behind any connected components
+
+```javascript
+isCycle(V, adj) {
+    let queue = new MyQueuee();
+    let visitedArr = Array.from({length: V}, () => 0);
+    for(let start =0; start <V; start++) {
+        if(!visitedArr[start]){
+            queue.enqueue([start, -1]);
+            visitedArr[start] = 1;
+            while(!queue.empty()) {
+                let [pop, parent] = queue.dequeue();
+                if(pop) {
+                    let neighbours = adj[pop];
+                    for(let i = 0; i < neighbours.length; i++) {
+                        if(!visitedArr[neighbours[i]]) {
+                            visitedArr[neighbours[i]] = 1;
+                            queue.enqueue([neighbours[i], pop]);
+                        } else if(neighbours[i] != parent) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+```
+
+This can also be done by DFS. Concept is same, if any neighbour of a node is already visited but not it's parent, then there is a cycle
+
+```javascript
+isCycle(V, adj) {
+    let hasCycle = false
+    let visitedArr = Array.from({length: V}, () => 0);
+    const _traverse = (node, parent) => {
+        if(hasCycle) return;
+        let neighbours = adj[node];
+        for(let i = 0; i< neighbours.length; i++) {
+            if(!visitedArr[neighbours[i]]) {
+                visitedArr[neighbours[i]] = 1;
+                _traverse(neighbours[i], node);
+            } else if(neighbours[i] != parent) {
+                hasCycle = true
+            }
+        }
+    }
+    for(let start = 0; start < V; start++) {
+        if(hasCycle) break;
+        if(!visitedArr[start]) {
+            visitedArr[start] = 1;
+            _traverse(start, -1)
+        }
+    }
+    return hasCycle;
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

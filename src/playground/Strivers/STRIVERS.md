@@ -3873,7 +3873,7 @@ We need to find the minimum time needed to rot all fresh oranges where the rotti
 - In DFS, the first rotten node to try to go as much deep and calculate the time. so it will take 3 unit time to rot all nodes.
 - But in reality if we closely observe, in t=1, the two corner nodes can start rotting simultaneously, and in t=2 all the oranges will rot.
 - So the answer is not 3, it is 2.
-- If we consider all the 2 nodes initially as level 0, and all their neighbours as the level 1, then we can say that we need to traverse level wise, right? So we need to go with BFS
+- If we consider all the 2 nodes initially as level 0, and all their neighbours as the level 1, then we can say that we need to traverse level wise, right? `So we need to go with BFS`
 
 How?
 
@@ -3934,7 +3934,7 @@ var orangesRotting = function (grid) {
 
 ### 81. Detecting cycle in a Undirected graph
 
-- Main trick is for a cycle to be present in a graph, a neighbour of a node must have been visited before (maybe from some other node) but not the parent of the node.
+- Main trick is `for a cycle to be present in a graph, a neighbour of a node must have been visited before (maybe from some other node) but not the parent of the node`.
 - This can be either achieved by BFS or DFS.
 
 BFS?
@@ -4004,6 +4004,7 @@ isCycle(V, adj) {
 ### 82. 01 Matrix
 
 - Same pattern as rotten oranges. we need to find the minimum distance from all 1 nodes to it's nearest 0
+- Instead of starting with the 1s,` we will start with 0s and see distance to 1`
 - As we were putting all rotten oranges in queue, we will put all 0s to the queue
 - Now we will run till queue is not empty
 - Pop and move in all the directions where it's not visited with a incremented dist
@@ -4042,6 +4043,63 @@ var updateMatrix = function (mat) {
         }
     }
     return final
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 83. Surrounding regions
+
+We need to capture all O which are surrounded by X in a 2D matrix. 
+
+- `Trick is to do reverse engineering and start DFS from the O in the boundary. `
+- change all O which are connected to boundary O to 'temp' or something
+- then traverse the matrix and convert the 'temp' to 'O' back and convert the remaining 'O' to 'X'
+
+```javascript
+var solve = function (board) {
+  if(!board.length) return;
+  const ROW = board.length;
+  const COL = board[0].length
+  const _traverse = (i, j) => {
+    if (!board[i] || (board[i] && board[i][j] == undefined)) return;
+    if (board[i][j] == 'X') return;
+    board[i][j] = 'TEMP';
+    _traverse(i - 1, j);
+    _traverse(i + 1, j);
+    _traverse(i, j + 1);
+    _traverse(i, j - 1);
+  };
+  let boundaryOs = [];
+
+  for (let i = 0; i < ROW; i++) {
+    if (board[i][0] == 'O') {
+      boundaryOs.push([i, 0]);
+    }
+    if (board[i][COL - 1] == 'O') {
+      boundaryOs.push([i, COL - 1]);
+    }
+  }
+  for (let i = 1; i < COL - 1; i++) {
+    if (board[0][i] == 'O') {
+      boundaryOs.push([0, i]);
+    }
+    if (board[ROW- 1][i] == 'O') {
+      boundaryOs.push([board.length - 1, i]);
+    }
+  }
+  for (let b = 0; b < boundaryOs.length; b++) {
+    _traverse(boundaryOs[b][0], boundaryOs[b][1]);
+  }
+  for (let i = 0; i < ROW; i++) {
+    for (let j = 0; j < COL; j++) {
+      if (board[i][j] == 'TEMP') {
+        board[i][j] = 'O';
+      } else if (board[i][j] == 'O') {
+        board[i][j] = 'X';
+      }
+    }
+  }
+  return board;
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------

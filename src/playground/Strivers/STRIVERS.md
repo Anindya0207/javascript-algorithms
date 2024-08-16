@@ -3932,7 +3932,7 @@ var orangesRotting = function (grid) {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 81. Detecting cycle in a Undirected graph
+### 81. Detecting cycle in a Undirected / Directed graph
 
 - Main trick is `for a cycle to be present in a graph, a neighbour of a node must have been visited before (maybe from some other node) but not the parent of the node`.
 - This can be either achieved by BFS or DFS.
@@ -3999,6 +3999,51 @@ isCycle(V, adj) {
     return hasCycle;
 }
 ```
+
+But can we do the same for Directed Graph? no. we can't because it may so happen that one neighbour node is visited from a different path which is not it's parent but there's no actual cycle
+![alt text](image-8.png)
+
+So if we carefully observe this, when we are at 7, maybe 5 is already visited from 3 -> 4 -> 5, So according to our existing logic, 5 is not parent of 7, and it's visited, so there should be a cycle. But no, 3 -> 4-> 5 -> 7 is not a cycle
+
+How?
+
+- We will have to take a `visited` and a `pathVisited` array
+- Run a loop over all vertices like we did.
+- Do plain DFS and keep returning if we get a cycle or not
+- keep marking nodes as true in pathVisited before visiting and un-mark after coming back. 
+- If we get any node visited in neighbour for which `pathVisited` is also true that means that there is a cycle 
+
+```javascript
+isCycle(V, adj) {
+    let hasCycle = false
+    let visitedArr = Array.from({length: V}, () => 0);
+    let pathVisited =  Array.from({length: V}, () => 0);
+    const _traverse = (node) => {
+        if(hasCycle) return;
+        visitedArr[node] = 1;
+        pathVisited[node] = 1;
+        let neighbours = adj[node];
+        for(let i = 0; i< neighbours.length; i++) {
+            if(!visitedArr[neighbours[i]]) {
+                _traverse(neighbours[i]);
+            } else if(pathVisited[neighbours[i]]) {
+                hasCycle = true
+            }
+        }
+        pathVisited[node] = 0;
+    }
+    for(let start = 0; start < V; start++) {
+        if(hasCycle) break;
+        if(!visitedArr[start]) {
+            visitedArr[start] = 1;
+            _traverse(start)
+        }
+    }
+    return hasCycle;
+}
+```
+https://www.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1
+
 --------------------------------------------------------------------------------------------------------------------------------
 
 ### 82. 01 Matrix
@@ -4101,5 +4146,159 @@ var solve = function (board) {
   }
   return board;
 };
+```
+Same pattern: https://leetcode.com/problems/number-of-enclaves/submissions/1356880310/
+ 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 84. Word Ladder I
+
+We will be given a `startWord` a `endWord` and a `wordList` dictionary. We can change one char at a time, we need to find minimum length of transformation sequence to make the startWord to endWord
+
+- Intuition is to start from either startWord or endWord and running a BFS traversal 
+- If we are starting with the endWord, we will put it in queue.
+- pop it
+- Run a loop over the word 
+- replace one character of the word at a time with a - z
+- if after replacement the replacedWord exists in the wordList and it's not visited before we can put it in the queue
+- Like this, as soon as we encounter the startWord, we can break and the count that we are carrying forward will be the minimum since we are breaking as soon as the startWord
+- One thing to note over here is unlike other BFS problems we have not take n visited Map. `we are reducing the wordList itself after each queue enqueue`
+
+```javascript
+const replaceAt = function (str, index, replacement) {
+    return str.substring(0, index) + replacement + str.substring(index + replacement.length);
+}
+let alphabets = [
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+]
+var ladderLength = function (beginWord, endWord, wordList) {
+    let wordListMap = {};
+    //Putting it in a map
+    for(let i = 0; i<wordList.length; i++) {
+        wordListMap[wordList[i]] = true
+    }
+    // if endWord not in wordList fail fast
+    if(!wordListMap[endWord]) return 0;
+    // If Beginword not in list, please insert
+    if(!wordListMap[beginWord]) {
+        wordList.push(beginWord);
+        wordListMap[beginWord] = true
+    }
+    let queue = new MyQueuee();
+    let maxC = 0;
+    queue.enqueue([endWord, 1]);
+    // insteading of taking visitedMap, delete the word from map
+    delete wordListMap[endWord];
+
+    while(!queue.empty()) {
+        let [currentWord, wordC] = queue.dequeue();
+        // Let's run a loop over currentWord
+        for(let i = 0; i < currentWord.length; i++) {
+            for(let j  = 0; j < alphabets.length; j++) {
+                // replace the ith character of currentword with an alphabet
+                let replacedWord = replace(currentWord, i, alphabets[j]);
+                if(wordListMap[replacedWord] && replacedWord != currentWord) {
+                    delete wordListMap[replacedWord]
+                    queue.enqueue([replacedWord, wordC + 1])
+                }
+            }
+        }
+        maxC = Math.max(maxC, wordC);
+        // as soon as the startWord is encountered return
+        if(currentWord == beginWord) return maxC;
+    }
+    return 0; // could not be transformed.
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 85 Word Ladder II
+
+This is similar to the above but we need to find all the shortest paths. Few things to change from the above aopproach
+
+- We need to delete from wordListMap after processing all letters for the particular level. i.e the for loop   `for(let i = 0; i < currentWord.length; i++) `
+- We need to keep a minLevel variable as Infinity initially and as soon as we get the endWord we need to store the currentLevel as minLevel. Post that if we get currLevel > minLevel we break
+
+```javascript
+var findLadders = function (beginWord, endWord, wordList) {
+    let wordListMap = {}, final = [];
+    for (let i = 0; i < wordList.length; i++) {
+        wordListMap[wordList[i]] = true;
+    }
+    if (!wordListMap[endWord]) return [];
+    if (!wordListMap[beginWord]) {
+        wordList.push(beginWord);
+        wordListMap[beginWord] = true;
+    }
+
+    let minSteps = Infinity;
+    let queue = new MyQueuee();
+    queue.enqueue([beginWord, [beginWord], 1]);
+
+    while (!queue.empty()) {
+        let [currentWord, abtakWords, currLevel] = queue.dequeue();
+        // Please note these for Word Ladder 2
+        if (currLevel > minSteps) break;
+        if (currentWord === endWord) {
+            if (minSteps > currLevel) {
+                minSteps = currLevel
+            }
+            final.push(abtakWords);
+        }
+
+        for (let i = 0; i < currentWord.length; i++) {
+            for (let j = 0; j < chars.length; j++) {
+                let replacedWord = replaceAt(currentWord, i, chars[j]);
+                if (!!wordListMap[replacedWord]) {
+                    queue.enqueue([replacedWord, abtakWords.concat(replacedWord), currLevel + 1]);
+                }
+            }
+        }
+        delete wordListMap[currentWord]
+    }
+    return final;
+};
+```
+
+But with this also we are getting TLE. Maybe we need to use bidirectional BFS. 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 86. Number of distinct islands
+
+- Trick is `to detect uniqueness of paths` while DFS traversal
+- The path should have everything, the start, backtrackings etc..
+
+```javascript
+countDistinctIslands(grid)
+    {
+     let directions = [[-1, 0, 'U'], [1, 0, 'D'], [0, -1, 'L'], [0, 1, 'R']];
+       let visitedMap = {};
+       let currentPath = '';
+        const _traverse = (i, j) => {
+            for(let [di, dj, dir] of directions) {
+                let newI = i + di;
+                let newJ = j + dj;
+                if(grid[newI] &&grid[newI][newJ] == 1 && !visitedMap[`${newI},${newJ}`]) {
+                  visitedMap[`${newI},${newJ}`] = true
+                  currentPath = currentPath + dir;
+                  _traverse(newI, newJ);
+                  currentPath += 'B'
+                }
+            }
+        }
+        let final = [];
+        for(let i = 0;  i< grid.length; i++) {
+            for(let j = 0; j < grid[i].length; j++) {
+                if(grid[i][j] == 1 && !visitedMap[`${i},${j}`]) {
+                    visitedMap[`${i},${j}`] = true
+                    currentPath = 'S';
+                    _traverse(i, j);
+                    final.push(currentPath)
+                }
+            }
+        }
+        return new Set(final).size
+    }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

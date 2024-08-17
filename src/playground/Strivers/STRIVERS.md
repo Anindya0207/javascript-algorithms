@@ -3937,7 +3937,8 @@ var orangesRotting = function (grid) {
 - Main trick is `for a cycle to be present in a graph, a neighbour of a node must have been visited before (maybe from some other node) but not the parent of the node`.
 - This can be either achieved by BFS or DFS.
 
-BFS?
+Approach 1: BFS
+
 - We will simply apply BFS where we will push the starting vertex and do level wise traversal by queue and dequeue from a queue.
 - We will have to push the node and it;'s parent both in the queue for tracking
 - If we get any node which has a neighbour which is not it's parent but it's already visited, return true.
@@ -3970,6 +3971,8 @@ isCycle(V, adj) {
     return false;
 }
 ```
+
+Approach 2: DFS 
 
 This can also be done by DFS. Concept is same, if any neighbour of a node is already visited but not it's parent, then there is a cycle
 
@@ -4007,6 +4010,8 @@ So if we carefully observe this, when we are at 7, maybe 5 is already visited fr
 
 How?
 
+Approach1: DFS
+
 - We will have to take a `visited` and a `pathVisited` array
 - Run a loop over all vertices like we did.
 - Do plain DFS and keep returning if we get a cycle or not
@@ -4042,7 +4047,46 @@ isCycle(V, adj) {
     return hasCycle;
 }
 ```
+
+Approach 2: BFS
+
+- We can apply Kahn's algo and keep a indegree array
+- Put all nodes with indegree = 0 in queue
+- keep popping from queue and decrease the indegree of the neighbours of the popped element
+- If the indegree of the neighbour become 0, enqueue them
+- Finally all indegree array should have 0
+
+```javascript
+isCyclic(V, adj) {
+    let indegree = Array.from({length: V}, () => 0);
+    let queue = new MyQueuee()
+    for(let i = 0 ;i < V; i++) {
+        let neighbours = adj[i];
+        for(let j =0; j < neighbours.length; j++) {
+            indegree[neighbours[j]]++;
+        }
+    }
+    for(let i = 0;i< V; i++) {
+        if(indegree[i] == 0) {
+            queue.enqueue(i);
+        }
+    }
+    while(!queue.empty()) {
+        let pop = queue.dequeue();
+        let neighbours = adj[pop];
+        for(let i= 0; i < neighbours.length; i++) {
+            indegree[neighbours[i]]--;
+            if(indegree[neighbours[i]] == 0) {
+                queue.enqueue(neighbours[i])
+            }
+        }
+    }
+    return !indegree.every(i => i==0);
+}
+```
+
 https://www.geeksforgeeks.org/problems/detect-cycle-in-a-directed-graph/1
+
 
 --------------------------------------------------------------------------------------------------------------------------------
 

@@ -4302,3 +4302,49 @@ countDistinctIslands(grid)
     }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 87. Topo sort (DFS and BFS/Kahn's algorithm)
+
+- DFS approach is prettuy simple. just unshift to final array after DFS traversal is complete for a particular node. 
+
+Kahn's Algorithm /BFS
+
+- Kahn's Algorithm is based on BFS traversal
+- We need to first figure out the indegree array of the given DAG
+- Now we need to initially enqueue all the nodes in queue where indegree is 0
+- This means the nodes where there is no edge incoming, obviously they can be printed first, right? means no node has this node in it's adj[node]
+- Now we can keep running normal BFS till queue is empty. 
+- pop and push it in the final array. 
+- Find it's neighbours and decrease their indegree. why? because since the node is popped out, whatever outgoing edge it had to other nodes, are gone, right? so we can decrease the indegree of all those nodes which had a incoming edge from this popped node by 1.
+
+```javascript
+topoSort(V, adj) {
+    let indegree = Array.from({length: V}, () => 0);
+    let queue = new MyQueuee();
+    let final = [];
+    for(let i = 0;  i<V; i++) {
+        let neighbours = adj[i];
+        for(let j = 0; j<neighbours.length; j++) {
+            indegree[neighbours[j]]++
+        }
+    }
+    for(let i =0; i< V;i++) {
+        if(indegree[i] == 0) {
+            queue.enqueue(i);
+        }
+    }
+    while(!queue.empty()) {
+        let pop = queue.dequeue();
+        final.push(pop);
+        let neighbours = adj[pop];
+        for(let i = 0; i <neighbours.length;i++) {
+            indegree[neighbours[i]]--;
+            if(indegree[neighbours[i]] == 0) {
+                queue.enqueue(neighbours[i]);
+            }
+        }
+    }
+    return final
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

@@ -50,6 +50,7 @@ Similarly, the number of edges outgoing from a node in a graph is called outdegr
 - Acyclic graph: A graph where there is no cycle
 - Bipartite graph: if there are two sets of nodes, each set doesn't connect within itselves
 - Weighted graph: Graph with weights in all edges
+- DAG: Direct Acyclic graph . For a DAG, there will always be atleast one node with indegree = 0
 
 
 ![alt text](image-3.png)
@@ -216,5 +217,86 @@ dfsOfGraph(V, adj) {
 }
 ```
 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Topological Sorting
+
+Approach 1: DFS
+
+{0: [1,2,3], 1: [4,5], 2: [], 3: [4]}
+If we are given certain adjacency list of a graph like above and we write a linear ordering out of that, where all nodes appear before all adj[node]
+then it's called a topological sorting
+
+- It is always possible in a directed acyclic graph (DAG) becuase for a undirected graph there are two way dependency for two nodes and it's impossible to write the linear ordering where 1 comes before 2 and 2 also comes before 1
+- It is not possible in a cyclic graph as well.
+- The intuition is quite simple, we just need to run a Simple DFS traversal, where after the completion of any nodes DFS we push it in a Stack
+- Finally pop from the stack
+- Since we use recursion in dfs which is already stack based, we can also take a array and unshift() in it to get the ordering right as well
+
+```javascript
+topoSort(V, adj)
+{
+    let visitedArr = Array.from({length: V}, () => 0);
+    let final = [];
+    const _traverse = (node) => {
+        visitedArr[node] = 1;
+        let neighbours = adj[node] || [];
+        for(let i = 0; i<neighbours.length; i++) {
+            if(!visitedArr[neighbours[i]]) {
+                _traverse(neighbours[i]);
+            }
+        }
+        final.unshift(node);
+    }
+    for(let i = 0; i < V; i++) {
+        if(!visitedArr[i]) {
+            _traverse(i);
+        }
+    }
+    return final;
+}
+```
+
+Approach 2: Kahn's Algorithm 
+
+- Kahn's Algorithm is based on BFS traversal
+- We need to first figure out the indegree array of the given DAG
+- Now we need to initially enqueue all the nodes in queue where indegree is 0
+- This means the nodes where there is no edge incoming, obviously they can be printed first, right? means no node has this node in it's adj[node]
+- Now we can keep running normal BFS till queue is empty. 
+- pop and push it in the final array. 
+- Find it's neighbours and decrease their indegree. why? because since the node is popped out, whatever outgoing edge it had to other nodes, are gone, right? so we can decrease the indegree of all those nodes which had a incoming edge from this popped node by 1.
+
+```javascript
+topoSort(V, adj) {
+    let indegree = Array.from({length: V}, () => 0);
+    let queue = new MyQueuee();
+    let final = [];
+    for(let i = 0;  i<V; i++) {
+        let neighbours = adj[i];
+        for(let j = 0; j<neighbours.length; j++) {
+            indegree[neighbours[j]]++
+        }
+    }
+    for(let i =0; i< V;i++) {
+        if(indegree[i] == 0) {
+            queue.enqueue(i);
+        }
+    }
+    while(!queue.empty()) {
+        let pop = queue.dequeue();
+        final.push(pop);
+        let neighbours = adj[pop];
+        for(let i = 0; i <neighbours.length;i++) {
+            indegree[neighbours[i]]--;
+            if(indegree[neighbours[i]] == 0) {
+                queue.enqueue(neighbours[i]);
+            }
+        }
+    }
+    return final
+}
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

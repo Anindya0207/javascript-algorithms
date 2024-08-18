@@ -308,8 +308,10 @@ DFS Approach (Not suitable)
 ```javascript
 const shortestPath = (adj, n, m, src) => {
   let visitedMap = {[src]: true};
-  let final = [];
+  let final = Array.from({length: N}, () => Infinity);
   let adj = Array.from({length: n}, () => new Array());
+  visitedMap[src] = 0
+  final[src] = 0;
   const _traverse = (_src, _dest, dist) => {
       if(_src == _dest) {
         return dist
@@ -326,15 +328,11 @@ const shortestPath = (adj, n, m, src) => {
       return minDist;
   }
   for(let i = 0; i < n; i++) {
-      if(src == i) {
-        final.push(0)
-      } else {
-        visitedMap = {[src]: true};
-        let shortestDistance= _traverse(src, i, 0);
-        final.push(shortestDistance == Infinity ? -1: shortestDistance);
-      }
+    visitedMap[src] = true
+    let shortestDist = _traverse(src, i, 0);
+    final[i] = shortestDist == Infinity ? -1: shortestDist
   }
-  return final;
+  return final.map(f => f == Infinity ? -1: f);
 }
 ```
 
@@ -371,4 +369,70 @@ const shortestPath = (edges, n, m, src) => {
 }
 ```
 
+- Similarly if the edges are weighted instead of unit weight, we can do the same way -
+
+```javascript
+const shortestPathBFS = (edges, N) => {
+  let src = 0;
+  let final = Array.from({length: N}, () => Infinity);
+  let adj = Array.from({length: N}, () => new Array());
+  for(let i  = 0; i< edges.length; i++) {
+    let [u, v, weight] = edges[i];
+    adj[u].push({v, weight}); // storing the node and the edge weight both in enqueue
+  }
+  final[src] = 0;
+  let queue = new MyQueuee();
+  queue.enqueue([0, 0]);
+  while(!queue.empty()) {
+    let [node, dist] = queue.dequeue();
+    let neighbours = adj[node];
+    for(let i =0; i<neighbours.length; i++) {
+      let {v, weight} = neighbours[i];
+      let newDis = dist + weight;// instead of dist + 1, we are doing dist + weight
+      if(final[v] > newDis) {
+        final[v] = newDis;
+        queue.enqueue([v, newDis]);
+      }
+    }
+  }
+  return final.map(f => f == Infinity ? -1: f);
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Djikstra's Algorithm
+
+- To find shortest path between two nodes in a DAG (Direct acyclic graph) with weighted edges we generally use BFS like above
+- Djikstra's algorith uses Priority Queue with a min heap implementation. That is the only difference.
+- Djikstra's algo doesn't work with negatigve weighted edges or cyclic graphs, as for negative weight will go back and forth and go in a loop while trying to find more lesser dist.
+- But Why we shoudl use Priority queue? The above implementation with queue works just fine right?
+
+```javascript
+const shortestPathDjikstra = (edges, N) => {
+  let src = 0;
+  let final = Array.from({length: N}, () => Infinity);
+  let adj = Array.from({length: N}, () => new Array());
+  for(let i  = 0; i< edges.length; i++) {
+    let [u, v, weight] = edges[i];
+    adj[u].push({v, weight});
+  }
+  final[src] = 0;
+  let queue = new PriorityQueue(Math.pow(10, 5));
+  queue.enqueue({value: [0, 0], priority: 0});
+  while(!queue.empty()) {
+    let [node, dist] = queue.dequeue().value;
+    let neighbours = adj[node];
+    for(let i =0; i<neighbours.length; i++) {
+      let {v, weight} = neighbours[i];
+      let newDis = dist + weight;
+      if(final[v] > newDis) {
+        final[v] = newDis;
+        queue.enqueue({value: [v, newDis], priority: newDis});
+      }
+    }
+  }
+  return final.map(f => f == Infinity ? -1: f);
+}
+```
 --------------------------------------------------------------------------------------------------------------------------------

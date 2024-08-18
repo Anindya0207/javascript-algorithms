@@ -4392,3 +4392,41 @@ topoSort(V, adj) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 88. Djikstra's algo
+
+- To find shortest path between two nodes in a DAG (Direct acyclic graph) with weighted edges we generally use BFS like above
+- Djikstra's algorith uses Priority Queue with a min heap implementation. That is the only difference.
+- Djikstra's algo doesn't work with negatigve weighted edges or cyclic graphs, as for negative weight will go back and forth and go in a loop while trying to find more lesser dist.
+- But Why we shoudl use Priority queue? The above implementation with queue works just fine right?
+
+```javascript
+const shortestPathDjikstra = (edges, N) => {
+  let src = 0;
+  let final = Array.from({length: N}, () => Infinity);
+  let adj = Array.from({length: N}, () => new Array());
+  for(let i  = 0; i< edges.length; i++) {
+    let [u, v, weight] = edges[i];
+    adj[u].push({v, weight});
+  }
+  final[src] = 0;
+  let queue = new PriorityQueue(Math.pow(10, 5));
+  queue.enqueue({value: [0, 0], priority: 0});
+  while(!queue.empty()) {
+    let [node, dist] = queue.dequeue().value;
+    let neighbours = adj[node];
+    for(let i =0; i<neighbours.length; i++) {
+      let {v, weight} = neighbours[i];
+      let newDis = dist + weight;
+      if(final[v] > newDis) {
+        final[v] = newDis;
+        queue.enqueue({value: [v, newDis], priority: newDis});
+      }
+    }
+  }
+  return final.map(f => f == Infinity ? -1: f);
+}
+```
+https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1
+
+--------------------------------------------------------------------------------------------------------------------------------

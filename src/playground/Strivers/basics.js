@@ -21,29 +21,7 @@ MyStack.prototype.empty = function() {
 
 // Queue
 
-var MyQueuee = function () {
-  this.array = [];
-  this.front = -1;
-  this.rear = -1;
-};
-
-MyQueuee.prototype.enqueue = function (el) {
-  if (this.front == -1) this.front = 0;
-  this.array[++this.rear] = el;
-};
-
-MyQueuee.prototype.dequeue = function () {
-  if (this.front == -1 || this.rear == -1) return;
-  return this.array[this.front++];
-};
-
-MyQueuee.prototype.frontt = function () {
-  if (this.front == -1 || this.rear == -1) return -1;
-  return this.array[this.front];
-};
-MyQueuee.prototype.empty = function() {
-    return (this.front == -1 || this.rear == -1 || this.front > this.rear) 
-}
+ 
 
 
 //DQueue
@@ -177,13 +155,13 @@ const heapify = (arr, root, start, end) => {
     }
   }
   
-  var PriorityQueue1 = function(length) {
+  var PriorityQueuee = function() {
     this.front = -1; this.rear = -1;
-    this.arr = new Array(length);
+    this.arr = new Array(Math.pow(10, 5));
   }
   
-  PriorityQueue1.prototype.enqueue = function(item) {
-    if(!item.value || !item.priority) {
+  PriorityQueuee.prototype.enqueue = function(item) {
+    if(item.value == undefined || item.priority == undefined) {
       return;
     }
     if(this.rear == this.arr.length - 1) {
@@ -195,7 +173,7 @@ const heapify = (arr, root, start, end) => {
   }
   
   
-  PriorityQueue1.prototype.dequeue = function() {
+  PriorityQueuee.prototype.dequeue = function() {
     if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
       return;
     }
@@ -203,14 +181,14 @@ const heapify = (arr, root, start, end) => {
     return this.arr[this.front++];
   }
 
-  PriorityQueue1.prototype.empty = function() {
+  PriorityQueuee.prototype.empty = function() {
     if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
       return true;
     }
     return false;
   }
   
-  PriorityQueue1.prototype.top = function() {
+  PriorityQueuee.prototype.top = function() {
     if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
       return
     }

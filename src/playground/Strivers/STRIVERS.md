@@ -4456,7 +4456,11 @@ const shortestPathDjikstra = (edges, N) => {
 ```
 https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1
 
-Similar pattern: https://leetcode.com/problems/path-with-minimum-effort/submissions/1360548131/
+Similar pattern: 
+https://leetcode.com/problems/path-with-minimum-effort/submissions/1360548131/
+https://leetcode.com/problems/cheapest-flights-within-k-stops/submissions/1360587583/
+
+Remember:
 
 Djikstra's can be applied to any pattern where we need to find minimum in a path. Since it's based on min heap, it can solve these patterns
 

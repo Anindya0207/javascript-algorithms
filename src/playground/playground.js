@@ -51,12 +51,12 @@ class Item {
   }
 }
 
-var PriorityQueue1 = function(length) {
+var PriorityQueuee = function() {
   this.front = -1; this.rear = -1;
-  this.arr = new Array(length);
+  this.arr = new Array(Math.pow(10, 5));
 }
 
-PriorityQueue1.prototype.enqueue = function(item) {
+PriorityQueuee.prototype.enqueue = function(item) {
   if(item.value == undefined || item.priority == undefined) {
     return;
   }
@@ -69,7 +69,7 @@ PriorityQueue1.prototype.enqueue = function(item) {
 }
 
 
-PriorityQueue1.prototype.dequeue = function() {
+PriorityQueuee.prototype.dequeue = function() {
   if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
     return;
   }
@@ -77,14 +77,14 @@ PriorityQueue1.prototype.dequeue = function() {
   return this.arr[this.front++];
 }
 
-PriorityQueue1.prototype.empty = function() {
+PriorityQueuee.prototype.empty = function() {
   if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
     return true;
   }
   return false;
 }
 
-PriorityQueue1.prototype.top = function() {
+PriorityQueuee.prototype.top = function() {
   if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
     return
   }
@@ -94,29 +94,38 @@ PriorityQueue1.prototype.top = function() {
 
 
 
-var shortestPathBinaryMatrix = function(grid) {
-  let queue = new PriorityQueue1(Math.pow(10,5));
-  
-  let distArr = Array.from({length: grid.length}, () => Array.from({length: grid.length}, () => Infinity));
-  let directions = [[-1, 0], [1, 0], [0, 1], [0, -1], [-1, -1], [1,1],[-1,1], [1,-1]];
-  queue.enqueue({value: [0, 0, 1], priority: 1});
-  distArr[0][0] = 1;
+var findCheapestPrice = function(n, flights, src, dst, k) {
+  let queue = new PriorityQueuee();
+  let priceArr = Array.from({length: n}, () => Infinity);
+  let minPrice = Infinity
+  let adj = {};
+  for(let i = 0; i < flights.length; i++) {
+      let [u,v, price] = flights[i];
+      if(!adj[u]) {
+          adj[u] = [];
+      }
+      adj[u].push([v, price]);
+  }
+  priceArr[src] = 0;
+  queue.enqueue({value: [src, -1, 0], priority: 0});
   while(!queue.empty()) {
       let pop = queue.dequeue();
       let {value} = pop;
-      let [i, j, dist] = value;
-      for(let k = 0;k < directions.length; k++) {
-          let [dx, dy] = directions[k];
-          let newI = i + dx;
-          let newJ = j + dy;
-          let newDist = dist + 1;
-          if((distArr[newI] && distArr[newI][newJ] > newDist) && (grid[newI] && grid[newI][newJ] == 0)) {
-              distArr[newI][newJ] = newDist;
-              queue.enqueue({value: [newI, newJ, newDist], priority: newDist});
+      let [city, stops, currPrice] = value;
+      let neighbours = adj[city] || [];
+      if(city == dst && stops <= k) {
+          return Math.min(minPrice,currPrice);
+      }
+      for(let i = 0; i < neighbours.length; i++) {
+          let [destCity, price] = neighbours[i];
+          let newPrice = currPrice + price;
+          if(priceArr[destCity] > newPrice && stops + 1 <= k + 1) {
+              priceArr[destCity] = newPrice;
+              queue.enqueue({value: [destCity, stops + 1, newPrice], priority: stops + 1})
           }
       }
   }
-  return distArr[grid.length-1][grid.length-1] == Infinity ? -1 : distArr[grid.length-1][grid.length-1]
+  return -1;
 };
 
-console.log(shortestPathBinaryMatrix([[0,0,0],[1,0,0],[1,1,0]]))
+console.log(findCheapestPrice(3, [[0,1,100],[1,2,100],[0,2,500]], 0,2, 1))

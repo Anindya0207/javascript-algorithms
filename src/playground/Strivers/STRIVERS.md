@@ -4457,8 +4457,17 @@ const shortestPathDjikstra = (edges, N) => {
 https://www.geeksforgeeks.org/problems/implementing-dijkstra-set-1-adjacency-matrix/1
 
 Similar pattern: 
+
 https://leetcode.com/problems/path-with-minimum-effort/submissions/1360548131/
+- Here we need to minimse effort among multiple maximum aboslute effort difference of paths.
+- So we will store the minimum effort in the array. for any node's neighbour, the maximum path effort will be Math.max(effort, diff_between_neighbour_and_node)
+- if this value is < arr[neighbour] store it and enqueue it.
+
 https://leetcode.com/problems/cheapest-flights-within-k-stops/submissions/1360587583/
+
+- Here we need to minimse price
+- So we will store the minimum price in the array. for any city if the stops + 1 <= k we calculate the price = price + currentPrice.
+- if this price is < arr[neighbour] store it and enqueue it.
 
 Remember:
 

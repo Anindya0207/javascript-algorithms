@@ -300,3 +300,75 @@ topoSort(V, adj) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Shortest path
+
+DFS Approach (Not suitable)
+
+```javascript
+const shortestPath = (adj, n, m, src) => {
+  let visitedMap = {[src]: true};
+  let final = [];
+  let adj = Array.from({length: n}, () => new Array());
+  const _traverse = (_src, _dest, dist) => {
+      if(_src == _dest) {
+        return dist
+      }
+      let neighbours = adj[_src];
+      let minDist = Infinity;
+      for(let i = 0; i < neighbours.length; i++) {
+          if(!visitedMap[neighbours[i]]) {
+              visitedMap[neighbours[i]] = true;
+              minDist= Math.min(minDist,  _traverse(neighbours[i], _dest, dist+1));
+              visitedMap[neighbours[i]] = false;
+          }
+      }
+      return minDist;
+  }
+  for(let i = 0; i < n; i++) {
+      if(src == i) {
+        final.push(0)
+      } else {
+        visitedMap = {[src]: true};
+        let shortestDistance= _traverse(src, i, 0);
+        final.push(shortestDistance == Infinity ? -1: shortestDistance);
+      }
+  }
+  return final;
+}
+```
+
+BFS - Better Approach
+
+- we will take a distanceArray of V length all valiue as Infinity
+- we will first put the source node in the queue and mark the `distance[src] = 0`
+- till queue is empty we will pop and find the popeed node's neighbours from adj matrix
+- Now, the updated distance will be dist + 1 right? but we should update it only if the current distance is bigger than it
+
+```javascript
+const shortestPath = (edges, n, m, src) => {
+  let final = Array.from({length: n}, () => Infinity);
+  let adj = Array.from({length: n}, () => new Array())
+  let queue = new MyQueuee();
+  for(let i = 0; i < edges.length; i++) {
+    let [u, v] = edges[i];
+    adj[u].push(v);
+    adj[v].push(u)
+  }
+  queue.enqueue([src, 0]);
+  final[0] = 0;
+  while(!queue.empty()) {
+    let [node, dist] = queue.dequeue();
+    let neighbours = adj[node];
+    for(let i =0; i<neighbours.length; i++) {
+      if(dist + 1 < final[neighbours[i]]) {
+        final[neighbours[i]] = dist + 1;
+        queue.enqueue([neighbours[i], dist + 1]);
+      }
+    }
+  }
+  return final
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

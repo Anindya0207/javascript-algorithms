@@ -23,59 +23,28 @@ MyQueuee.prototype.empty = function() {
 }
 
 
-const findOrder = (dict,N,K) => {
-  let l = 0, r = 1;
-  let adj = {};
-  let uniqueW = {}
-  let indegree = {};
+const shortestPath = (edges, n, m, src) => {
+  let final = Array.from({length: n}, () => Infinity);
+  let adj = Array.from({length: n}, () => new Array())
   let queue = new MyQueuee();
-  let final = []
-  while(r < dict.length) {
-      let leftWord = dict[l];
-      let rightWord = dict[r];
-      let i = 0, j = 0;
-      while(i < leftWord.length && j < rightWord.length) {
-        if(leftWord.charAt(i) == rightWord.charAt(j)) {
-            i++; j++
-        } else {
-            if(!adj[leftWord.charAt(i)]) {
-              adj[leftWord.charAt(i)] = [];
-            }
-            adj[leftWord.charAt(i)].push(rightWord.charAt(j))
-            uniqueW[rightWord.charAt(j)] = true;
-            uniqueW[leftWord.charAt(i)] = true
-            break;
-        }
-      }
-      l++; r++;
+  for(let i = 0; i < edges.length; i++) {
+    let [u, v] = edges[i];
+    adj[u].push(v);
+    adj[v].push(u)
   }
-  return adj;
-  let alphabets = Object.keys(uniqueW);
-  for(let i = 0; i<alphabets.length; i++) {
-    let neighbours = adj[alphabets[i]] || [];
-    for(let j = 0; j<neighbours.length; j++) {
-        if(indegree[neighbours[j]] == undefined) indegree[neighbours[j]] = 0 
-        indegree[neighbours[j]]++;
-    }
-  }
-  for(let i =0; i< alphabets.length;i++) {
-    if(!indegree[alphabets[i]]) {
-        queue.enqueue(alphabets[i]);
-    }
-  }
+  queue.enqueue([src, 0]);
+  final[0] = 0;
   while(!queue.empty()) {
-    let pop = queue.dequeue();
-    final.push(pop);
-    let neighbours = adj[pop] || [];
-    for(let i = 0; i <neighbours.length;i++) {
-        indegree[neighbours[i]]--;
-        if(indegree[neighbours[i]] == 0) {
-            queue.enqueue(neighbours[i]);
-        }
+    let [node, dist] = queue.dequeue();
+    let neighbours = adj[node];
+    for(let i =0; i<neighbours.length; i++) {
+      if(dist + 1 < final[neighbours[i]]) {
+        final[neighbours[i]] = dist + 1;
+        queue.enqueue([neighbours[i], dist + 1]);
+      }
     }
   }
   return final
 }
 
-
-console.log(findOrder(["baa","abcd","abca","cab","cad"],5,4))
+console.log(shortestPath([[0,1],[0,3],[3,4],[4,5],[5,6],[1,2],[2,6],[6,7],[7,8],[6,8]], 9, 10, 0))

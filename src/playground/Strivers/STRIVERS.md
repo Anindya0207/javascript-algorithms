@@ -4400,6 +4400,33 @@ topoSort(V, adj) {
 - Djikstra's algo doesn't work with negatigve weighted edges or cyclic graphs, as for negative weight will go back and forth and go in a loop while trying to find more lesser dist.
 - But Why we shoudl use Priority queue? The above implementation with queue works just fine right?
 
+Reason is - 
+```
+let's say we got a node 1 for which we got a distance 7 so far from traversal and we enqueued it before. 
+But again we got the same node 1 for which we got a distance 3 which is better than 7 right? so we updated the dist Array and enqueued this also.
+But since the previous entry [1,7] is enqueued before it will be dequeued before and it will keep enqueuing connected nodes unnecessarily in the queue. Where as we don;t even need to consider [1,7] anymore right?
+Now let's say we take a PQ. so we pushed [1,7] first in the queue, after this we pushed [1,4] But since PQ works on minheap it will pop out and process [1,4] first. Later when it will pop out [1,7] it will just be neglected as distance array of it's connected nodes might already have lesser values. 
+Hence PQ approach has lesser time complexity than Q approach
+```
+
+TC: E Log V where E = No of Edges, V =No of Vertex. Why?
+
+```
+while(!queue.empty()) {
+     let [node, dist] = queue.dequeue().value;
+     for(let i =0; i<neighbours.length; i++) {
+        queue.enqueue({value: [v, newDis], priority: newDis});
+     }
+}
+This is what we are doing right?
+- `while(!queue.empty())` will run max V times. becuase PQ will dequeue fast and it will not have much unnecessary nodes. Worst case it will run V times
+- `queue.dequeue().value;` this is PQ dequeue where we build Min heap - log(Heap size) is the TC. Now Heap size can be V*V as there can be one node connected to V-1 node and second node can connect to V-1 node liek that. In that case one node will dequeue and enqueue V-1 nodes. So heap will have max V*V size. Hence this line TC = log(V*V) = 2 logV
+- `for(let i =0; i<neighbours.length; i++)` => again worst case this will run V times. one node can have worst case V - 1 neighbours.
+- `enqueue` is O(1)
+- So total TC = V * V * logV = E * logV where E = V* V. Why? because if there are V nodes and each node has an edge to V-1 other nodes then total number of edges  = V * V-1 right? so E = V*V
+
+```
+
 ```javascript
 const shortestPathDjikstra = (edges, N) => {
   let src = 0;

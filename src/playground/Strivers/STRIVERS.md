@@ -4474,3 +4474,53 @@ Remember:
 Djikstra's can be applied to any pattern where we need to find minimum in a path. Since it's based on min heap, it can solve these patterns
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 89. Number of Ways to Arrive at Destination
+
+So far we have been finding shortest time of shortest effort etc using Djikstra's algo. In tis problem we need to find count of all the shortest paths to the destination from source
+
+- The Trick is `to take a countArr similar to distArr which will hold the path counts at any node`
+- THe incoming connection to a "neighbour" from a "node" if the condition of time < distArr[neihgbour] matches is gonna be countArr[node]. Why? becuase whatever countArr[node] holds is all the possible paths to reach "node" in min time right? 
+- Now if we encounter mintime again for a neighbour, from a different "node", add that node's path count as well
+
+```javascript
+var countPaths = function (n, times) {
+    let MAX = Math.pow(10, 9) + 7
+    let distArr = Array.from({ length: n }, () => Infinity);
+    let countArr = Array.from({ length: n }, () => 0);
+    let adj = Array.from({ length: n }, () => new Array());
+    let queue = new PriorityQueuee();
+    for (let i = 0; i < times.length; i++) {
+        let [u, v, w] = times[i];
+        adj[u].push({ dest: v, w });
+        adj[v].push({ dest: u, w });
+    }
+    distArr[0] = 0;
+    countArr[0] = 1;
+    queue.enqueue({ value: [0, 0], priority: 0 });
+
+    while (!queue.empty()) {
+        let pop = queue.dequeue();
+        let { value } = pop;
+        let [node, time] = value;
+        let neighbours = adj[node] || [];
+        for (let i = 0; i < neighbours.length; i++) {
+            let { dest, w } = neighbours[i];
+            let newTime = time + w;
+            if (distArr[dest] > newTime) {
+                distArr[dest] = newTime;
+                // minTime observed, so overriding the neighbour count as node's count
+                countArr[dest] = countArr[node];
+                queue.enqueue({ value: [dest, newTime], priority: newTime });
+            }
+            else if (newTime === distArr[dest]) {
+                // same time observed, adding node's count to the neighbours count
+                countArr[dest] = (countArr[dest] + countArr[node]) % MAX;
+            }
+        }
+    }
+    return countArr[n - 1]
+};
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

@@ -97,41 +97,29 @@ PriorityQueuee.prototype.top = function () {
   buildMaxHeap(this.arr, this.front, this.rear);
   return this.arr[this.front];
 }
-
-var countPaths = function (n, times) {
-  let MAX = Math.pow(10, 9) + 7
-  let distArr = Array.from({ length: n  }, () => Infinity);
-  let countArr = Array.from({ length: n  }, () => Infinity);
-  let adj = Array.from({ length: n  }, () => new Array());
-  let queue = new PriorityQueuee();
-  for (let i = 0; i < times.length; i++) {
-      let [u, v, w] = times[i];
-      adj[u].push({ dest: v, w });
-      adj[v].push({ dest: u, w });
-  }
-  distArr[0] = 0;
-  countArr[0] = 1;
-  queue.enqueue({value: [0, 0], priority: 0});
-
+const minimumMultiplications = (arr, start, end) =>  {
+  let distArr = Array.from({length: end +1}, () => Infinity);
+  let queue= new PriorityQueuee();
+  distArr[start] = 0;
+  queue.enqueue({value: [start,0], priority: 0});
+  let minDist = Infinity;
   while(!queue.empty()) {
-      let pop = queue.dequeue();
-      let {value} = pop;
-      let [node, time] = value;
-      let neighbours = adj[node] || [];
-      for(let i = 0;  i< neighbours.length; i++) {
-          let {dest, w} = neighbours[i];
-          let newTime = time + w;
-          if(distArr[dest] > newTime) {
-              distArr[dest] = newTime;
-              countArr[dest] = countArr[node];
-              queue.enqueue({value: [dest, newTime], priority: newTime});
+      let pop= queue.dequeue();
+      let [node, dist]= pop.value;
+      if(node==end){
+          minDist = Math.min(minDist, dist);
+      }
+      for(let k= 0; k < arr.length; k++){
+          let newNode= (node * arr[k]) % 100000;
+          let newDist = dist + 1;
+          if(newNode <= end && distArr[newNode] > newDist){
+              distArr[newNode] = newDist;
+              queue.enqueue({value:[newNode, newDist], priority: newDist});
           }
-          else if (newTime === distArr[dest]) {
-            countArr[dest] = (countArr[dest] + countArr[node]) % MAX;
-        }
       }
   }
-  return countArr[n - 1]
-};
+  return minDist ==Infinity? -1: minDist
+}
 
-console.log(countPaths(7, [[0,6,7],[0,1,2],[1,2,3],[1,3,3],[6,3,3],[3,5,1],[6,5,1],[2,5,1],[0,4,5],[4,6,2]]))
+console.log(minimumMultiplications([3,4,65],7, 66175))
+

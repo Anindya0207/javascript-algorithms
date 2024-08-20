@@ -434,6 +434,11 @@ This is what we are doing right?
 
 ```
 
+Limitations of Djikstra's algo -
+
+- It wont work for negative weights
+- It wont work for negative cycle
+
 ```javascript
 const shortestPathDjikstra = (edges, N) => {
   let src = 0;
@@ -459,6 +464,88 @@ const shortestPathDjikstra = (edges, N) => {
     }
   }
   return final.map(f => f == Infinity ? -1: f);
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Bellman ford algo
+
+- Djisktra's algowhich doesn't work for negative cycle and negative weight can be solved by Bellman ford
+- We need to run a outerloop of 0 - V-1 where V is number of vertices
+- Inner loop will run through all edges which has a [u,v,w] where u is the source node, v is the destination node and w is the weight
+- Relax the nodes : `if dist[u] + w < dist[v] then update dist[v] = dist[u] + w` this is something we were doing in djikstra's also
+- After running V-1 iteration, we should get all shortest paths for all nodes from source.
+- If we run through the edges one more times and If there's any decrease in the distance then there is a negative cycle.
+
+```javascript
+bellman_ford(V, edges, S) {
+    let dist = Array.from({length: V}, () => Infinity);
+    dist[S] = 0;
+    // Relax all edges V - 1 times
+    for (let i = 0; i < V - 1; i++) {
+        for (let j = 0; j < edges.length; j++) {
+            let [u, v, w] = edges[j];
+            if (dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+            }
+        }
+    }
+    // Check for negative weight cycles
+    for (let j = 0; j < edges.length; j++) {
+        let [u, v, w] = edges[j];
+        if (dist[u] + w < dist[v]) {
+            return [-1]; // Indicates a negative weight cycle
+        }
+    }
+    return dist.map(h => h== Infinity? Math.pow(10, 8): h);
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Flyod Warshal Algo 
+
+- To find shortest distance in a graph with multiple sources weuse Floyd wrarshal.
+- Based on dynamic programming. acts on previously computed value. such that distance[i][j] via a node "via" - dist[i][j] = Min(dist[i][j], dist[i][via] + dist[via][j])
+- Unlike previous algos we will use Adj matrix over here
+
+How?
+
+- first iterate the matrix and `mark 0 for i ==j` and `mark all -1 to Infinity`
+- Now for each node as via {THIS IS IMPORTANT TO MAKE IT AS OUTER LOOP}, run through the entire matrix and apply the formula `dist[i][j] = Min(dist[i][j], dist[i][via] + dist[via][j])`
+- Finally run through the matrix again and change `all Infinity to -1`
+
+```javascript
+shortest_distance(matrix)
+{
+    //Step1
+    for(let i = 0; i< matrix.length; i++) {
+        for(let j = 0; j < matrix.length; j++) {
+                if(matrix[i][j] == -1) {
+                    matrix[i][j] = Infinity;
+                }
+                if(i == j) {
+                matrix[i][j] = 0;
+                }
+        }
+    }
+    //Step2
+    for(let via = 0; via < matrix.length;  via++) {
+        for(let i = 0; i< matrix.length; i++) {
+            for(let j = 0; j < matrix.length; j++) {
+            
+                matrix[i][j] = Math.min(matrix[i][j], matrix[i][via] + matrix[via][j]);
+            }
+        }
+    }
+    //Step3
+    for(let i = 0; i< matrix.length; i++) {
+        for(let j = 0; j < matrix.length; j++) {
+                if(matrix[i][j]== Infinity) {
+                matrix[i][j] = -1;
+                }
+        }
+    }
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

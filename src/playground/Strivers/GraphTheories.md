@@ -549,3 +549,52 @@ shortest_distance(matrix)
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Minimum Spanning Tree (MST)
+
+spanning tree is is a graph where there are N nodes, N-1 edges and all nodes are connected with each other
+MST is the sopanning tree with minimum weight sum.
+WE use Prim's algo or Kruskal's algo to find MST
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Prim's algo
+
+- Like Djisktra we will take a Priority queue and we will take a visitedArr
+- Insert [weight, node, parent] as [0, 0, -1] initially in the queue
+- run a loop till queue is not empty
+- Pop from the queue
+- find it's neighbours and iterate over them
+- whoever is not visited, `enqueue them but dont mark as visited`
+- next time when they will get popped, check if its not yet visited, then push in MST and add up to sum
+- Since PQ will make sure to pop the min weights always, we will add the min weights in MST and add to sum and since we are also marking as visited, they will not be processed again
+
+```javascript
+spanningTree(v, adj) {
+    let queue = new PriorityQueuee();
+    let visitedArr= Array.from({length: v},() => 0);
+    let mstArr = [];
+    let sum = 0;
+    queue.emnqueue({value: [0, 0, -1], priority: 0});
+    while(!queue.empty()){
+        let pop = queue.dequeue();
+        let {value} = pop;
+        let [currNodeWeight, node, parent] = value;
+        let neighbours = adj[node];
+        // if for any node it's already visited dont process it at all
+        if(visitedArr[node] == 1) continue;
+        visitedArr[node] = 1;
+        mstArray.push([parent, node]);
+        sum += currNodeWeight;
+        for(let i =0; i<neighbours.length; i++) {
+            let [destNode, destWeight]= neighbours[i];
+            if(visitedArr[destNode] ==0) {
+                queue.enqueue({value: [destWeight,destNode, node ], priority:destWeight });
+            }
+        }
+    }
+    return sum;
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

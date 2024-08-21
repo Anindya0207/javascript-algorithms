@@ -128,10 +128,10 @@ const heapify = (arr, root, start, end) => {
     let left = 2 * root + 1 - start;
     let right = 2 * root + 2 - start;
     let maxPriorityIndex = root;
-    if(arr[left] && arr[left].priority > arr[maxPriorityIndex].priority && left <= end) {
+    if(arr[left] && arr[left].priority < arr[maxPriorityIndex].priority && left <= end) {
       maxPriorityIndex = left;
     }
-    if(arr[right] && arr[right].priority > arr[maxPriorityIndex].priority && right <= end) {
+    if(arr[right] && arr[right].priority < arr[maxPriorityIndex].priority && right <= end) {
       maxPriorityIndex = right;
     }
     if(maxPriorityIndex != root) {

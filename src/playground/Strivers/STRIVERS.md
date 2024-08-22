@@ -4568,3 +4568,56 @@ spanningTree(v, adj) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 91. Disjoint sets
+
+If there are disconnected components in graph and the graph is a dynamic graph i.e the connections are being created dynamically, 
+then if we are asked to find a connection/parent for a given node, we will have to do a DFS or BFS which will take O(V+E) TC
+But with disjoint set it can be done in near constant time
+
+- We will take two array, parent array and rank Array. 
+- Parent array will be of size N and will be initialised with the node values itself. ie. each node will be it;s oarent initially.
+- Rank array will be also of size N and will be initialised with 0
+- We will have two methods. `findParent` which will take a node and return its parent
+- and `unionRank` which will create the connection and increse the rank for a node.
+- `findParent` will recursively call itself with nodes parent and do `Path compression` 
+    - ie it will try to break the connection to it's immidiate parent 
+    - and try to find ultimate parent and 
+    - create the connection with that. 
+    - Once it find `parent[node] = node` it will return node.
+- `unionRank` will find the parent for the two nodes passed. 
+    - if both the parents are same it will return as they are already in the same connected graph.
+    - If `rank of parentA > rank of parentB` then the smaller guy ie ParentB will be child of parentA. so `parent[parentB] = parentA`
+    - If `rank of parentB > rank of parentA` then the smaller guy ie ParentB will be child of parentA. so `parent[parentA] = parentB`
+    - If `rank of parentB = rank of parentA` then the we can make any one child of the other. lets say we do `parent[parentA] = parentB`, in that case we need to increase the rank of parentB as it's child count got increased. so `rank[parentB]++`
+
+```javascript
+function DisjoinSet(size) {
+  this.rankArr = Array.from({length: size + 1} , () => 0);
+  this.parentArr = Array.from({length: size + 1});
+  for(let i  = 0; i <= size; i++) {
+    this.parentArr[i] = i;
+  }
+}
+
+DisjoinSet.prototype.findParent = function(pivot) {
+  if(this.parentArr[pivot] == pivot) return pivot;
+  this.parentArr[pivot] = this.findParent(this.parentArr[pivot]);
+  return this.parentArr[pivot];
+}
+
+DisjoinSet.prototype.unionRank = function(U, V){ 
+  let parentU = this.findParent(U);
+  let parentV = this.findParent(V);
+  if(parentU == parentV) return;
+  if(this.rankArr[parentU] > this.rankArr[parentV]) {
+    this.parentArr[parentV] = parentU;
+  } else if(this.rankArr[parentU] < this.rankArr[parentV] ) {
+    this.parentArr[parentU] = parentV;
+  } else {
+    this.parentArr[parentU] = parentV;
+    this.rankArr[parentV]++;
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

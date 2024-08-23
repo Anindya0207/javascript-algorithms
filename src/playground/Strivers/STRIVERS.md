@@ -4594,6 +4594,7 @@ But with disjoint set it can be done in near constant time
 ```javascript
 function DisjoinSet(size) {
   this.rankArr = Array.from({length: size + 1} , () => 0);
+  this.sizeArr = Array.from({length: size + 1} , () => 1);
   this.parentArr = Array.from({length: size + 1});
   for(let i  = 0; i <= size; i++) {
     this.parentArr[i] = i;
@@ -4619,8 +4620,7 @@ DisjoinSet.prototype.unionRank = function(U, V){
     this.rankArr[parentV]++;
   }
 }
-
-DisjoinSet.prototype.unionRank = function(U, V){ 
+DisjoinSet.prototype.unionSize = function(U, V){ 
     let parentU = this.findParent(U);
     let parentV = this.findParent(V);
     if(parentU == parentV) return;
@@ -4631,6 +4631,40 @@ DisjoinSet.prototype.unionRank = function(U, V){
         this.parentArr[parentU] = parentV;
         this.sizeArr[parentV] += this.sizeArr[parentU]
     }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 92. Kruskal's Algo: finding MST
+
+- To find MST we can also use Kruskal's algo which is based on Disjoint set
+- We need sort the edges in increaseing order of the edge weight
+- Then we need to run a loop over it
+- For each set, we will find the ultimate parent of both nodes using disjoint set
+- If they are same, then we just continue
+- If not, we connect them with unionRank or unionSize and add them in MST array
+
+```javascript
+spanningTree(v, adj) {
+    let dj = new DisjoinSett(v);
+    let edges = [];
+    for(let i = 0; i <adj.length; i++) {
+        for(let j = 0; j<adj[i].length; j++) {
+            let [v, w] = adj[i][j];
+            edges.push([i, v, w]);
+        }
+    }
+    edges.sort((a, b) => a[2] - b[2])
+    let sum = 0;
+    for(let i =0 ;i < edges.length; i++) {
+        let [ u, v, w] = edges[i];
+        let parentU = dj.findParent(u);
+        let parentV = dj.findParent(v);
+        if(parentV == parentU) continue;
+        dj.unionRank(u, v);
+        sum += w;
+    }
+    return sum;
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

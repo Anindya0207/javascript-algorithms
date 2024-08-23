@@ -4619,5 +4619,18 @@ DisjoinSet.prototype.unionRank = function(U, V){
     this.rankArr[parentV]++;
   }
 }
+
+DisjoinSet.prototype.unionRank = function(U, V){ 
+    let parentU = this.findParent(U);
+    let parentV = this.findParent(V);
+    if(parentU == parentV) return;
+    if(this.sizeArr[parentU] >= this.sizeArr[parentV]) {
+        this.parentArr[parentV] = parentU;
+        this.sizeArr[parentU] += this.sizeArr[parentV]
+    } else {
+        this.parentArr[parentU] = parentV;
+        this.sizeArr[parentV] += this.sizeArr[parentU]
+    }
+}
 ```
 --------------------------------------------------------------------------------------------------------------------------------

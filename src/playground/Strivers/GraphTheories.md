@@ -631,6 +631,7 @@ But with disjoint set it can be done in near constant time
 ```javascript
 function DisjoinSet(size) {
   this.rankArr = Array.from({length: size + 1} , () => 0);
+  this.sizeArr = Array.from({length: size + 1} , () => 1);
   this.parentArr = Array.from({length: size + 1});
   for(let i  = 0; i <= size; i++) {
     this.parentArr[i] = i;
@@ -655,6 +656,18 @@ DisjoinSet.prototype.unionRank = function(U, V){
     this.parentArr[parentU] = parentV;
     this.rankArr[parentV]++;
   }
+}
+DisjoinSet.prototype.unionRank = function(U, V){ 
+    let parentU = this.findParent(U);
+    let parentV = this.findParent(V);
+    if(parentU == parentV) return;
+    if(this.sizeArr[parentU] >= this.sizeArr[parentV]) {
+        this.parentArr[parentV] = parentU;
+        this.sizeArr[parentU] += this.sizeArr[parentV]
+    } else {
+        this.parentArr[parentU] = parentV;
+        this.sizeArr[parentV] += this.sizeArr[parentU]
+    }
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

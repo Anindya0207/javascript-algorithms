@@ -4591,6 +4591,8 @@ But with disjoint set it can be done in near constant time
     - If `rank of parentB > rank of parentA` then the smaller guy ie ParentB will be child of parentA. so `parent[parentA] = parentB`
     - If `rank of parentB = rank of parentA` then the we can make any one child of the other. lets say we do `parent[parentA] = parentB`, in that case we need to increase the rank of parentB as it's child count got increased. so `rank[parentB]++`
 
+- `One trick to find the number of disconnected graphs component` => `Iterate over parentArr and see if parentArr[i] == i`
+
 ```javascript
 function DisjoinSet(size) {
   this.rankArr = Array.from({length: size + 1} , () => 0);
@@ -4667,4 +4669,106 @@ spanningTree(v, adj) {
     return sum;
 }
 ```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 93. Most stones removed from 2D plane
+
+We need to remove most number of stones from a row and col if that row and that col has another stone in it.
+
+- Trick is to consider `flatten the col and count them as row + colIndex + 1 as the graph's node`. ie. if there is 2* 2 matrix, we will consider the graph nodes as 0, 1, 2, 3. Notice that 2 is for col = 1 and row = 0 (we calculated this as colIndex + rowCount + 1 = 1 + 0 + 1 = 2)
+- this way we can create connections between the graph nodes as the connections given to us in input
+- Now, from all the disconnected components, we can keep 1 stone each and remove everything else right?
+- So `total no of stone remove = total number of stones given - (total number of disconnected components * 1)` right?
+
+```javascript
+var removeStones = function(stones) {
+    let maxR = -Infinity;
+    let maxC = -Infinity;
+    let uniqueParent = {};
+    for(let i =0; i< stones.length;i++) {
+        let [u,v] = stones[i];
+        maxR = Math.max(maxR, u);
+        maxC = Math.max(maxC, v);
+    }
+    let dj = new DisjoinSet(maxR + maxC + 1) // max lengh of the parentArr etc will be rowCount + col count+1. like 0,1,2,3 for a 2 *2 matrix
+    for(let i = 0;i<stones.length; i++) {
+        let [row, col] = stones[i];
+        let normalisedCol = col + maxR+ 1;
+        dj.unionRank(row, normalisedCol);
+    }
+    // At this point our parentArr is ready all connections have been made
+    // Now we need to find unique parents which has some children under it. 
+    let uniqueParent = {}
+    for(let i = 0;i<stones.length; i++) {
+        let [row, col] = stones[i];
+        let normalisedCol = col + maxR+ 1;
+        let parentU = dj.findParent(row);
+        let parentV = dj.findParent(normalisedCol);
+        uniqueParent[parentU]++
+        uniqueParent[parentV]++
+    }
+    // Number of uniqueParents is total disconnected graph components
+    let totalDisconnected = Object.keys(uniqueParent);
+    // so..
+    let ans  = stones.length  - totalDisconnected;
+    return ans;
+}
+```
+
+FOR THESE KIND OF PATTERNS IT'S IMP TO NUMBER EVERYTHING AND CONSIDER THEM AS GRAPH NODES. 
+Here we numbered rows first, then columns. 
+Similar pattern: https://leetcode.com/problems/accounts-merge/submissions/1366610821/
+In this problem we needed to number all names first then all emails
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 94. Number of Islands II 
+
+- In Number of Islands I the 0 and 1 were already placed in the 2D plane and we ran DFS traversal to calculate the number of islands
+- In this problem we are given operations and in each operation dynamically the islands are placed in the 2D plane
+- Whenever there is a use case of Dynamic graph, we need to think in direction of Disjoin Set
+- Here the trick to number is `we will number every index of the 2D matrix a unique number`, so we will take a disjoin set of row * col size
+- Now, for each operation, we would be passed a row and col
+- If that row and col is visited, we can ignore
+- If not, we will first blindly increment a counter. This counter will give us the number of islands after each operation.
+- Now, from the current node, we will check up/down/left/right. If those are already visited, that means those are islands also right?
+- In that case, we need to check if the current node and the up/down/left/right node both parents are same from Disjoin set
+- If they are different, then we will connect them and reduce the count. why? becuase by connecting they became part of the same island
+
+```javascript
+numOfIslands(rows, cols, operators) {
+    const getNormalisedNode = (row, col) => cols * row + col
+    let visitedArr = Array.from({length: rows}, () => Array.from({length: cols} , () => 0));
+    let dj = new DisjoinSet(rows * cols);
+    let final = [], count = 0;
+    let directions = [[-1,0], [1, 0], [0, -1], [0,1]]
+    for(let i=0; i< operators.length; i++) {
+        let [row, col] = operators[i];
+        if(visitedArr[row][col]){
+        final.push(count);
+        continue;
+        }
+        count++;
+        visitedArr[row][col] = 1;
+        for(let dir of directions) {
+        const [deltaRow, deltaCol] = dir;
+        let newRow = row + deltaRow;
+        let newCol = col + deltaCol;
+        let normalisedNode = getNormalisedNode(row, col);
+        let newNormalisedNode = getNormalisedNode(newRow, newCol);
+        if(visitedArr[newRow] && visitedArr[newRow][newCol]) {
+            let parentU = dj.findParent(normalisedNode);
+            let parentV = dj.findParent(newNormalisedNode);
+            if(parentU != parentV) {
+            dj.unionRank(normalisedNode, newNormalisedNode);
+            count--;
+            }
+        }
+        }
+        final.push(count);
+    }
+    return final;
+}
+```
+
 --------------------------------------------------------------------------------------------------------------------------------

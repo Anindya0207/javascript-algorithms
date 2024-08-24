@@ -245,3 +245,24 @@ const heapify = (arr, root, start, end) => {
       this.rankArr[parentV]++;
     }
   }
+  DisjoinSet.prototype.unionRankParent = function(parentU, parentV){ 
+    if(parentU == parentV) return;
+    if(this.rankArr[parentU] > this.rankArr[parentV]) {
+      this.parentArr[parentV] = parentU;
+    } else if(this.rankArr[parentU] < this.rankArr[parentV] ) {
+      this.parentArr[parentU] = parentV;
+    } else {
+      this.parentArr[parentU] = parentV;
+      this.rankArr[parentV]++;
+    }
+  }
+  DisjoinSet.prototype.getDisconnected = function(){
+    let count = 0;
+    console.log(this.parentArr)
+    for(let i = 0; i< this.parentArr.length; i++) {
+        if(this.parentArr[i] == i) {
+            count++;
+        }
+    } 
+    return count;
+}

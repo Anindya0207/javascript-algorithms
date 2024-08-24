@@ -672,7 +672,7 @@ DisjoinSet.prototype.unionSize = function(U, V){
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 92. Kruskal's Algo: finding MST
+### Kruskal's Algo: finding MST
 
 - To find MST we can also use Kruskal's algo which is based on Disjoint set
 - We need sort the edges in increaseing order of the edge weight

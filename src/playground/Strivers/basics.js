@@ -219,9 +219,10 @@ const heapify = (arr, root, start, end) => {
   }
   
   function DisjoinSet(size) {
-    this.rankArr = Array.from({length: size + 1} , () => 0);
-    this.parentArr = Array.from({length: size + 1});
-    for(let i  = 0; i <= size; i++) {
+    this.rankArr = Array.from({length: size} , () => 0);
+    this.sizeArr = Array.from({length: size} , () => 1);
+    this.parentArr = Array.from({length: size});
+    for(let i  = 0; i < size; i++) {
       this.parentArr[i] = i;
     }
   }
@@ -245,16 +246,17 @@ const heapify = (arr, root, start, end) => {
       this.rankArr[parentV]++;
     }
   }
-  DisjoinSet.prototype.unionRankParent = function(parentU, parentV){ 
-    if(parentU == parentV) return;
-    if(this.rankArr[parentU] > this.rankArr[parentV]) {
-      this.parentArr[parentV] = parentU;
-    } else if(this.rankArr[parentU] < this.rankArr[parentV] ) {
-      this.parentArr[parentU] = parentV;
-    } else {
-      this.parentArr[parentU] = parentV;
-      this.rankArr[parentV]++;
-    }
+  DisjoinSet.prototype.unionSize = function(U, V){ 
+      let parentU = this.findParent(U);
+      let parentV = this.findParent(V);
+      if(parentU == parentV) return;
+      if(this.sizeArr[parentU] >= this.sizeArr[parentV]) {
+          this.parentArr[parentV] = parentU;
+          this.sizeArr[parentU] += this.sizeArr[parentV]
+      } else {
+          this.parentArr[parentU] = parentV;
+          this.sizeArr[parentV] += this.sizeArr[parentU]
+      }
   }
   DisjoinSet.prototype.getDisconnected = function(){
     let count = 0;

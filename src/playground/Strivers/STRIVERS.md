@@ -4745,25 +4745,25 @@ numOfIslands(rows, cols, operators) {
     for(let i=0; i< operators.length; i++) {
         let [row, col] = operators[i];
         if(visitedArr[row][col]){
-        final.push(count);
-        continue;
+            final.push(count);
+            continue;
         }
         count++;
         visitedArr[row][col] = 1;
         for(let dir of directions) {
-        const [deltaRow, deltaCol] = dir;
-        let newRow = row + deltaRow;
-        let newCol = col + deltaCol;
-        let normalisedNode = getNormalisedNode(row, col);
-        let newNormalisedNode = getNormalisedNode(newRow, newCol);
-        if(visitedArr[newRow] && visitedArr[newRow][newCol]) {
-            let parentU = dj.findParent(normalisedNode);
-            let parentV = dj.findParent(newNormalisedNode);
-            if(parentU != parentV) {
-            dj.unionRank(normalisedNode, newNormalisedNode);
-            count--;
+            const [deltaRow, deltaCol] = dir;
+            let newRow = row + deltaRow;
+            let newCol = col + deltaCol;
+            let normalisedNode = getNormalisedNode(row, col);
+            let newNormalisedNode = getNormalisedNode(newRow, newCol);
+            if(visitedArr[newRow] && visitedArr[newRow][newCol]) {
+                let parentU = dj.findParent(normalisedNode);
+                let parentV = dj.findParent(newNormalisedNode);
+                if(parentU != parentV) {
+                    dj.unionRank(normalisedNode, newNormalisedNode);
+                    count--;
+                }
             }
-        }
         }
         final.push(count);
     }
@@ -4771,4 +4771,48 @@ numOfIslands(rows, cols, operators) {
 }
 ```
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 95. Swim in rising water
+
+- We would simply need to apply Kruskal algo
+- We will sort all the elevations in ascending order
+- IDea is to ` find a MST to contain start and end node only`
+- iterate over the elevations and start connecting adjacent cells only if the neghbour cell is les elevation than the current cell
+- As soon as we find that parent of both the 0th node and n-1,n-1 node is same, return the current node becauwe thats the least time we would need to connect 0 to n-1
+
+```javascript
+
+var swimInWater = function(grid) {
+  let arr = [];
+  let n = grid.length;
+  let getNormalisedNode = (row,col) => col * n + row;
+  let dj = new DisjoinSet(n *n)
+  for(let i = 0; i < grid.length; i++) {
+      for(let j = 0; j<grid.length; j++) {
+          const normalisedNode = getNormalisedNode(i, j)
+          arr.push([grid[i][j], normalisedNode, [i, j]])
+      }
+  }
+  arr.sort((a, b) => a[0] - b[0]);
+  console.log(arr);
+  let directions = [[-1,0], [1,0], [0,1], [0,-1]];
+  for(let i =0; i < arr.length; i++) {
+    let [val, normalisedNode, [r,c]] = arr[i];
+    for(let dir of directions) {
+      let [deltaR, deltaC] = dir;
+      let newR = deltaR + r;
+      let newC = deltaC + c;
+      if(grid[newR] && grid[newR][newC] != undefined && grid[newR][newC] < grid[r][c]) {
+        dj.unionRank(normalisedNode, getNormalisedNode(newR, newC));
+      }
+    }
+    if(dj.findParent(0) == dj.findParent(getNormalisedNode(n-1, n-1))) {
+      return val
+    }
+  }
+  return -1
+};
+
+```
 --------------------------------------------------------------------------------------------------------------------------------

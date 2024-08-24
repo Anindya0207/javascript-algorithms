@@ -1,14 +1,11 @@
-/**
- * @param {number[][]} stones
- * @return {number}
- */
 function DisjoinSet(size) {
-  this.rankArr = Array.from({length: size } , () => 0);
-  this.sizeArr = Array.from({length: size } , () => 1);
+  this.rankArr = Array.from({length: size} , () => 0);
+  this.sizeArr = Array.from({length: size} , () => 1);
   this.parentArr = Array.from({length: size});
   for(let i  = 0; i < size; i++) {
     this.parentArr[i] = i;
   }
+  this.maxSize = -Infinity;
 }
 
 DisjoinSet.prototype.findParent = function(pivot) {
@@ -17,7 +14,7 @@ DisjoinSet.prototype.findParent = function(pivot) {
   return this.parentArr[pivot];
 }
 
-DisjoinSet.prototype.unionRank = function(U, V){
+DisjoinSet.prototype.unionRank = function(U, V){ 
   let parentU = this.findParent(U);
   let parentV = this.findParent(V);
   if(parentU == parentV) return;
@@ -26,54 +23,54 @@ DisjoinSet.prototype.unionRank = function(U, V){
   } else if(this.rankArr[parentU] < this.rankArr[parentV] ) {
     this.parentArr[parentU] = parentV;
   } else {
-    this.parentArr[parentV] = parentU
-    this.rankArr[parentU]++;
+    this.parentArr[parentU] = parentV;
+    this.rankArr[parentV]++;
   }
 }
-DisjoinSet.prototype.getUniqueParents = function(){
-  let uniqueParent = {};
-  for(let i = 0; i< this.parentArr.length; i++) {
-      if(this.parentArr[i] != i) {
-          uniqueParent[this.parentArr[i]] = true
-      }
-  } 
-  return Object.keys(uniqueParent);
+DisjoinSet.prototype.unionSize = function(U, V){ 
+    let parentU = this.findParent(U);
+    let parentV = this.findParent(V);
+    if(parentU == parentV) return;
+    if(this.sizeArr[parentU] >= this.sizeArr[parentV]) {
+        this.parentArr[parentV] = parentU;
+        this.sizeArr[parentU] += this.sizeArr[parentV]
+        this.maxSize = Math.max(this.maxSize, this.sizeArr[parentU]);
+    } else {
+        this.parentArr[parentU] = parentV;
+        this.sizeArr[parentV] += this.sizeArr[parentU]
+        this.maxSize = Math.max(this.maxSize, this.sizeArr[parentV]);
+    }
 }
 
-
-const numOfIslands = (rows, cols, operators) => {
-  const getNormalisedNode = (row, col) => cols * row + col
-  let visitedArr = Array.from({length: rows}, () => Array.from({length: cols} , () => 0));
-  let dj = new DisjoinSet(rows * cols);
-  let final = [], count = 0;
-  let directions = [[-1,0], [1, 0], [0, -1], [0,1]]
-  for(let i=0; i< operators.length; i++) {
-      let [row, col] = operators[i];
-      if(visitedArr[row][col]){
-        final.push(count);
-        continue;
+var swimInWater = function(grid) {
+  let arr = [];
+  let n = grid.length;
+  let getNormalisedNode = (row,col) => col * n + row;
+  let dj = new DisjoinSet(n *n)
+  for(let i = 0; i < grid.length; i++) {
+      for(let j = 0; j<grid.length; j++) {
+          const normalisedNode = getNormalisedNode(i, j)
+          arr.push([grid[i][j], normalisedNode, [i, j]])
       }
-      count++;
-      visitedArr[row][col] = 1;
-      for(let dir of directions) {
-        const [deltaRow, deltaCol] = dir;
-        let newRow = row + deltaRow;
-        let newCol = col + deltaCol;
-        let normalisedNode = getNormalisedNode(row, col);
-        let newNormalisedNode = getNormalisedNode(newRow, newCol);
-        if(visitedArr[newRow] && visitedArr[newRow][newCol]) {
-          let parentU = dj.findParent(normalisedNode);
-          let parentV = dj.findParent(newNormalisedNode);
-          if(parentU != parentV) {
-            dj.unionRank(normalisedNode, newNormalisedNode);
-            count--;
-          }
-        }
-      }
-      final.push(count);
   }
-  return final;
-}
+  arr.sort((a, b) => a[0] - b[0]);
+  console.log(arr);
+  let directions = [[-1,0], [1,0], [0,1], [0,-1]];
+  for(let i =0; i < arr.length; i++) {
+    let [val, normalisedNode, [r,c]] = arr[i];
+    for(let dir of directions) {
+      let [deltaR, deltaC] = dir;
+      let newR = deltaR + r;
+      let newC = deltaC + c;
+      if(grid[newR] && grid[newR][newC] != undefined && grid[newR][newC] < grid[r][c]) {
+        dj.unionRank(normalisedNode, getNormalisedNode(newR, newC));
+      }
+    }
+    if(dj.findParent(0) == dj.findParent(getNormalisedNode(n-1, n-1))) {
+      return val
+    }
+  }
+  return -1
+};
 
-console.log(numOfIslands(5,8,[[0,3], [4,3], [3,1], [3,5]]))
-// console.log(numOfIslands(4, 5,[[1,1], [0,1], [3,3], [3,4]]))
+console.log(swimInWater([[0,1,2,3,4],[24,23,22,21,5],[12,13,14,15,16],[11,17,18,19,20],[10,9,8,7,6]]))

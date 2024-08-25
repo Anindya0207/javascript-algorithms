@@ -753,11 +753,147 @@ var criticalConnections = function(n, adj) {
             else {
                 // be greedy, just take the low of the neighbour to node
                 low[node] = Math.min(low[node], low[dest])
-            }
+            }   
         }
     }
     _traverse(0, -1);
     return bridges;
 }
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Aritculation point
+
+Aritculation points are those vertex in graph which disconnected, the graph will become disconnected components
+
+- The process is same as finding the bridges in graph
+- Only differences are - 
+    - We were checking `low[dest] > high[node]` in bridges. Here we will do `low[dest] >= high[node] && parent != -1` why? because it is still invalid if the minimum time to reach the neighbour is equal to the max time to visit the parent because with the node gone, it won't be able to reach the node in the same time. 
+    - We were setting `low[node] = Math.min(low[node], low[dest])` if it's visited already. Here we will set `low[node] = Math.min(low[node], high[dest])`
+    - We will also need to  check if `parent == -1 and unvisited child count is  > 1` then the node is also an articulation point
+    - Also there might be multiple articulation points so `keep a map`
+    - Also, graph may be disconnected, `loop all vertices`
+
+```javascript
+var criticalConnections = function(n, adj) {
+    let artPoints = {};
+    let timer = 1;
+    let visitedArray = Array.from({length: n}, () => 0);
+    let low =  Array.from({length: n});
+    let high =  Array.from({length: n});
+    const _traverse = (node, parent) => {
+        visited[node] = 1;
+        low[node] = timer;
+        high[node] = timer;
+        timer++;
+        let neighbours = adj[node];
+        let child = 0
+        for(let i =0; i<neighbours.length;i++) {
+            let dest = neighbours[i];
+            if(dest == parent) continue;
+            if(visitedArray[dest] == 0) {
+                _traverse(dest, node);
+                low[node] = Math.min(low[node], low[dest])
+                //check for >= and check if parent != -1
+                if(low[dest] >= high[node] && parent != -1) {
+                    // take map since we might find same articulation point multiple times
+                    artPoints[node] = true
+                }
+                child++;
+            }
+            else {
+                // Take high instead of low of the neighbour 
+                low[node] = Math.min(low[node], high[dest])
+            }   
+        }
+        // consider the parent node also if it has multiple unvisited child
+        if(child > 1 && parent == -1) {
+            artPoints[node] = true
+        }
+    }
+    // loop for all vertices
+    for(let i  = 0; i < n;i ++) {
+        if(!visitedArray[i]) {
+            _traverse(i, -1)
+        }
+    }
+    return Object.keys(artPoints);
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Kosaraju's algo: SCC
+
+SCC or Stronly connected components are those nodes in graph which can be reached in any direction, 
+![alt text](image-7.png)
+for example, here 0,1,2 are nodes in cycle so we can traverse from 0 to 2 in any direction. This makes it a SCC
+Our job is to find the SCCs in a graph
+
+- Intuition is, In a directed graph SCC1 -> SCC2 -> SCC3 -> SCC4 will always be true
+- Exacly why, if we reverse this,  SCC1 <- SCC2 <- SCC3 <- SCC4 then first SCC1 will not be able to traverse to second SCC. 
+
+How?
+- Step1: Sort the graph in it's DFS traversal order
+- Step2: Reverse the graph
+- Step3: Pop from stack one by one and start DFS on the nodes if they are not visited. After every SCC is traversed, the DFS will break. That way we can compute the number of scc or nodes in the scc
+
+```javascript
+kosaraju(edges, v, e) {
+    // Step 0: compute both forward and reverse graph
+    let adj = Array.from({length: v}, () => new Array());
+    let adjRev = Array.from({length: v}, () => new Array());
+    for(let i = 0; i< arr.length; i++) {
+        let [x, y] = arr[i];
+        adj[x].push(y);
+        adjRev[y].push(x);
+    }
+
+    const _traverse = (node) => {
+        visited[node] = 1;
+        let neighbours = adj[node];
+        for(let i =0; i<neighbours.length; i++) {
+            if(!visited[neighbours[i]]) {
+                _traverse(neighbours[i]);
+            }
+        }
+        st.push(node);
+    }
+    let visited = Array.from({length: v}, () => 0);
+    // Step 1: sort all the nodes as per DFS finish time
+    let st = new MyStack();
+    for(let i = 0; i<v; i++) {
+        if(!visited[i]) {
+            _traverse(i);
+        }
+    }
+
+    //Step2: we already have the reverse adj list
+    
+    //Step3: Do a DFS in adjRev
+    let scc = 0;
+    visited = {};
+    const _traverseRev = (node, nodes) => {
+        visited[node] = 1;
+        let neighbours = adjRev[node];
+        nodes.push(node);
+        for(let i =0; i<neighbours.length; i++) {
+            if(!visited[neighbours[i]]) {
+                _traverseRev(neighbours[i], nodes);
+            }
+        }
+        return nodes;
+    }
+    while(!st.empty()) {
+        let i = st.pop();
+        if(!visited[i]) {
+            let retnodes = _traverseRev(i, [i]);
+            scc++;
+        }
+    }
+    return scc;
+}
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

@@ -4535,6 +4535,7 @@ Prim's also is one of the way to find MST and sum of weights in a MST
 - Insert [weight, node, parent] as [0, 0, -1] initially in the queue
 - run a loop till queue is not empty
 - Pop from the queue
+- If `it's already visited, dont dont anything, else mark it as visited and push in MST`
 - find it's neighbours and iterate over them
 - whoever is not visited, `enqueue them but dont mark as visited`
 - next time when they will get popped, check if its not yet visited, then push in MST and add up to sum

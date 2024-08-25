@@ -4938,7 +4938,9 @@ var criticalConnections = function(n, adj) {
 ### 98. Kosaraju's algo: SCC
 
 SCC or Stronly connected components are those nodes in graph which can be reached in any direction, 
+
 ![alt text](image-7.png)
+
 for example, here 0,1,2 are nodes in cycle so we can traverse from 0 to 2 in any direction. This makes it a SCC
 Our job is to find the SCCs in a graph
 

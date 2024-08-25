@@ -705,3 +705,59 @@ spanningTree(v, adj) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Trajan's Algo: Bridges in Graph
+
+- Bridges are the edges without which components become disconnected in a graph
+For example in the following graph
+![alt text](image-6.png)
+- the edge between 4-5, 5-6 and 8-10 are bridges
+- The algo simply does DFS traversal 
+- We will need to additionally take a `lowest time to reach node array` and `highest time to reach node array`
+- While traversing each node, we will keep increasing both the array for the particular node
+- Now when we check for its neighbours
+    - If the neighbour is visited, take it's low if thats lower than it's low.
+    - If the neighbour is not visited, do DFS traversal for the neighbour
+    - after DFS, take it's low if that lower than it's low
+    - If at any time, `lowest time to reach the neighbour > max time to reach its parent node ` that means that the neighbour can not be reached in any other shorter path. That means there is a bridge edge which connects the node and the neighbour
+
+```javascript
+var criticalConnections = function(n, adj) {
+    let bridges = [];
+    let timer = 1;
+    let visitedArray = Array.from({length: n}, () => 0);
+    let low =  Array.from({length: n});
+    let high =  Array.from({length: n});
+    const _traverse = (node, parent) => {
+        // let's make node visited, and put current timer in it's low and high both. high won't be changed but we will try to minimise the low
+        visited[node] = 1;
+        low[node] = timer;
+        high[node] = timer;
+        timer++;
+        // time to check neighbours and start DFS
+        let neighbours = adj[node];
+        for(let i =0; i<neighbours.length;i++) {
+            let dest = neighbours[i];
+            // now if any of the neighbour of the current node is it's parent only, dont do anything
+            if(dest == parent) continue;
+            // if the current neighbour is not visited start DFS
+            if(visitedArray[dest] == 0) {
+                _traverse(dest, node);
+                // be greedy, just take the low of the neighbour to node
+                low[node] = Math.min(low[node], low[dest])
+                // check for bridge. if the neighbour's minimum time is still more than the current node's high, that means the neighbour can not be reached in any shorter time
+                if(low[dest] > high[node]) {
+                    bridges.push([dest, node])
+                }
+            }
+            else {
+                // be greedy, just take the low of the neighbour to node
+                low[node] = Math.min(low[node], low[dest])
+            }
+        }
+    }
+    _traverse(0, -1);
+    return bridges;
+}
+
+--------------------------------------------------------------------------------------------------------------------------------

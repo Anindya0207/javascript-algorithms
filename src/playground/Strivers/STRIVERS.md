@@ -5011,3 +5011,56 @@ kosaraju(edges, v, e) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 99. House Robber II
+
+We need to find max robbed stuff from all houses when the houses are circularly arranged 
+
+- Trick to this problem is find the max omitting the last house once and first house once
+- Max of both is the ans
+
+```javascript
+var rob = function (nums) {
+    if(nums.length <= 1) {
+        return nums[0] || 0
+    }
+    const _findMax = (_nums) => {
+        let dp = Array.from({ length: _nums.length }, () => -1);
+        dp[0] = _nums[0]
+        dp[1] = Math.max(_nums[0], _nums[1])
+        for (let i = 2; i < _nums.length; i++) {
+            dp[i] = Math.max(dp[i - 1], dp[i - 2] + _nums[i]);
+        }
+        return dp[_nums.length - 1]
+    }
+    let arr1 = nums.slice(0, nums.length - 1);
+    let arr2 = nums.slice(1, nums.length);
+    let max1 = _findMax(arr1);
+    let max2 = _findMax(arr2);
+    return Math.max(max1, max2)
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 100. Count bits
+
+We need to count set bits of all numbers till n
+
+- Any number n is constructed of 2^x + 1 or 2^x
+- So if we divide the number by 2, we will get a number for which we would have computed the count of setbits in past?
+- If we got that, then the current number's setbit will be the set bit count of n/2 + 1 if the current number is odd or else n/2 +1
+
+```javascript
+var countBits = function(n) {
+    if(n == 0) return [0];
+    let dp = new Array(n+1).fill(-1);
+    dp[0] = 0;
+    dp[1] = 1;
+    for(let i = 2; i <= n; i++){
+        dp[i] = dp[i >> 1] + (i & 1)
+    } 
+   return dp;
+    
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

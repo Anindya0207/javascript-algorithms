@@ -5064,3 +5064,57 @@ var countBits = function(n) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 101. Divisor Game
+
+Alice nd Bob plays game where a number n is given. Alice starts first and picks a number x such that n % x = 0 then n = n- x . We need to find if Alice will win.
+
+- So `here the state will hold if player wins at ith step so dp[i] will be if the player can win at ith number. `
+- So at i th number, player can choose any number from 1 to i right? let's say that is x
+- For any  x, if i % x = 0 then that number can be picked. Now for that exact number if i - x can not be picked then dp[i] is true, right?
+- so what will give us if i - x can not picked? yes !dp[i-x] will give if that can not be picked
+
+```javascript
+var divisorGame = function(n) {
+    let dp = Array.from({length: n+1}, () => false);
+    for(let i = 1;i <= n; i++) {
+        for(let x = 1; x <i ; x ++) {
+            if(i % x == 0 && !dp[i-x]) {
+                dp[i] = true;
+                break;
+            }
+        }
+    }
+    return dp[n];
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 102. Geek's Training
+
+Geek needs to maximise the points earned by doing either of 3 activities n days when he cant perform same activities on consecutive days
+
+- Here our state will be `dp[i][curr] = Maximum points geek can earn on i day by doing curr activity`
+- We need to run all the combinations of activities that could have been run on the prev day vs all the activities that can be run today
+- We need to make sure `prev != curr`
+- Now dp[i][curr] `is the Maximum of (point earned today by doing curr activity + dp[i-1][prev] ie. max points earned by doing any other activity on the previous day)`
+
+```javascript
+maximumPoints(arr, n) {
+    let dp = Array.from({length: arr.length}, () => Array.from({length: 3}, () => 0));
+    dp[0][0] = arr[0][0] // what is the maxium point geek can earn on day 0 by 0th activity? yes, simple.. it's arr[0][0]
+    dp[0][1] = arr[0][1] 
+    dp[0][2] = arr[0][2] 
+    for(let i = 1; i< arr.length; i++) {
+        for(let prev = 0; prev < 3; prev++) {
+            for(let curr = 0; curr < 3; curr++) {
+                if(prev != curr) {
+                        dp[i][curr] = Math.max(dp[i][curr], arr[i][curr] + dp[i-1][prev])
+                }
+            }
+        }
+    }
+    return Math.max(...dp[n-1])
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

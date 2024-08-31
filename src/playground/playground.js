@@ -1,16 +1,19 @@
-var countBits = function(n) {
-  let dp = new Array(n+1).fill(-1);
-  dp[0] = 0;
-  dp[1] = 1;
-  for(let i = 2; i <= n; i++){
-    if((i & i-1) == 0) {
-      dp[i] = 1;
-    } else {
-      dp[i] = dp[i-1] + 1
-    }
-  } 
-  console.log(dp)
-  
+var uniquePaths = function(m, n) {
+  let dp = Array.from({length: m}, () => Array.from({length: n}, () => 0));
+  dp[0][0] = 0;
+  dp[0][1] = 1;
+  dp[1][0] = 1;
+  for(let i = 0; i < m; i++) {
+      for(let j = 0; j < n; j++) {
+         if(i > 0) {
+          dp[i][j] += dp[i-1][j]
+         }
+         if(j > 0) {
+          dp[i][j] += dp[i][j-1]
+         }
+      }
+  }
+  return dp[m-1][n-1]
 };
 
-countBits(6)
+console.log(uniquePaths(3, 2))

@@ -5118,3 +5118,114 @@ maximumPoints(arr, n) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 103. Chocolate Pickup : 3D Dp
+
+There are two robots collecting chocoates in a 2D plane from 0,0 and 0, m-1 cells respectively. We need to calculate the max chocolate pickup by both robot such that if they are at same cell only one robot will pick the chocolate
+
+- We will solve this with recursion first and then apply DP
+- Let's say we `start the recusion with row i = 0, and two column position for Robot1 and Robot2 as j1, j2`
+- We know for sure if it's out of bound like `i <0 or j1 >m etc. we can return -Infinity`
+- `If we reach the last row we need to return the sumation of the cell values of two robots, only if they are at two different cells - VVIMP`
+- Now for any i and j we will try out all the combination of columns the robots can go.. like Robot one can go -1,0,1 from the curent column and for each transition Robo2 can also go to -1,0,1 columns from it's current column
+- For all these new combination we will gather the max sum and we will return to the parent callstack. 
+- So if we simply write the recursion
+
+```javascript
+const solve = (n, m, grid) => {
+    const _calc = (i, j1, j2) => {
+        if(i < 0 || j1 <0 || j1 >=m || j2 <0|| j2 >=m) {
+            return -Infinity
+        }
+        // Edge condition
+        if(i == n-1) {
+            if(j1 ==j2) {
+                // Don't consider the cell value twice if both robos are in same cell
+                return grid[i][j1]
+            } else {
+                // return sum of both robos cells
+                return grid[i][j1] + grid[i][j2];
+            }
+        }
+        // Normal case
+        let max = -Infinity
+        for(let dj1 = -1; dj1 <= 1; dj1++) {
+            for(let dj2 = -1; dj2 <= 1; dj2++) {
+                let currVal;
+                // the current Rows sum is this..
+                if(j1 == j2) {
+                    currVal = grid[i][j1];
+                } else {
+                    currVal = grid[i][j1] + grid[i][j2]
+                }
+                // Gather the down rows sums as well and compute max
+                max = Math.max(max, currVal + _calc(i+1, j1 + dj1, j2 + dj2));
+            }
+        }
+        return max;
+    }
+    return _calc(0, 0, m-1);
+}
+```
+
+- thats it. It should work But the TC is O(n^3). Now to optimise we will apply memoisation (DP)
+- Since our reciursion has three states  i, j1 and j2 we need a 3d DP 
+- After applying DP- 
+
+```javascript
+const solve = (n, m, grid) => {
+    // n * m * m 3D DP
+    let dp = Array.from({length:n}, ()=> Array.from({length: m}, () =>  Array.from({length: m}, () => -1)));
+    const _calc = (i, j1, j2) => {
+        if(i < 0 || j1 <0 || j1 >=m || j2 <0|| j2 >=m) {
+            return -Infinity
+        }
+        // Edge condition
+        if(i == n-1) {
+            if(j1 ==j2) {
+                // Don't consider the cell value twice if both robos are in same cell
+                
+                // SET IT IN DP AS WELL
+                dp[i][j1][j2] = grid[i][j1]
+
+                return grid[i][j1]
+            } else {
+                // return sum of both robos cells
+
+                // SET IT IN DP AS WELL
+                dp[i][j1][j2] = grid[i][j1] + grid[i][j2];
+
+                return grid[i][j1] + grid[i][j2];
+            }
+        }
+
+        // IF DP CACHE HIT. RETURN FROM DP
+        if( dp[i][j1][j2] != -1) return  dp[i][j1][j2];
+
+        // Normal case
+        let max = -Infinity
+        for(let dj1 = -1; dj1 <= 1; dj1++) {
+            for(let dj2 = -1; dj2 <= 1; dj2++) {
+                let currVal;
+                // the current Rows sum is this..
+                if(j1 == j2) {
+                    currVal = grid[i][j1];
+                } else {
+                    currVal = grid[i][j1] + grid[i][j2]
+                }
+                // Gather the down rows sums as well and compute max
+                max = Math.max(max, currVal + _calc(i+1, j1 + dj1, j2 + dj2));
+            }
+        }
+        //SET IN DP
+        dp[i][j1][j2] = max;
+
+        return max;
+    }
+    return _calc(0, 0, m-1);
+}
+```
+
+thats it. It's simple memoisation when we store overlapping subproblem result in DP 
+
+--------------------------------------------------------------------------------------------------------------------------------

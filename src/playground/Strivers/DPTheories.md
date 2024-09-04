@@ -88,4 +88,79 @@ e.g: You are a professional robber planning to rob houses along a street. Each h
 };
 ```
 
+- For DP on Subsequences always try to do the recursiom starting from n-1 instead of 0. That way we will get the base case to be index ==0
+- The same base case can then be aplied in the tabulation approach and solve the probelm easily
+
+For e.g: we can solve  a subset sum problem typically like this - like we have seen in recursion series
+
+```javascript
+ isSubsetSum(arr,n,sum){
+    let dp = Array.from({length: arr.length}, () => Array.from({length: sum}, () => undefined))
+    const _calc = (index, _sum) => {
+        if(_sum == sum) return true;
+        if(index == n-1) {
+            return _sum == sum - arr[n-1]
+        }
+        if(dp[index][_sum] != undefined) return dp[index][_sum]
+        let notakeRes = _calc(index+1, _sum);
+        let takeRes = false;
+        if( arr[index] + _sum <= sum )
+        takeRes = _calc(index+1, _sum + arr[index]);
+        dp[index][_sum] = notakeRes || takeRes;
+        return dp[index][_sum];
+    }
+    return _calc(0, 0);
+}
+```
+
+But instead we will solve it like this - where we will keep decrementing arr[index] from the actual sum given and see if _sum == 0 
+
+```javascript
+isSubsetSum(arr,n,sum){
+    let dp = Array.from({length: arr.length}, () => Array.from({length: sum}, () => undefined))
+    const _calc = (index, _sum) => {
+        if(_sum == 0) return true;
+        if(index == 0) {
+            return _sum == arr[0]
+        }
+        if(dp[index][_sum] != undefined) return dp[index][_sum]
+        let notakeRes = _calc(index-1, _sum);
+        let takeRes = false;
+        if( arr[index] <= _sum )
+        takeRes = _calc(index-1, _sum - arr[index]);
+        dp[index][_sum] = notakeRes || takeRes;
+        return dp[index][_sum];
+    }
+    return _calc(n-1, sum);
+}
+```
+
+Now the base case can be easily applied in tabulation - 
+- for any index if _sum == 0 then return true, hence for i = 0...n dp[i][0] = true
+- For index = 0, only for a[0] the result is true then dp[0][a[0]]= true;
+- We will always run two loops in tabulation for two variables (index and _sum)
+- now, the main logic is just a copy paste of the recursiomn logic. Just replace the recursion calls with dp
+
+```javascript
+isSubsetSum(arr,n,sum){
+    let dp = Array.from({length: arr.length}, () => Array.from({length: sum}, () => false))
+    for(let i = 0 ;i <n;i++) {
+        dp[i][0] = true;
+    }
+    if (arr[0] <= sum) {
+        dp[0][arr[0]] = true;
+    }
+
+    for(let index = 1;index<n; index++) {
+        for(let _sum = 1; _sum <= sum; _sum++) {
+            let notakeRes = dp[index-1][_sum];
+            let takeRes = false;
+            if( arr[index] <= _sum )
+            takeRes = dp[index-1][_sum - arr[index]];
+            dp[index][_sum] = notakeRes || takeRes;
+        }
+    }
+    return dp[n-1][sum] || false
+}
+```
 --------------------------------------------------------------------------------------------------------------------------------  

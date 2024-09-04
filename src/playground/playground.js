@@ -1,38 +1,22 @@
-const solve = (n, m, grid) => {
-  let dp = Array.from({length:n}, ()=> Array.from({length: m}, () =>  Array.from({length: m}, () => -1)));
-  const _calc = (i, j1, j2) => {
-      if(i < 0 || j1 >= m || j1 < 0 || j2 < 0 || j2 >= m) {
-          return -Infinity
-      } 
-      if(i == n-1) {
-          if(j1 == j2) {
-             dp[i][j1][j2] =  grid[i][j1]; 
-             return grid[i][j1];  
-          } else {
-            dp[i][j1][j2] = grid[i][j1] + grid[i][j2];
-             return grid[i][j1] + grid[i][j2];
-          }
+const perfectSum= (nums,sum) => {
+  let maxSum = nums.reduce((acc, curr) => acc+curr, 0);
+  let count = 0;
+  let dp = Array.from({length: nums.length +1}, () => Array.from({length: maxSum+ 1},()=> -1));
+  const _calc = (index, _sum) => {
+      if(sum == _sum) {
+          return 1
       }
-      if(dp[i][j1][j2] != -1) return dp[i][j1][j2];
-      let max = -Infinity;
-      // I will wait at i, j1, j2. Go down and find max and give me
-      for(let dj1 = -1; dj1 <= 1; dj1++) {
-          for(let dj2 = -1; dj2 <= 1; dj2++) {
-              let currVal = 0;
-              if(j1 == j2) {
-                  currVal = grid[i][j1];
-              } else {
-                  currVal = grid[i][j1] + grid[i][j2];
-              }
-              // max Nikal ke do mujhe
-              max = Math.max(max, currVal + _calc(i+1, j1+dj1, j2+dj2));
-          }
+      if(index >= nums.length ||  _sum > sum) return 0;
+      if(dp[index][_sum] != -1) {
+          return dp[index][_sum]
       }
-      dp[i][j1][j2] = max;
-      return max;
+      let take = _calc(index+1, _sum + nums[index]);
+      let notake = _calc(index + 1, _sum);
+      dp[index][_sum] = take + notake;
+      return dp[index][_sum]
   }
- const blabla = _calc(0, 0, m-1);
- console.log(blabla);
+  _calc(0, 0);
+  return dp
 }
 
-console.log(solve(4, 3,[[3,1,1],[2,5,1],[1,5,5],[2,1,1]]))
+console.log(perfectSum([5, 2, 3, 10, 6, 8], 10))

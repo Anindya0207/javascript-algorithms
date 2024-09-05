@@ -136,21 +136,19 @@ isSubsetSum(arr,n,sum){
 ```
 
 Now the base case can be easily applied in tabulation - 
-- for any index if _sum == 0 then return true, hence for i = 0...n dp[i][0] = true
-- For index = 0, only for a[0] the result is true then dp[0][a[0]]= true;
+- Always think of the base condition as in the first row and first column of the tabulation
+- Think ,` for any index can I make a sum of 0? yes we can, we wont take the element, it will be sum  = 0 hence dp[i][0] = true`
+- Think again, `At 0th index, what sum can I make? I can make 0 and I can make a sum of arr[0] right? dp[0][0] = true already by prev step. We will mark dp[0][arr[0]] = true`
 - We will always run two loops in tabulation for two variables (index and _sum)
 - now, the main logic is just a copy paste of the recursiomn logic. Just replace the recursion calls with dp
 
 ```javascript
 isSubsetSum(arr,n,sum){
-    let dp = Array.from({length: arr.length}, () => Array.from({length: sum}, () => false))
+    let dp = Array.from({length: arr.length}, () => Array.from({length: sum+1}, () => false))
     for(let i = 0 ;i <n;i++) {
         dp[i][0] = true;
     }
-    if (arr[0] <= sum) {
-        dp[0][arr[0]] = true;
-    }
-
+    dp[0][arr[0]] = true;
     for(let index = 1;index<n; index++) {
         for(let _sum = 1; _sum <= sum; _sum++) {
             let notakeRes = dp[index-1][_sum];
@@ -160,7 +158,7 @@ isSubsetSum(arr,n,sum){
             dp[index][_sum] = notakeRes || takeRes;
         }
     }
-    return dp[n-1][sum] || false
+    return dp[n-1][sum]
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------  

@@ -5229,3 +5229,49 @@ const solve = (n, m, grid) => {
 thats it. It's simple memoisation when we store overlapping subproblem result in DP 
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 104. Partition array with min absolute difference between sum of partitions
+
+- So we need to partition the array in two arrays where the sum of the subarrays will have minimum abs diff
+- If we get all the possible subset sums of the given array we can get the corresponding counterpart of those subset sums by total - subsetSum right?
+- Then we can easily find the minimum of these
+- To find all the subset sums possible in the array we either can do a recursion and do take and notake and add all the subset sums
+- Or we can use tabulation. In the subset sum problem we generally take `dp[index][sum]` which denotes `if sum is possible at index`
+- Hence if we calculate the dp for a sum of `total` then `dp[n-1]` ie the last row will give all the possible subset sums possible in the array
+
+```javascript
+var minimumDifference = function (nums) {
+    let n = nums.length;
+
+    let total = nums.reduce((acc, curr) => acc + curr, 0);
+    let dp = Array.from({ length: n }, () => Array.from({ length: total + 1 }, () => false));
+    const _calc = () => {
+        for (let i = 0; i < n; i++) {
+            dp[i][0] = true;
+        }
+        if (nums[0] <= total) dp[0][nums[0]] = true;
+        for (let index = 1; index < n; index++) {
+            for (let target = 1; target <= total; target++) {
+                let notake = dp[index - 1][target];
+                let take = false;
+                if (nums[index] <= target) {
+                    take = dp[index - 1][target - nums[index]]
+                }
+                dp[index][target] = take || notake;
+            }
+        }
+        return dp[n - 1].map((s, i) => !!s ? i : null).filter(Boolean)
+    }
+    let allPossibleSubsetSums = _calc();
+    let min = Infinity;
+    for (let i = 0; i < allPossibleSubsetSums.length; i++) {
+        otherCounter = total - allPossibleSubsetSums[i];
+        min = Math.min(min, Math.abs(otherCounter - allPossibleSubsetSums[i]))
+    }
+    return min
+};
+```
+
+But this will not work for -ve elements. can be solve with meet in the middle
+
+-------------------------------------------------------------------------------------------------------------------------------

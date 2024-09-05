@@ -1,22 +1,31 @@
-const perfectSum= (nums,sum) => {
-  let maxSum = nums.reduce((acc, curr) => acc+curr, 0);
-  let count = 0;
-  let dp = Array.from({length: nums.length +1}, () => Array.from({length: maxSum+ 1},()=> -1));
-  const _calc = (index, _sum) => {
-      if(sum == _sum) {
-          return 1
+var minimumDifference = function(nums) { 
+  let n  = nums.length;
+  
+  let total = nums.reduce((acc, curr) => acc+curr, 0); 
+  let dp = Array.from({length: n}, () => Array.from({length: total+1}, () => false));
+  const _calc = () => {
+      for(let i = 0; i < n; i++) {
+          dp[i][0] = true;
       }
-      if(index >= nums.length ||  _sum > sum) return 0;
-      if(dp[index][_sum] != -1) {
-          return dp[index][_sum]
+      if(nums[0] <= total) dp[0][nums[0]] = true;
+      for(let index = 1; index < n; index++) {
+          for(let target = 1; target <= total; target++) {
+              let notake = dp[index-1][target];
+              let take = false;
+              if(nums[index] <= target) {
+                  take = dp[index-1][target - nums[index]]
+              }
+              dp[index][target] = take || notake;
+          }
       }
-      let take = _calc(index+1, _sum + nums[index]);
-      let notake = _calc(index + 1, _sum);
-      dp[index][_sum] = take + notake;
-      return dp[index][_sum]
+      return dp[n-1].filter(Boolean).map(i =>)
   }
-  _calc(0, 0);
-  return dp
-}
-
-console.log(perfectSum([5, 2, 3, 10, 6, 8], 10))
+  let allPossibleSubsetSums = _calc();
+  let min = Infinity;
+  for(let i = 0; i < allPossibleSubsetSums.length; i++) {
+      otherCounter = total - allPossibleSubsetSums[i];
+      min = Math.min(min, Math.abs(otherCounter - allPossibleSubsetSums[i]))
+  }
+  return min
+};
+console.log(minimumDifference([3,9,7,3]))

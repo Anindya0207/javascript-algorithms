@@ -5354,4 +5354,16 @@ var subSetSumExists = (arr, target) => {
 }
 ```
 
+For partition problems try to boil it down to Subset problem by applying formula.
+
+#### EG1 Partition with equal sum. 
+
+If there are two partition in a array with equal sum, doesn't it mean that the subsets are having sum = total / 2?
+then it boils down a problem where we need to find all subsets with sum = total / 2 right?
+
+#### EG2: Partition with Difference D
+
+Lets say we have two partiion with subset sums S1 and S2. and S1 - S2 = D. If S1 + S2 = total, then we can prove that S2 = (total - D )/2
+Then here also the problem becomes, finding count of subset with sum =  (total - D )/2
+
 --------------------------------------------------------------------------------------------------------------------------------

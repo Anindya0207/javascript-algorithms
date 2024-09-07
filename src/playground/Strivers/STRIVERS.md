@@ -5230,48 +5230,128 @@ thats it. It's simple memoisation when we store overlapping subproblem result in
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### 104. Partition array with min absolute difference between sum of partitions
+### 104. DP On subsequence : Subset sum problems
 
-- So we need to partition the array in two arrays where the sum of the subarrays will have minimum abs diff
-- If we get all the possible subset sums of the given array we can get the corresponding counterpart of those subset sums by total - subsetSum right?
-- Then we can easily find the minimum of these
-- To find all the subset sums possible in the array we either can do a recursion and do take and notake and add all the subset sums
-- Or we can use tabulation. In the subset sum problem we generally take `dp[index][sum]` which denotes `if sum is possible at index`
-- Hence if we calculate the dp for a sum of `total` then `dp[n-1]` ie the last row will give all the possible subset sums possible in the array
+- We might be given problems like subset sum = K / Target is possible or not. or number of subsets with Sum = K/Target etc.
+- VVIMP: This kind of problem depends on contraint. The base case will change if the array elemtns contain 0 or -ve numbers
+
+If arr[i] can not have 0 or -ve numbers:
+
+Recursive / Memoisation way
+
+- We will start the recursion call with n-1 and the target because it's a top down approach.
+- Base case is if we encounter `_sum == 0 we return true or 1` based on if we need to find out possibility or number of subsets. always remember that at any index we can always make a sum of 0 by simply not taking that element. hence we can blindly return 1. 
+- Now `at index == 0 we can always make a sum of arr[0] if arr[0] is less than or equal to target`
+- Apart from these, we will consider the notake and take scenario by either considering the arr[i] or not. So typically the code might be like -
 
 ```javascript
-var minimumDifference = function (nums) {
-    let n = nums.length;
-
-    let total = nums.reduce((acc, curr) => acc + curr, 0);
-    let dp = Array.from({ length: n }, () => Array.from({ length: total + 1 }, () => false));
-    const _calc = () => {
-        for (let i = 0; i < n; i++) {
-            dp[i][0] = true;
+var subSetSumExists = (arr, target) => {
+    let n = arr.length;
+    let dp = Array.from({length: n}, () => Array.from({length: target + }, () => undefined))
+    const _calc = (index, _sum) => {
+        if(_sum == 0) return true; // we can return  1 if we need to count number of subsets
+        if(index == 0) return arr[0] == _sum;
+        if ( dp[index][_sum] != undefined) return  dp[index][_sum]
+        let notake = _calc(index -1, _sum);
+        let take = false;
+         if(_sum >= arr[index]) {
+            take = _calc(index -1, _sum - arr[index]);
         }
-        if (nums[0] <= total) dp[0][nums[0]] = true;
-        for (let index = 1; index < n; index++) {
-            for (let target = 1; target <= total; target++) {
-                let notake = dp[index - 1][target];
-                let take = false;
-                if (nums[index] <= target) {
-                    take = dp[index - 1][target - nums[index]]
-                }
-                dp[index][target] = take || notake;
-            }
-        }
-        return dp[n - 1].map((s, i) => !!s ? i : null).filter(Boolean)
+        dp[index][_sum] = take || notake; // We can return take + notake if we need to find count of subsets
+        return  dp[index][_sum]
     }
-    let allPossibleSubsetSums = _calc();
-    let min = Infinity;
-    for (let i = 0; i < allPossibleSubsetSums.length; i++) {
-        otherCounter = total - allPossibleSubsetSums[i];
-        min = Math.min(min, Math.abs(otherCounter - allPossibleSubsetSums[i]))
-    }
-    return min
-};
+    return _calc(n-1, target);
+}
 ```
 
-But this will not work for -ve elements. can be solve with meet in the middle
+Tabulation way
 
--------------------------------------------------------------------------------------------------------------------------------
+- Intuition is the same of tabulation also. But it's a bottoms up approach so we will initialise the dp array with base values to start with.
+
+```javascript
+var subSetSumExists = (arr, target) => {
+    let n = arr.length;
+    let dp = Array.from({length: n}, () => Array.from({length: target + }, () => false))
+    for(let i  = 0 ;i < n; i++) {
+        dp[i][0] = true; // we can set as 1 if we need to count number of subsets. 
+    }
+    if(arr[0] <= target) {
+        dp[0][arr[0]] = true;
+    }
+    for(let index = 1; index <n ; indes ++) {
+        for(let _sum = 1; _sum <= target ; _sum++) {
+            let notake = dp[index-1][_sum];
+            let take = false;
+            if(arr[index] <= _sum) {
+                take = dp[index-1][_sum - arr[index]];
+            }
+            dp[index][_sum] = take || notake; // We can return take + notake if we need to find count of subsets
+        }
+    }
+    return dp[n-1][target];
+}
+```
+
+- Now let's say there is 0 in the array.
+- We can't blindly return 1 from any index if _sum == 0 because arr[index] might be 0
+- We know one thing for sure, that at index == 0, `if we encounter arr[index] = 0, then there can be two subsets to make a sum 0. [] and [0] which adds up to 0`
+- But keep in mind that `we can not say this for any index > 0 for which arr[index] = 0`
+- at `index = 0 if arr[index] != 0 then we can definitely make a sum of arr[index]` like we were doing.
+- We can also say that `if index = 0 and arr[index] != 0 we can make a sum 0 by not taking it`
+
+```javascript
+var subSetSumExists = (arr, target) => {
+    let n = arr.length;
+    let dp = Array.from({length: n}, () => Array.from({length: target + 1}, () => -1))
+    const _calc = (index, _sum) => {
+        if(index == 0) {
+            if(_sum == 0 && (arr[index] == 0)) return 2;
+            if(_sum == 0) return 1;
+            if(arr[index] == _sum) return 1;
+            return 0;
+        }
+        if ( dp[index][_sum] != -1) return  dp[index][_sum]
+        let notake = _calc(index -1, _sum);
+        let take = 0;
+        if(_sum >= arr[index]) {
+            take = _calc(index -1, _sum - arr[index]);
+        }
+        dp[index][_sum] =( take + notake) % (Math.pow(10, 9) + 7)
+        return  dp[index][_sum]
+    }
+    return _calc(n-1, target);
+}
+```
+
+Tabulation
+- Intuition is same. `We can only make dp[0][0] as 2 if arr[0] is 0.`
+- Else We can make only one sum of 0 at index 0 dp[0][0] = 1
+- And ofcourse `we can make a sum of arr[0] if arr[0] <= target`
+
+```javascript
+var subSetSumExists = (arr, target) => {
+   let n = arr.length;
+    let dp = Array.from({length: n}, () => Array.from({length: target + 1}, () => 0))
+        if(arr[0] == 0) {
+            dp[0][0] = 2
+        } else {
+            dp[0][0] = 1;
+            if(arr[0] <= target) {
+                dp[0][arr[0]] = 1
+            }
+        }
+        for(let index = 1; index < n; index++){
+            for(let _sum = 0; _sum <= target; _sum++) {
+                let notake = dp[index-1][_sum];
+                let take = 0;
+                if(_sum >= arr[index]) {
+                    take = dp[index -1][_sum - arr[index]];
+                }
+                dp[index][_sum] = (take + notake) % (Math.pow(10, 9) + 7)
+            }
+        }
+        return dp[n-1][target];
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

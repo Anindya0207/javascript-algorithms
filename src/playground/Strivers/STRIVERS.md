@@ -5237,7 +5237,7 @@ thats it. It's simple memoisation when we store overlapping subproblem result in
 
 If arr[i] can not have 0 or -ve numbers:
 
-Recursive / Memoisation way
+#### Recursion
 
 - We will start the recursion call with n-1 and the target because it's a top down approach.
 - Base case is if we encounter `_sum == 0 we return true or 1` based on if we need to find out possibility or number of subsets. always remember that at any index we can always make a sum of 0 by simply not taking that element. hence we can blindly return 1. 
@@ -5264,7 +5264,7 @@ var subSetSumExists = (arr, target) => {
 }
 ```
 
-Tabulation way
+#### Tabulation 
 
 - Intuition is the same of tabulation also. But it's a bottoms up approach so we will initialise the dp array with base values to start with.
 
@@ -5292,12 +5292,16 @@ var subSetSumExists = (arr, target) => {
 }
 ```
 
+
+
 - Now let's say there is 0 in the array.
 - We can't blindly return 1 from any index if _sum == 0 because arr[index] might be 0
 - We know one thing for sure, that at index == 0, `if we encounter arr[index] = 0, then there can be two subsets to make a sum 0. [] and [0] which adds up to 0`
 - But keep in mind that `we can not say this for any index > 0 for which arr[index] = 0`
 - at `index = 0 if arr[index] != 0 then we can definitely make a sum of arr[index]` like we were doing.
 - We can also say that `if index = 0 and arr[index] != 0 we can make a sum 0 by not taking it`
+
+#### Recursion
 
 ```javascript
 var subSetSumExists = (arr, target) => {
@@ -5323,7 +5327,8 @@ var subSetSumExists = (arr, target) => {
 }
 ```
 
-Tabulation
+#### Tabulation
+
 - Intuition is same. `We can only make dp[0][0] as 2 if arr[0] is 0.`
 - Else We can make only one sum of 0 at index 0 dp[0][0] = 1
 - And ofcourse `we can make a sum of arr[0] if arr[0] <= target`
@@ -5365,5 +5370,99 @@ then it boils down a problem where we need to find all subsets with sum = total 
 
 Lets say we have two partiion with subset sums S1 and S2. and S1 - S2 = D. If S1 + S2 = total, then we can prove that S2 = (total - D )/2
 Then here also the problem becomes, finding count of subset with sum =  (total - D )/2
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 105. 0/1 Knapsack problem: Coin Change
+
+Problems like thief stealing stuff from houses with a knapsack of fixed weight can be solved with 0/1 Knapsack pattern. 
+Unlike fractional knapsack (where we can break a particular element and consider only fraction of it) in 0/1 knapsack we either take it or not take it
+
+- The approach is same as DP on subsequences where we have a pick and no pick condition
+- But in DP of subsequence, our objective was to return whether a subset is possible (true/false) or number of subsets (count)
+- That's why we were calling take and notake condition from top down and returning `take || notake` or `take + notake`
+- Here we would be said to return maximum value of theft or minimum coins of denomination
+- We can return `Math.min(take, notake)` or `Math.max(take, notake)`
+- Hence `its important to return Infinity or -Infinity for invalid options. `
+- It is also important that we add the current value for take scenario before calling the recursion with reduced value.
+
+#### Recursion
+
+- Base condition for recursion is like when we are at index = 0, if the denomination at 0th index is a divisor of the remaining amt, we can add that many coins to fulfil that amount right?
+- Otherwise we return Infinity becuase it was not possible to fulfil the lat remaining amt
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => undefined))
+    if (amount == 0) return 0
+    const _calc = (index, _amt) => {
+        if (index == 0) {
+            if (_amt % coins[index] == 0) {
+                dp[index][_amt] =  _amt / coins[index];
+                return _amt / coins[index];
+            }
+            return Infinity
+        }
+        if (dp[index][_amt] != undefined) return dp[index][_amt]
+        let notake = _calc(index - 1, _amt);
+        // initially setting as Infinity. as It will be esay to compute Math.min between take and notake.
+        let take = Infinity
+        if (coins[index] <= _amt) {
+            // adding a coin for the curent denomination and calling the recursion again 
+            take = 1 + _calc(index, _amt - coins[index]);
+        }
+        dp[index][_amt] = Math.min(take, notake)
+        return dp[index][_amt]
+    }
+
+    let ans = _calc(n - 1, amount)
+    return ans == Infinity ? -1 : ans
+};
+```
+
+#### Tabulation
+
+- Base condition for tabulation is also same. We said that for any amount which is divisible by the 0-th denomination we can add that many coins. for the other amount where its not possible, it would be Inifinity.
+- Similarly, an amount of 0 can be made at any index without taking that denomination hence `for index 0---n dp[index][0] = 0`
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => Infinity))
+    if (amount == 0) return 0
+    for (let _amt = 0; _amt <= amount; _amt++) {
+        if (_amt % coins[0] == 0) {
+            dp[0][_amt] = _amt / coins[0];
+        }
+    }
+    for (let i = 0; i < n; i++) {
+        dp[i][0] = 0
+    }
+    for (let index = 1; index < n; index++) {
+        for (let _amt = 1; _amt <= amount; _amt++) {
+            let notake = dp[index - 1][_amt];
+            let take = Infinity
+            if (coins[index] <= _amt) {
+                take = 1 + dp[index][_amt - coins[index]]
+            }
+            dp[index][_amt] = Math.min(take, notake)
+        }
+    }
+    return dp[n - 1][amount] == Infinity ? -1 : dp[n - 1][amount];
+};
+```
+
+```
+Space optimisation #1
+
+We can optimise the space by taking only a prev and a curr array which will have dp[index-1] and dp[index] rows. We dont need to store the entire 2D dp right?
+
+Space optimisation #2
+
+Now do we really need the prev and curr array also? Notice that we are only accessing the previous values of the prev rows `prev[_amt - coins[index]]` So if we iterate the amount from Right to left ie. `let _amt = amount; _amt >= amount; _amt--` then we can simply do 
+`prev[_amt] = 1 + prev[_amt - coins[index]]` becuase for the current index, we are only accessing the amount which is lesser than _amt and since we are traversing from right to left it will not disturb the values to the right.. 
+
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

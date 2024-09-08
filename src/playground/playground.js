@@ -1,33 +1,26 @@
-const countPartitions = (n, d, nums) => {
-  let total = nums.reduce((acc, curr) => acc + curr, 0);
-  let dp = Array.from({ length: n }, () => Array.from({ length: total + 1 }, () => 0));
-  for(let i =0 ;i<n; i++) {
-      dp[i][0] = 1;
-  }
-  if(nums[0] <= total) {
-    dp[0][nums[0]] = 1;
-  }
+var coinChange = function (coins, amount) {
+  let n = coins.length;
+  let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => Infinity))
   
-  for(let index = 1; index < n; index++) {
-      for(let target = 1; target <= total; target++) {
-          let notake = dp[index -1][target];
-          let take = false;
-          if(nums[index] <= target) {
-              take=dp[index -1][target - nums[index]]
-          }
-          dp[index][target] = take + notake;
+  for (let _amt = 0; _amt <= amount; _amt++) {
+      if (_amt % coins[0] == 0) {
+          dp[0][_amt] =  _amt / coins[0];
       }
   }
-  let allPossibleSubSetSumCounts = dp[n-1];
-  let final = 0
-  for(let i = 0; i < allPossibleSubSetSumCounts.length; i++) {
-    let currSum = i;
-    let other = total - i;
-    if(currSum - other == d && currSum >= other) {
-      final += allPossibleSubSetSumCounts[i];
-    }
+  for(let i =0 ;i < n; i++) {
+    dp[i][0] = 0
   }
-  return final
-}
+  for (let index = 1; index < n; index++) {
+      for (let _amt = 1; _amt <= amount; _amt++) {
+          let notake = dp[index - 1][_amt];
+          let take = Infinity
+          if (coins[index] <= _amt) {
+              take =  1+ dp[index][_amt - coins[index]]
+          }
+          dp[index][_amt] = Math.min(take, notake)
+      }
+  }
+  return dp[n-1][amount] == Infinity ? -1: dp[n-1][amount];
+};
 
-console.log(countPartitions(4, 3, [5,2,6,4]))
+console.log(coinChange([1,2], 2))

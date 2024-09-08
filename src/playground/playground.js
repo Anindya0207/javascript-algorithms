@@ -1,26 +1,25 @@
-var coinChange = function (coins, amount) {
-  let n = coins.length;
-  let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => Infinity))
-  
-  for (let _amt = 0; _amt <= amount; _amt++) {
-      if (_amt % coins[0] == 0) {
-          dp[0][_amt] =  _amt / coins[0];
-      }
-  }
-  for(let i =0 ;i < n; i++) {
-    dp[i][0] = 0
-  }
-  for (let index = 1; index < n; index++) {
-      for (let _amt = 1; _amt <= amount; _amt++) {
-          let notake = dp[index - 1][_amt];
-          let take = Infinity
-          if (coins[index] <= _amt) {
-              take =  1+ dp[index][_amt - coins[index]]
+const knapSac = (N,W,val,wt) => {
+  let dp = Array.from({length: N}, () => Array.from({length: W+ 1}, () => undefined))
+  const _calc = (index, _weight) => {
+      if(index == 0) {
+          if(_weight == 0) return 0;
+          if(_weight >= wt[index]) {
+              return val[index] * Math.floor(_weight / wt[index])
           }
-          dp[index][_amt] = Math.min(take, notake)
+          return -Infinity;
       }
+      if(dp[index][_weight] != undefined) return dp[index][_weight]
+      let notake = _calc(index -1, _weight);
+      let take = -Infinity;
+      if(wt[index] <= _weight) {
+          take = val[index] + _calc(index, _weight - wt[index]);
+      }
+      dp[index][_weight]= Math.max(take, notake);
+      return dp[index][_weight];
   }
-  return dp[n-1][amount] == Infinity ? -1: dp[n-1][amount];
-};
+  
+  let balbla = _calc(N-1, W) 
+  return balbla == -Infinity ? 0 : balbla
+}
 
-console.log(coinChange([1,2], 2))
+console.log(knapSac(1,5, [10], [2]))

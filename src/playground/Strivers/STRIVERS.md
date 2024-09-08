@@ -5465,4 +5465,10 @@ Now do we really need the prev and curr array also? Notice that we are only acce
 
 ```
 
+Similar problems: 
+https://www.geeksforgeeks.org/problems/knapsack-with-duplicate-items4201/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=knapsack-with-duplicate-items
+https://leetcode.com/problems/coin-change/
+https://leetcode.com/problems/coin-change-ii/description/
+https://www.geeksforgeeks.org/problems/rod-cutting0840/1
+
 --------------------------------------------------------------------------------------------------------------------------------

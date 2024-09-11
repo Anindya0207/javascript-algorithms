@@ -5472,3 +5472,43 @@ https://leetcode.com/problems/coin-change-ii/description/
 https://www.geeksforgeeks.org/problems/rod-cutting0840/1
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 106. Finding longest common Substring
+
+- We check match no match method for LCS ( longest common subseq ) where we do `1 + dp[index1 - 1][index2-1]` for match and `Math.max(dp[index1][index2-1], dp[index1-1][index2])` for no match
+- But substring is continous, and the above method will fail
+- So we need to stop carrying the previous state forward if there is no match. Rather we will set it as 0 if there is no match
+- If there is match, we will do `1 + dp[index1 - 1][index2-1]` as usual
+
+```javascript
+longestCommonSubstr(s, t) {
+    let n = s.length;
+    let m = t.length;
+    let dp = Array.from({length: n + 1}, () => Array(m + 1).fill(-1));  // Initialize memoization with -1 to indicate unvisited
+    let maxC = -Infinity
+    for(let i = 0; i <= n; i++) {
+        dp[i][0] = 0;
+    }
+    for(let j = 0; j <= m; j++) {
+        dp[0][j] = 0;
+    }
+    for(let index1 = 1; index1 <= n; index1++) {
+        for(let index2 = 1; index2 <= m ; index2++) {
+            if(s.charAt(index1 - 1) == t.charAt(index2 - 1)) {
+                dp[index1][index2] = 1 + dp[index1 - 1][index2 - 1];
+            } else {
+                dp[index1][index2] = 0
+            }
+            maxC = Math.max(maxC,  dp[index1][index2])
+        }
+    }
+    return maxC
+}
+```
+
+In most of the substring problems we need observations
+
+- Like to find longest palindrome subsequence : things to notice is if a string is reversed, the LCS between them is the longest palindrome subsequence, isn't it?
+- Similarly, how many character will we insert in a string to make it palindrome? it will be the string length - LCS of the string and it;s reverse string, right? why? because it and its reverse string will be palindrome if their LCS  = s.length. the difference between them is the number of characters to insert to make it palindrome
+
+--------------------------------------------------------------------------------------------------------------------------------

@@ -288,3 +288,163 @@ var subSetSumExists = (arr, target) => {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 0/1 Knapsack problem: Coin Change
+
+Problems like thief stealing stuff from houses with a knapsack of fixed weight can be solved with 0/1 Knapsack pattern. 
+Unlike fractional knapsack (where we can break a particular element and consider only fraction of it) in 0/1 knapsack we either take it or not take it
+
+- The approach is same as DP on subsequences where we have a pick and no pick condition
+- But in DP of subsequence, our objective was to return whether a subset is possible (true/false) or number of subsets (count)
+- That's why we were calling take and notake condition from top down and returning `take || notake` or `take + notake`
+- Here we would be said to return maximum value of theft or minimum coins of denomination
+- We can return `Math.min(take, notake)` or `Math.max(take, notake)`
+- Hence `its important to return Infinity or -Infinity for invalid options. `
+- It is also important that we add the current value for take scenario before calling the recursion with reduced value.
+
+#### Recursion
+
+- Base condition for recursion is like when we are at index = 0, if the denomination at 0th index is a divisor of the remaining amt, we can add that many coins to fulfil that amount right?
+- Otherwise we return Infinity becuase it was not possible to fulfil the lat remaining amt
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => undefined))
+    if (amount == 0) return 0
+    const _calc = (index, _amt) => {
+        if (index == 0) {
+            if (_amt % coins[index] == 0) {
+                dp[index][_amt] =  _amt / coins[index];
+                return _amt / coins[index];
+            }
+            return Infinity
+        }
+        if (dp[index][_amt] != undefined) return dp[index][_amt]
+        let notake = _calc(index - 1, _amt);
+        // initially setting as Infinity. as It will be esay to compute Math.min between take and notake.
+        let take = Infinity
+        if (coins[index] <= _amt) {
+            // adding a coin for the curent denomination and calling the recursion again 
+            take = 1 + _calc(index, _amt - coins[index]);
+        }
+        dp[index][_amt] = Math.min(take, notake)
+        return dp[index][_amt]
+    }
+
+    let ans = _calc(n - 1, amount)
+    return ans == Infinity ? -1 : ans
+};
+```
+
+#### Tabulation
+
+- Base condition for tabulation is also same. We said that for any amount which is divisible by the 0-th denomination we can add that many coins. for the other amount where its not possible, it would be Inifinity.
+- Similarly, an amount of 0 can be made at any index without taking that denomination hence `for index 0---n dp[index][0] = 0`
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let dp = Array.from({ length: n }, () => Array.from({ length: amount + 1 }, () => Infinity))
+    if (amount == 0) return 0
+    for (let _amt = 0; _amt <= amount; _amt++) {
+        if (_amt % coins[0] == 0) {
+            dp[0][_amt] = _amt / coins[0];
+        }
+    }
+    for (let i = 0; i < n; i++) {
+        dp[i][0] = 0
+    }
+    for (let index = 1; index < n; index++) {
+        for (let _amt = 1; _amt <= amount; _amt++) {
+            let notake = dp[index - 1][_amt];
+            let take = Infinity
+            if (coins[index] <= _amt) {
+                take = 1 + dp[index][_amt - coins[index]]
+            }
+            dp[index][_amt] = Math.min(take, notake)
+        }
+    }
+    return dp[n - 1][amount] == Infinity ? -1 : dp[n - 1][amount];
+};
+```
+
+```
+Space optimisation #1
+
+We can optimise the space by taking only a prev and a curr array which will have dp[index-1] and dp[index] rows. We dont need to store the entire 2D dp right?
+
+Space optimisation #2
+
+Now do we really need the prev and curr array also? Notice that we are only accessing the previous values of the prev rows `prev[_amt - coins[index]]` So if we iterate the amount from Right to left ie. `let _amt = amount; _amt >= amount; _amt--` then we can simply do 
+`prev[_amt] = 1 + prev[_amt - coins[index]]` becuase for the current index, we are only accessing the amount which is lesser than _amt and since we are traversing from right to left it will not disturb the values to the right.. 
+
+```
+
+Similar problems: 
+https://www.geeksforgeeks.org/problems/knapsack-with-duplicate-items4201/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=knapsack-with-duplicate-items
+https://leetcode.com/problems/coin-change/
+https://leetcode.com/problems/coin-change-ii/description/
+https://www.geeksforgeeks.org/problems/rod-cutting0840/1
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### DP on Strings
+
+- In DP of string problems we generally have to find longest common subsequence etc..
+- Try to express it in indexes, so we will take two indexes for two strings. 
+- At each index we will have match / no match pattern
+- If at index1 and index2 the characters of both strings match, then we can say that at least the common subseq length will be 1 + longest common subseq at index1 - 1 and index2 - 1 ie-`1+ _calc(index1 - 1, index2- 1)`
+- If they dont match we will check wither by reducing index1 or index2 and take the maximum of them as we need to find maximum common subseq
+
+#### Recursion
+
+```javascript
+ var longestCommonSubsequence = function(text1, text2) {
+     let n = text1.length; 
+     let m = text2.length;
+     let dp = Array.from({length: n +1}, () => Array.from({length: m+1}, () => -1))
+
+     const _calc = (index1, index2) => {
+         if(index1 == 0 || index2 == 0) return 0; 
+         if(dp[index1][index2] != -1) return dp[index1][index2]
+         if(text1.charAt(index1 - 1) == text2.charAt(index2 - 1)) {
+             dp[index1][index2] = 1 + _calc(index1 -1, index2 -1)
+             return dp[index1][index2]
+         }
+         dp[index1][index2]= Math.max(_calc(index1 - 1, index2) , _calc(index1, index2 - 1))
+         return dp[index1][index2]
+      }
+     return _calc(n, m)
+ };
+
+```
+
+#### Tabulation
+
+- If we see the base case for recursion, for  index1 == 0, at all index2 we are returing 0 and vice versa.
+
+```javascript
+var longestCommonSubsequence = function (text1, text2) {
+    let n = text1.length;
+    let m = text2.length;
+    let dp = Array.from({ length: n + 1 }, () => Array.from({ length: m + 1 }, () => 0))
+    for (let i = 0; i <= n; i++) {
+        dp[i][0] = 0
+    }
+    for (let i = 0; i <= m; i++) {
+        dp[0][i] = 0
+    }
+    for (let index1 = 1; index1 <= n; index1++) {
+        for (let index2 = 1; index2 <= m; index2++) {
+            if (text1.charAt(index1 - 1) == text2.charAt(index2 - 1)) {
+                dp[index1][index2] = 1 + dp[index1 - 1][index2 - 1]
+            } else {
+                dp[index1][index2] = Math.max(dp[index1 - 1][index2], dp[index1][index2 - 1])
+            }
+        }
+    }
+    return dp[n][m]
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

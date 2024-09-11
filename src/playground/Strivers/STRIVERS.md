@@ -5512,3 +5512,39 @@ In most of the substring problems we need observations
 - Similarly, how many character will we insert in a string to make it palindrome? it will be the string length - LCS of the string and it;s reverse string, right? why? because it and its reverse string will be palindrome if their LCS  = s.length. the difference between them is the number of characters to insert to make it palindrome
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 107. Distinct Subsequence
+
+We need to find the distinct subseqence of a string s which is equal to t (a smaller string)
+
+- We will apply dsame match and no match technique but it will change what we will have to do
+- let's say we find a match between s and t, we can match the character in t with that character with s or we can say we wont match, hoping that in earlier indexes of s there might be a match for that character. So we will call the recursion with `_calc(index1 - 1, index2 - 1) and _calc(index1 - 1, index2)` both. We will add the count iof both the routes
+- If it doesn't match, then its simple, We will check in the left subpart of s that the character in t is there `_calc(index1 - 1, index2)`
+- now, lets say we reach less than the first index for the second string t, that means all the strings have been matched in t, right? we can return 1 in that case
+- else if we reach < 0  for the first string s, then it means that there is still some character left in t to be matched. So return 0
+
+```javascript
+var numDistinct = function (word1, word2) {
+    let n = word1.length;
+    let m = word2.length;
+    let dp = Array.from({ length: n }, () => Array.from({ length: m }, () => undefined))
+    
+    const _calc = (index1, index2) => {
+         if(index2 < 0) return 1;
+        if(index1 < 0) return 0;
+
+       
+        if(dp[index1][index2] != undefined) return dp[index1][index2]
+        if(word1.charAt(index1) == word2.charAt(index2)) {
+            dp[index1][index2] = _calc(index1- 1, index2 -1) + _calc(index1 - 1, index2)
+        }
+        else {
+            dp[index1][index2] = _calc(index1 - 1, index2) 
+        }
+        return dp[index1][index2];
+    }
+
+    return _calc(n-1, m-1);
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

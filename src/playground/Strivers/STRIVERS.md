@@ -5527,15 +5527,13 @@ We need to find the distinct subseqence of a string s which is equal to t (a sma
 var numDistinct = function (word1, word2) {
     let n = word1.length;
     let m = word2.length;
-    let dp = Array.from({ length: n }, () => Array.from({ length: m }, () => undefined))
+    let dp = Array.from({ length: n+1 }, () => Array.from({ length: m+1 }, () => undefined))
     
     const _calc = (index1, index2) => {
-         if(index2 < 0) return 1;
-        if(index1 < 0) return 0;
-
-       
+        if(index2 == 0) return 1;
+        if(index1 == 0) return 0;
         if(dp[index1][index2] != undefined) return dp[index1][index2]
-        if(word1.charAt(index1) == word2.charAt(index2)) {
+        if(word1.charAt(index1-1) == word2.charAt(index2-1)) {
             dp[index1][index2] = _calc(index1- 1, index2 -1) + _calc(index1 - 1, index2)
         }
         else {
@@ -5544,7 +5542,46 @@ var numDistinct = function (word1, word2) {
         return dp[index1][index2];
     }
 
-    return _calc(n-1, m-1);
+    return _calc(n, m);
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 108. Edit Distance
+
+We need to find the minimum steps to convert word1 to word2 by inserting a character / replacing a character/ deleting a character
+
+- If we start from end and we get a match bw word1 and word2, we should only match it, no steps required
+- If we dont find any match then we can say we have three choices 
+- we can either say we will insert one character at index1 place. in that case, we will next match index2 - 1 with index1. 
+- we an also say, we will replace the character at index1 place. then we will next match index1 - 1 with index2-1
+- we can also say, we will delete the character at index1 place, then we will next match index1 - 1 with index2
+- as base case, we can say when index2 reached 0, then whatever index1 is at, all the characters before that has to be deleted. so `index1` steps will be required if we follow 1 based indexing) or index1 + 1 steps if we follow 0 based indexing
+- similarly if index1 reached 0, all the characters before index2 has to be deleted
+
+```javascript
+var minDistance = function (word1, word2) {
+    let n = word1.length;
+    let m = word2.length;
+    if(n == 0) return m;
+    if(m == 0) return n;
+    let dp = Array.from({ length: n+1 }, () => Array.from({ length: m+1 }, () => undefined))
+    const _calc = (index1, index2) => {
+        if (index2 == 0) return index1
+        if (index1 == 0) return index2
+        if(dp[index1][index2] != undefined) return dp[index1][index2]
+        if(word1.charAt(index1-1) == word2.charAt(index2-1)) {
+            dp[index1][index2] = _calc(index1 - 1, index2 - 1)
+        } else {
+            dp[index1][index2] = Math.min(
+                1 + _calc(index1 -1 , index2 - 1), 
+                1 + _calc(index1 , index2 - 1),
+                1 + _calc(index1 - 1, index2)
+            )
+        }
+        return dp[index1][index2] 
+    }
+    return _calc(n, m)
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------

@@ -5585,3 +5585,46 @@ var minDistance = function (word1, word2) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 109. Wildcard entry
+
+We have to match a string s with a regex pattern p where '?' means match single character and '*' means it matches a subsequence
+
+- in this when we get a * as pattern then we will once match that with the prev character of s and once we will match the prev pattern of p with s
+- If we get same char in p and s or we get the char in p as ? we continue, means both -1
+- else we return false
+- now as base condition, if both indexes have reached 0 return true
+- if pattern index reached 0 and index1 has not, then return false
+- If index1 reached 0, then just check if all characters from 0 to current index2 is * or not, if so, return true else false
+
+```javascript
+var isMatch = function(s, p) {
+    if(p == '*') return true;
+    let n = s.length;
+    let m = p.length;
+    let dp = Array.from({length: n +1}, () => Array.from({length: m +1}, () => undefined))
+    const _calc = (index1, index2) => {
+        if(index1 == 0 && index2 == 0)  return true;
+        if(index2 == 0) return false;
+        if(index1 == 0) {
+            for(let i = 1; i <= index2; i++) {
+                if(p.charAt(i -1) != '*') return false;
+            }
+            return true
+        }
+        if(dp[index1][index2] != undefined) return dp[index1][index2]
+        for(let index1 = 1; index1 <= n; index1++) {
+             for(let index2 = 1; index2 <= m; index2++) {
+                if(p.charAt(index2 -1) == '*') {
+                    return _calc(index1-1, index2) || _calc(index1, index2 - 1);
+                } else if(p.charAt(index2 - 1) == s.charAt(index1 -1) || p.charAt(index2 - 1) == '?') {
+                    return _calc(index1 - 1, index2 - 1)
+                }
+             }
+        }
+    }
+    return _calc(n, m);
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

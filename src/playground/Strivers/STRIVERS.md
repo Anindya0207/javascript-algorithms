@@ -5612,16 +5612,14 @@ var isMatch = function(s, p) {
             }
             return true
         }
-        if(dp[index1][index2] != undefined) return dp[index1][index2]
-        for(let index1 = 1; index1 <= n; index1++) {
-             for(let index2 = 1; index2 <= m; index2++) {
-                if(p.charAt(index2 -1) == '*') {
-                    return _calc(index1-1, index2) || _calc(index1, index2 - 1);
-                } else if(p.charAt(index2 - 1) == s.charAt(index1 -1) || p.charAt(index2 - 1) == '?') {
-                    return _calc(index1 - 1, index2 - 1)
-                }
-             }
+        if (dp[index1][index2] != undefined) return dp[index1][index2]
+        if (p.charAt(index2 - 1) == '*') {
+            dp[index1][index2] = _calc(index1 - 1, index2) || _calc(index1, index2 - 1);
+        } else if (p.charAt(index2 - 1) == s.charAt(index1 - 1) || p.charAt(index2 - 1) == '?') {
+            dp[index1][index2] = _calc(index1 - 1, index2 - 1)
         }
+        else dp[index1][index2]= false
+        return dp[index1][index2]
     }
     return _calc(n, m);
 }

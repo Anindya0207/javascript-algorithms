@@ -1,26 +1,27 @@
-var isMatch = function(s, p) {
-    if(p == '*') return true;
-    let n = s.length;
-    let m = p.length;
-    const _calc = (index1, index2) => {
-        if(index2 < 0) return index1 < 0
-        if(index1 < 0) return index2 < 0 || p.charAt(index2) == '*'
-        if(p.charAt(index2) == '*') {
-            if(p.charAt(index2 - 1) != s.charAt(index1)) {
-                if(index1 == 0) return false
-                return true && _calc(index1 - 1, index2 );
-            } else {
-                return true && _calc(index1, index2 - 1 );
+var maxProfit = function (prices) {
+    let n = prices.length;
+    let dp = Array.from({ length: n + 1 }, () => Array.from({ length: 2 }, () => Array.from({ length: 3 }, () => 0)))
+    dp[n][0][2] = 0
+    dp[n][1][2] = 0
+    for (let index = n - 1; index >= 0; index--) {
+        for (let buy = 1; buy >= 0; buy--) {
+            for (let transactionCount = 1; transactionCount >= 0; transactionCount--) {
+                if (buy) {
+                    dp[index][buy][transactionCount] = Math.max(
+                        -prices[index] + dp[index + 1][0][transactionCount],
+                        0 + dp[index + 1][1][transactionCount],
+                    )
+                } else {
+                    dp[index][buy][transactionCount] = Math.max(
+                        prices[index] + dp[index + 1][1][transactionCount + 1],
+                        0 + dp[index + 1][0][transactionCount],
+                    )
+                }
             }
         }
-        if(s.charAt(index1) == p.charAt(index2) || p.charAt(index2) == '?') {
-            return true && _calc(index1 - 1, index2 - 1);
-        } else {
-            return false;
-        }
     }
+    return dp[0][1][0]
+}
 
-    return _calc(n - 1, m - 1);
-};
 
-console.log(isMatch('aab', 'c*a*b'))
+console.log(maxProfit([3,3,5,0,0,3,1,4]))

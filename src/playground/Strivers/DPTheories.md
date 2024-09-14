@@ -472,4 +472,39 @@ var maxProfit = function (prices) {
     return maxProfit
 }
 ```
+
+- Now this was when we can do only one transaction
+- if we can do unlimited transaction then we one way can be to carry the till now minimum and till now max
+- But we will do it in recursion as it will extend to future problems
+- In recursion, we will define the recurrence as on the current day whether we can `buy/sell`
+- if we can buy, there can be two cases, `we buy or we don't buy`
+- if we can't buy (bcz we already holding stock bought earlier), then also there can be two cases `we sell/ we don't sell`
+- If we can buy, and we buy we lose money as `-prices[index]` but we are eligible to sell in the next index so we call recursion with `_calc(index+1, 0)`
+- If we can buy but we don't then we dont lose any money, but we still call the recursion with `_calc(index+1, 1)` because we havent bought, we can still buy in next day
+- Similar for sell as well
+
+```javascript
+var maxProfit = function (prices) {
+    let dp = Array.from({length: prices.length}, () => Array.from({length: 2}, () => undefined))
+    const _calc = (index, buy) => {
+        if(index == prices.length) return 0;
+        if(dp[index][buy] != undefined) return dp[index][buy];
+        if(buy) {
+            dp[index][buy]= Math.max(
+                -prices[index] + _calc(index + 1, 0),
+                0 + _calc(index +1, 1)
+            )
+        } else {
+            dp[index][buy]= Math.max(
+                prices[index] + _calc(index + 1, 1),
+                0 + _calc(index +1, 0)
+            )
+        }
+        return dp[index][buy]
+    }
+    return _calc(0, 1);
+}
+```
+- In tabulation we need to take 1 based indexing as in base condition we are havivn to check for `index == n`
+
 --------------------------------------------------------------------------------------------------------------------------------

@@ -1,27 +1,21 @@
-var maxProfit = function (prices) {
-    let n = prices.length;
-    let dp = Array.from({ length: n + 1 }, () => Array.from({ length: 2 }, () => Array.from({ length: 3 }, () => 0)))
-    dp[n][0][2] = 0
-    dp[n][1][2] = 0
-    for (let index = n - 1; index >= 0; index--) {
-        for (let buy = 1; buy >= 0; buy--) {
-            for (let transactionCount = 1; transactionCount >= 0; transactionCount--) {
-                if (buy) {
-                    dp[index][buy][transactionCount] = Math.max(
-                        -prices[index] + dp[index + 1][0][transactionCount],
-                        0 + dp[index + 1][1][transactionCount],
-                    )
-                } else {
-                    dp[index][buy][transactionCount] = Math.max(
-                        prices[index] + dp[index + 1][1][transactionCount + 1],
-                        0 + dp[index + 1][0][transactionCount],
-                    )
-                }
-            }
+var maxProfit = function(prices) {
+    
+    const _calc = (index, buy) => {
+        if(index >= prices.length) return 0
+        if(buy == 1) {
+            return Math.max(
+                -prices[index] + _calc(index + 1, 0),
+                0 + _calc(index + 1, 1)
+            )
+        } else if(buy == 0) {
+            return Math.max(
+                prices[index] + _calc(index + 2, 1),
+                0 + _calc(index + 1, 0)
+            )
         }
     }
-    return dp[0][1][0]
-}
 
+    return _calc(0, 1);
+};
 
-console.log(maxProfit([3,3,5,0,0,3,1,4]))
+console.log(maxProfit([1,2,4]))

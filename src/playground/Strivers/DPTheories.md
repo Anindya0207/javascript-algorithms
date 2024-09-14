@@ -448,3 +448,28 @@ var longestCommonSubsequence = function (text1, text2) {
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### DP on Stocks
+
+In DP on stocks we generally have to find max profit by buying and selling stocks. 
+
+- We just need to memoise the till-now-minimum. thats it
+- at any index, if we have tillnow minimum, then we can calculate the profit at that index by doing `prices[index] - tillNowMin`
+- then the maxProfit can be easily calc by `maxProfit = Math.max(maxProfit, profit)`
+
+```javascript
+var maxProfit = function (prices) {
+    // let's assume the first index is the min
+    let minimum = prices[0];
+    let maxProfit = 0;
+    for(let i = 1; i < prices.length; i++) {
+        // calc the profit and maxProfit
+        let profit = prices[i] - minimum;
+        maxProfit = Math.max(maxProfit, profit);
+        // memoise the till now minimum
+        minimum = Math.min(minimum, prices[i]);
+    }
+    return maxProfit
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------

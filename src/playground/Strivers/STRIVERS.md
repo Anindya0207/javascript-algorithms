@@ -5694,3 +5694,75 @@ var maxProfit = function (prices) {
 Same for  Buy and Sell Stock IV Only difference is transactionCount is k.
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 111. Find length of LIS
+
+- In order to o this, we can also apply recursion (with memoisation) where we will have to carry the prev guy we took,
+- we will be like take and notake. we can always not take the current guy, but if the current guy is more than the prev guys, we can take as well
+- We need to return max of take and notake. Check DPTheories.md
+- But this will have O(N * N) SC. optimal way to solve this is with 1D dp.
+- `We need to define dp[i] as the length of the LIS till index i`
+- So we iterate index from 1 to n and prevIndex from 0 to index -1
+- Now for any prev, if we find that` arr[index] > arr[prev]` ei the current guy is actually more than that prev guy, we can add that guy in the subsequence right?
+- Hence whatever the max length that prev guy had, the current guy can have 1 + that, right?
+- We will maximise this over all prev guys which are before index
+
+```javascript
+var lengthOfLIST = function(nums) {
+    let n = nums.length
+    // all the indexes will have at least a subsequence with length 1 (the element itself, right?)
+    let dp = Array.from({length: n}, () => 1);
+    for(let index = 1; index < n; index++) {
+        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
+            dp[index] = Math.max(dp[index], dp[prevIndex]);
+        }
+    }
+    return Math.max(...dp)
+}
+```
+
+- If we need to print all the LIS, we can simply keep the sequence instead of length in the dp.
+
+`We can optimise the TC to nlogn using binary search`
+
+- We just need to run the loop once and keep forming an array
+- for each element, we need to run a binary search to check where exactly it should be there in the forming array
+- If it's within the forming array, replace that index with the present element or else push it
+- Finally just take the length of the formed array
+- `This will give us the length of LIS not the exact LIS`
+
+```javascript
+longestSubsequence(n, a)
+{
+    const _bSearch = (subarr ,element) => {
+        let start = 0, end = subarr.length - 1, ans = -1
+        while(start <= end) {
+            let mid = Math.floor((start + end)/2)
+            if(subarr[mid] == element) {
+                return mid
+            }
+            if(subarr[mid] > element) {
+                end = mid-1
+            } else {
+                start = mid + 1
+            }
+        }
+        return start;
+    }
+    let arr = [a[0]];
+    for(let i = 1; i < n; i++) {
+        let curr = a[i];
+        let subarr =arr;
+        let correctIndex = _bSearch(subarr, curr);
+        if(correctIndex < arr.length) {
+            arr[correctIndex] = curr;
+        }
+        else {
+            arr.push(curr)
+        }
+    }
+    return arr.length
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

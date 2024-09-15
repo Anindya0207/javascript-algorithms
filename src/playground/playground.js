@@ -1,21 +1,31 @@
-var maxProfit = function(prices) {
-    
-    const _calc = (index, buy) => {
-        if(index >= prices.length) return 0
-        if(buy == 1) {
-            return Math.max(
-                -prices[index] + _calc(index + 1, 0),
-                0 + _calc(index + 1, 1)
-            )
-        } else if(buy == 0) {
-            return Math.max(
-                prices[index] + _calc(index + 2, 1),
-                0 + _calc(index + 1, 0)
-            )
+const longestSubsequence = (n, a) => {
+    const _bSearch = (subarr ,element) => {
+        let start = 0, end = subarr.length - 1, ans = -1
+        while(start <= end) {
+            let mid = Math.floor((start + end)/2)
+            if(subarr[mid] == element) {
+                return mid
+            }
+            if(subarr[mid] > element) {
+                end = mid-1
+            } else {
+                start = mid + 1
+            }
+        }
+        return start;
+    }
+    let arr = [a[0]];
+    for(let i = 1; i < n; i++) {
+        let curr = a[i];
+        let subarr =arr;
+        let correctIndex = _bSearch(subarr, curr);
+        if(correctIndex < arr.length) {
+            arr[correctIndex] = curr;
+        }
+        else {
+            arr.push(curr)
         }
     }
-
-    return _calc(0, 1);
-};
-
-console.log(maxProfit([1,2,4]))
+    return arr.length
+}
+console.log(longestSubsequence(8, [1,7,8,4,5,6,-1,9]))

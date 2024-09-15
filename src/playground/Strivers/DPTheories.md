@@ -508,3 +508,78 @@ var maxProfit = function (prices) {
 - In tabulation we need to take 1 based indexing as in base condition we are havivn to check for `index == n`
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### DP on LIS (Longest increasing subsequence)
+
+Longest increasing subsequence demands to find the longest length or the print the LIS in an array where the subsequence is striclty increasing order
+
+- So we need to follow the same pick/no pick technique which we followed in subsequenece problems
+- Only caveat here is we need to carry the previousluy taken guy, and see if the current guy is more than the prev guy, then only we will take the current guy in the subsequence
+
+```javascript
+var lengthOfLIS = function(nums) {
+     let dp = Array.from({length: nums.length}, () => Array.from({length: nums.length + 1}, () => undefined))
+     const _calc = (index, prevIndex) => {
+        if(index == nums.length) return 0;
+        if(dp[index][prevIndex + 1] != undefined) return dp[index][prevIndex + 1];
+        let notake = 0 + _calc(index + 1, prevIndex);
+        let take = -Infinity;
+        if(prevIndex == -1 || nums[index] > nums[prevIndex]) {
+            take = 1 + _calc(index + 1, index);
+        } 
+        dp[index][prevIndex + 1] = Math.max(take, notake);
+        return dp[index][prevIndex + 1];
+    }
+    return _calc(0, -1);
+};
+```
+
+- If we want to do in tabulation, just notice one thing, that we are running till prevIndex = -1, but dp[something][-1] will not be there
+- So do offset
+- while writing the inner loop IMP to notice that `the prevIndex can atmost start from index -1 right? it cant be from n-1 bcz it's previous index`
+- now in the currence statements wherever we are accessing something from the dp, IMP to notice that the second param is always `+1` ie offseted
+
+```javascript
+var lengthOfLIST = function(nums) {
+    let n = nums.length;
+    // index is goign till n, hence take sizeof n+1
+    let dp = Array.from({length: n+ 1}, () => Array.from({length: n + 1}, () => 0))
+    // base case not required as everything is already init as 0
+    for(let index = n-1; index >= 0; index--) {
+        // now the prevIndex can atmost start from index -1 right? it cant be from n-1 bcz it's previous index
+        for(let prevIndex = index -1; prevIndex >= -1; prevIndex --) {
+            let notake = 0 + dp[index + 1][prevIndex +1]
+            let take = -Infinity;
+            if(prevIndex == -1 || nums[index] > nums[prevIndex]) {
+                take = 1 + dp[index + 1][index+1];
+            } 
+            dp[index][prevIndex + 1] = Math.max(take, notake);
+        }
+    }
+    return dp[0][-1+1]
+}
+```
+
+Now can we optimise this further? Yes, we can do in 1D DP O(N)
+
+- `We need to define dp[i] as the length of the LIS till index i`
+- So we iterate index from 1 to n and prevIndex from 0 to index -1
+- Now for any prev, if we find that` arr[index] > arr[prev]` ei the current guy is actually more than that prev guy, we can add that guy in the subsequence right?
+- Hence whatever the max length that prev guy had, the current guy can have 1 + that, right?
+- We will maximise this over all prev guys which are before index
+
+```javascript
+var lengthOfLIST = function(nums) {
+    let n = nums.length
+    // all the indexes will have at least a subsequence with length 1 (the element itself, right?)
+    let dp = Array.from({length: n}, () => 1);
+    for(let index = 1; index < n; index++) {
+        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
+            dp[index] = Math.max(dp[index], dp[prevIndex]);
+        }
+    }
+    return Math.max(...dp)
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

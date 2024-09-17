@@ -1,31 +1,32 @@
-const longestSubsequence = (n, a) => {
-    const _bSearch = (subarr ,element) => {
-        let start = 0, end = subarr.length - 1, ans = -1
-        while(start <= end) {
-            let mid = Math.floor((start + end)/2)
-            if(subarr[mid] == element) {
-                return mid
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var findNumberOfLIS = function(nums) {
+    let n = nums.length;
+    let dp = Array.from({length: n}, () => 1);
+    let count = Array.from({length: n}, () => 1);
+    // Calculate LIS length
+    for(let index = 1; index < n; index++) {
+        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
+            if(nums[index] > nums[prevIndex]) {
+                if(dp[prevIndex] + 1 > dp[index]) {
+                    dp[index] =  1 + dp[prevIndex];
+                    count[index] = count[prevIndex];
+                } else if (dp[prevIndex] + 1 == dp[index]) {
+                    count[index] += count[prevIndex];
+                }
             }
-            if(subarr[mid] > element) {
-                end = mid-1
-            } else {
-                start = mid + 1
-            }
-        }
-        return start;
-    }
-    let arr = [a[0]];
-    for(let i = 1; i < n; i++) {
-        let curr = a[i];
-        let subarr =arr;
-        let correctIndex = _bSearch(subarr, curr);
-        if(correctIndex < arr.length) {
-            arr[correctIndex] = curr;
-        }
-        else {
-            arr.push(curr)
         }
     }
-    return arr.length
-}
-console.log(longestSubsequence(8, [1,7,8,4,5,6,-1,9]))
+    let maxLength = Math.max(...dp)
+    let result = 0;
+    for (let i = 0; i < n; i++) {
+        if (dp[i] === maxLength) {
+            result += count[i];
+        }
+    }
+    return result
+};
+
+console.log(findNumberOfLIS([1,2,4,3,5,4,7,2]))

@@ -5714,7 +5714,9 @@ var lengthOfLIST = function(nums) {
     let dp = Array.from({length: n}, () => 1);
     for(let index = 1; index < n; index++) {
         for(let prevIndex = 0; prevIndex < index; prevIndex++) {
-            dp[index] = Math.max(dp[index], dp[prevIndex]);
+            if(nums[index] > nums[prevIndex]) {
+                dp[index] = Math.max(dp[index], 1 + dp[prevIndex]);
+            }
         }
     }
     return Math.max(...dp)
@@ -5765,4 +5767,91 @@ longestSubsequence(n, a)
 }
 ```
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 112. Longest Bitonic subsequence
+
+We need to find the longest bitonic subsequence (first strictly increasing and then strictly decreasing)
+
+- First check if the given array is strictly incrasing return 0
+- Trick is to `find the LIS and LDS (longest decreasing sequence)`
+- After we find the LIS and LDS, in two separate dp, we can maximise the `dp1[i] + dp2[i] -1`
+
+```javascript
+LongestBitonicSequence(n, nums) {
+    let increasing = true;
+    for(let i = 1; i < n; i++) {
+        if(nums[i] < nums[i-1]) {
+            increasing = false; break
+        }
+    }
+    if(increasing) return 0;
+    let dp1 = Array.from({ length: n }, () => 1);
+    let dp2 = Array.from({ length: n }, () => 1);
+    // Calculate LIS length
+    for(let index = 1; index < n; index++) {
+        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
+            if(nums[index] > nums[prevIndex]) {
+                dp1[index] = Math.max(dp1[index], 1+dp1[prevIndex])
+            }
+        }
+    }
+    //calculate LDS length
+    for(index = n-2; index >= 0; index--) {
+        for (nextIndex = index + 1; nextIndex < n; nextIndex++) {
+            if(nums[nextIndex] < nums[index]) { // peeche se increasing 
+              dp2[index] = Math.max(dp2[index], 1+dp2[nextIndex])
+            }
+        }
+    }
+    let final = -Infinity
+    for(let i = 0; i < n ; i++) {
+        if(dp1[i] > 1 && dp2[i] > 1) {
+            final= Math.max(final, dp1[i] + dp2[i] -1)
+        } 
+    }
+    return final
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 113. Count number of LIS
+
+We need to find number of LIS in a array Which means we might have multiple LIS of same length
+
+- We know for sure that we update the LIS when we get `dp[index] < dp[prevIndex] + 1` where dp[i] stores the length of LIS at index = i
+- Now here, we might get `dp[index] ==  dp[prevIndex] + 1` multiple times 
+- Very imp to understand that we need to take a count array also which will store `count[i] = number of LIS at index = i`
+- If we get `dp[index] < dp[prevIndex] + 1` we need to take `count[prevIndex]` and update `count[index]` why? because we just got another better LIS so upto prevIndex how much ever count we would have got for LIS, upto index, the count would be same, right?
+- But if we get `dp[index] == dp[prevIndex] + 1` this means, we got another way of same length LIS, then we would add up `count[prevIndex]` to `count[index]`
+
+```javascript
+ar findNumberOfLIS = function (nums) {
+    let n = nums.length;
+    let dp = Array.from({length: n}, () => 1);
+    let count = Array.from({length: n}, () => 1);
+    // Calculate LIS length
+    for(let index = 1; index < n; index++) {
+        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
+            if(nums[index] > nums[prevIndex]) {
+                if(dp[prevIndex] + 1 > dp[index]) {
+                    dp[index] =  1 + dp[prevIndex];
+                    count[index] = count[prevIndex];
+                } else if (dp[prevIndex] + 1 == dp[index]) {
+                    count[index] += count[prevIndex];
+                }
+            }
+        }
+    }
+    let maxLength = Math.max(...dp)
+    let result = 0;
+    for (let i = 0; i < n; i++) {
+        if (dp[i] === maxLength) {
+            result += count[i];
+        }
+    }
+    return result
+};
+```
 --------------------------------------------------------------------------------------------------------------------------------

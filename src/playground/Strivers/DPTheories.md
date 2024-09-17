@@ -575,7 +575,9 @@ var lengthOfLIST = function(nums) {
     let dp = Array.from({length: n}, () => 1);
     for(let index = 1; index < n; index++) {
         for(let prevIndex = 0; prevIndex < index; prevIndex++) {
-            dp[index] = Math.max(dp[index], dp[prevIndex]);
+            if(nums[index] > nums[prevIndex]) {
+                dp[index] = Math.max(dp[index], 1 + dp[prevIndex]);
+            }
         }
     }
     return Math.max(...dp)

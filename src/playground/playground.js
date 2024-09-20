@@ -1,32 +1,41 @@
-/**
- * @param {number[]} nums
- * @return {number}
- */
-var findNumberOfLIS = function(nums) {
-    let n = nums.length;
-    let dp = Array.from({length: n}, () => 1);
-    let count = Array.from({length: n}, () => 1);
-    // Calculate LIS length
-    for(let index = 1; index < n; index++) {
-        for(let prevIndex = 0; prevIndex < index; prevIndex++) {
-            if(nums[index] > nums[prevIndex]) {
-                if(dp[prevIndex] + 1 > dp[index]) {
-                    dp[index] =  1 + dp[prevIndex];
-                    count[index] = count[prevIndex];
-                } else if (dp[prevIndex] + 1 == dp[index]) {
-                    count[index] += count[prevIndex];
-                }
+var shortestPalindrome = function (s) {
+    let revs = s.split('').reverse().join('');
+    let n = s.length;
+    let maxLen = -Infinity;
+    let final = '';
+    const _calc = (index1, index2, str) => {
+       if(index1 == 0 || index2 == 0) {
+            if(str.length > maxLen) {
+                maxLen = str.length;
+                final = str
             }
+            return;
+       }
+       if(s.charAt(index1 - 1) == revs.charAt(index2 - 1)) {
+            _calc(index1 - 1, index2 - 1, `${s.charAt(index1 - 1)}${str}`)
+       } else {
+            _calc(index1 - 1, index2, str);
+            _calc(index1, index2 - 1, str);
+       }
+    }
+    _calc(n, n, '');
+    let i = 0, j = 0, revStr = ''
+    while(i < n) {
+        if(s.charAt(i) == final.charAt(j)) {
+            i++;
+            j++;
+        } else {
+            break;
         }
     }
-    let maxLength = Math.max(...dp)
-    let result = 0;
-    for (let i = 0; i < n; i++) {
-        if (dp[i] === maxLength) {
-            result += count[i];
-        }
+    if(i == 0) {
+        return `${final}${s}`
     }
-    return result
+    while(i < n) {
+      revStr = `${s.charAt(i)}${revStr}`
+      i++
+    }
+    return `${revStr}${s}`
 };
 
-console.log(findNumberOfLIS([1,2,4,3,5,4,7,2]))
+console.log(shortestPalindrome("aabba"))

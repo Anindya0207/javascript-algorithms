@@ -5869,6 +5869,8 @@ ar findNumberOfLIS = function (nums) {
 - and there would be some steps required to multiply the left part and right part separately, which can be asked to the recursion function again
 - So the left steps would be `_calc(i, k)` and right is `_calc(k+1, j)` right?
 
+Recursion
+
 ```javascript
  matrixMultiplication(arr, n){
     let dp = Array.from({length: n},() =>  Array.from({length: n}, () => undefined));
@@ -5888,6 +5890,35 @@ ar findNumberOfLIS = function (nums) {
     return _calc(1, n-1)
  }
 ```
+
+Tabulation:
+
+- In recursion we saw that i is going from 1 to n-1 and j is going from n-1 to 1
+- In Tabulation we just do it opp `i -> n-1 to 1` and `j -> 1 to n-1` 
+- But since `i <j` i should always be lesser than j it's practical to do `j = i+1 to n-1`
+
+```javascript
+ matrixMultiplication(arr, n){
+    let dp = Array.from({length: n},() =>  Array.from({length: n}, () => 0));
+    for(let i = n-1; i>0; i--) {
+        for (let j = i+1; j < n; j++) {
+            let mini = Infinity;
+            for(let k = i; k <= j-1; k++) {
+                let stepsReqWithCurrPartition = arr[i-1] * arr[k] * arr[j];
+                let leftSteps = dp[i][k];
+                let rightSteps = dp[k+1][j];
+                let totalSteps = stepsReqWithCurrPartition + leftSteps + rightSteps
+                mini = Math.min(mini,totalSteps)
+            }
+            dp[i][j] = mini;
+        }
+    }
+    return dp[1][n-1]
+ }
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 115. Different way to put parenthesis
 
 Similar pattern: https://leetcode.com/problems/different-ways-to-add-parentheses/description/
 - Here we had to add parenthesis different way and calculate the pattern evaluation
@@ -5929,6 +5960,45 @@ var diffWaysToCompute = function (expression) {
         return res
     }
     return _calc(expression)
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 116. Minimum cost to cut rods
+
+We are given a cuts array which indicates the position to cut rods. We need to find minimum cost to cut rods in those positions in any order
+
+- We will use partion dp here. But not on the entire array. but `on the cuts array with 0 and n prepended and appended in it respectively`
+- So basically cuts array will be `0 [...cuts] n`
+- Also we need to sort the cuts array
+- Now we can start the recursion from `1, c` where `c is the original cuts.length`
+- Like partiion dp, we will run a loop `k -> i to j`
+- the currentcost is defined as `cuts[j+1] - cuts[i-1]` as it will always be enclosed by 0 and n.
+- respectively find the leftCost and rightCost by calling the recursion with `i, k-1` and `k+1, j`
+
+```javascript
+var minCost = function(n, cuts) {
+    let c = cuts.length;
+    cuts.unshift(0);
+    cuts.push(n);
+    cuts.sort((a,b) => a-b);
+    let dp = Array.from({length: c+2}, () => Array.from({length: c+2} , ()=> undefined))
+    const _calc = (i, j) => {
+        if (j < i) return 0; // no more cuts possible
+        let mini = Infinity;
+        if(dp[i][j] != undefined) return dp[i][j]
+        for (let k = i; k <= j; k++) {
+            let currCost = cuts[j+1] - cuts[i-1]; // stick segment size
+            let leftCost = _calc(i, k-1); // cost for the left part
+            let rightCost = _calc(k+1, j); // cost for the right part
+            let totalCost = currCost + leftCost + rightCost;
+            mini = Math.min(mini, totalCost); // choose the minimum
+        }
+        dp[i][j] = mini
+        return mini;
+    };
+
+    return _calc(1, c);
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------

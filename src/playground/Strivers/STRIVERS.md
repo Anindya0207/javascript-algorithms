@@ -5855,3 +5855,80 @@ ar findNumberOfLIS = function (nums) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 114. Matrix Chain Multiplication
+
+- Whenever we get a pattern of trying out multiple patterns recursively and divide and conquer kind of pattern we need to go for `Partion DP`
+- Here we need to find the minimum step to do matrix multiplication
+- First understand that a matrix [A,B] can only be multiplied with a matrix of dimension [B,C] so the col of the first matrix has to be equal to the row of the second matrix
+- Second, the steps required to mulitply [A,B] and [B, C] is `A * B * C` you can do dry run and check
+- now, to find the min step required to multiply n matrices can be found by `putting partitions at different indexes in the array and finding out the total steps in each partition position and finding min of them all` right?
+- So we can say that we need the min steps for a matrix where `start of the matrix is at index 1 and end is n-1`
+- Now, since we can put partition at any index between i and j, we can run a loop of `k = i -> j-1` why j-1 because we will access k+1 in the loop
+- Now, at any partition, we can say that there are certain step for the multiplication of the left matrix and right matrix right? this would be `arr[i-1] * arr[k] * arr[j]`
+- and there would be some steps required to multiply the left part and right part separately, which can be asked to the recursion function again
+- So the left steps would be `_calc(i, k)` and right is `_calc(k+1, j)` right?
+
+```javascript
+ matrixMultiplication(arr, n){
+    let dp = Array.from({length: n},() =>  Array.from({length: n}, () => undefined));
+    const _calc = (i, j) => {
+        if(i == j) return 0;
+        let mini = Infinity;
+        for(let k = i; k <= j-1; k++) {
+            let stepsReqWithCurrPartition = arr[i-1] * arr[k] * arr[j];
+            let leftSteps = _calc(i, k);
+            let rightSteps = _calc(k+1, j);
+            let totalSteps = stepsReqWithCurrPartition + leftSteps + rightSteps
+            mini = Math.min(mini,totalSteps)
+        }
+        dp[i][j] = mini;
+        return mini;
+    };
+    return _calc(1, n-1)
+ }
+```
+
+Similar pattern: https://leetcode.com/problems/different-ways-to-add-parentheses/description/
+- Here we had to add parenthesis different way and calculate the pattern evaluation
+- So we can divide and conquer. we can interate through the entire expression and we can create a partition as and when we encounter an opeartor before and afgter the operator
+- Now we can call the recursion function again with that partition
+- If therer is no opeartor in the experssion then we will return the actual number evaluation
+
+```javascript
+var diffWaysToCompute = function (expression) {
+    const n = expression.length;
+    let dp = Array.from({ length: n * n }, () => undefined)
+    const _calc = (str) => {
+        if (!str.includes('+') && !str.includes('-') && !str.includes('*')) {
+            return [Number(str)]
+        }
+        let res = [];
+        if (dp[str] != undefined) return dp[str]
+        for (let i = 0; i < str.length; i++) {
+            if (['+', '-', '*'].includes(str.charAt(i))) {
+                let left = _calc(str.substring(0, i));
+                let right = _calc(str.substring(i + 1));
+
+                for (let l = 0; l < left.length; l++) {
+                    for (let r = 0; r < right.length; r++) {
+                        if (str.charAt(i) == '+') {
+                            res.push(left[l] + right[r])
+                        }
+                        if (str.charAt(i) == '-') {
+                            res.push(left[l] - right[r])
+                        }
+                        if (str.charAt(i) == '*') {
+                            res.push(left[l] * right[r])
+                        }
+                    }
+                }
+            }
+        }
+        dp[str] = res;
+        return res
+    }
+    return _calc(expression)
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

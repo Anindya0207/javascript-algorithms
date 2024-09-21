@@ -47,3 +47,33 @@ var diffWaysToCompute = function (expression) {
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+# 2. Lexicographical number
+
+We need to print numbers in lexicographical order till n
+
+- there are three factors here. 
+- it's going 1 - 9
+- For each of it, it is multilied by 10 and added by 0-9
+- so first if its 1, then for each number between 10 - 19 again we need to multiple it with 10 like 100 - 109 or 110-109 so on
+- So we need to iterate 1 - 9 numbers. for each of them we will multiply with 10 and add 0-9 number and then again call the recursion
+
+```javascript
+var lexicalOrder = function(n) {
+    let final = new Set();
+    const _calc= (num) => {
+        if(num > n) return;
+        final.add(num);
+        for(let i = 0; i <= 9;i++) {
+            let bla = 10 * num + i;
+            _calc(bla)
+        }
+    }
+    for(let i = 1; i<=9; i++) {
+        _calc(i);
+    }
+    return Array.from(final)
+};
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

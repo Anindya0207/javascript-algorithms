@@ -6002,3 +6002,36 @@ var minCost = function(n, cuts) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+# 117. Burst Baloons
+
+Similar pattern as the min cost to cut rods
+
+- We need to think the way that if I burst ith baloon, the left side baloons and right side baloons are already bursted and ith baloon is the last baloon to burst
+- Hence we need to prepend and append a 1 in the baloon array just liek we did in the rod cutting problem above.
+- Rest is same
+
+```javascript
+var maxCoins = function(nums) {
+    let n = nums.length;
+    let dp = Array.from({length: n+2}, () => Array.from({length: n+2}, () => undefined))
+    nums = [1,  ...nums, 1];
+    const _calc = (i, j) => {
+        if(i > j) return 0;
+        if(dp[i][j] != undefined) return dp[i][j]
+        let max = -Infinity;
+        for(let k = i; k<=j; k++) {
+            let currCoins = nums[i-1] * nums[k] * nums[j+1];
+            let leftCoin = _calc(i, k-1);
+            let rightCoin = _calc(k+1, j);
+            let total = currCoins + leftCoin+ rightCoin;
+            max = Math.max(max, total);
+        }
+        dp[i][j] = max;
+        return max;
+    }
+    return _calc(1, n);
+};
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

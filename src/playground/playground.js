@@ -1,25 +1,43 @@
-var minCost = function(n, cuts) {
-    let c = cuts.length;
-    cuts.unshift(0);
-    cuts.push(n);
-    cuts.sort((a,b) => a-b);
-    let dp = Array.from({length: c+2}, () => Array.from({length: c+2} , ()=> undefined))
-    const _calc = (i, j) => {
-        if (j < i) return 0; // no more cuts possible
-        let mini = Infinity;
-        if(dp[i][j] != undefined) return dp[i][j]
-        for (let k = i; k <= j; k++) {
-            let currCost = cuts[j+1] - cuts[i-1]; // stick segment size
-            let leftCost = _calc(i, k-1); // cost for the left part
-            let rightCost = _calc(k+1, j); // cost for the right part
-            let totalCost = currCost + leftCost + rightCost;
-            mini = Math.min(mini, totalCost); // choose the minimum
+splitByOuterCommas = (str) => {
+    let parts = [];
+    let lastSplit = 0, parenthesis = 0
+    for(let i = 0; i < str.length; i++) {
+        if(str.charAt(i)=='(') {
+            parenthesis++;
+        } 
+        else if(str.charAt(i) == ')') {
+            parenthesis--;
+        } else if(str.charAt(i) == ',' && parenthesis == 0) {
+            parts.push(str.substring(lastSplit, i));
+            lastSplit = i+1;
         }
-        dp[i][j] = mini
-        return mini;
-    };
-
-    return _calc(1, c);
+    }
+    parts.push(str.substring(lastSplit));
+    return parts
+}
+var parseBoolExpr = function(expression) {
+    let dp = {};
+    const _calc = (str) => {
+        if(str == 'f') return false;
+        if(str == 't') return true;
+        if(dp[str] != undefined) return dp[str]
+        if(['!'].includes(str.charAt(0))) {
+            let subExpression = str.substring(2, str.length - 1);
+            dp[str] = !_calc(subExpression); return  dp[str]
+        }
+        if(['&', '|'].includes(str.charAt(0))) {
+            let subExpressions = splitByOuterCommas(str.substring(2, str.length-1))
+            if(str.charAt(0) == '|') {
+                dp[str]= subExpressions.reduce((acc, curr) => (acc || _calc(curr)), false);
+                return  dp[str];
+            }
+            if(str.charAt(0) == '&') {
+                dp[str] = subExpressions.reduce((acc, curr) => (acc && _calc(curr)), true);
+                return  dp[str];
+            }
+        }
+    }
+    return _calc(expression)
 };
 
-console.log(minCost(9, [5,6,1,4,2]))
+console.log(parseBoolExpr('|(&(t,f,t),!(t))'))

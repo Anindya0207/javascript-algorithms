@@ -1261,6 +1261,26 @@ const partition = (str) => {
     return final;
 }
 ```
+
+Do you know we can use 2D dp to find Palindrome between index i and j within a string?
+- So initialise a 2D dp
+- iterate i from last n -1 and j from i to n
+- if `s[i] == s[j]` AND EITHER
+    - string length between i and j is <=3 ie "aba" is s[i]= s[j] then the middle character doesn't matter
+    - OR `dp[i+1][j-1] was a palindrome already calculated earlier`
+- then `dp[i][j] = true`
+
+```javascript
+    let n = str.length;
+   let dp = Array.from({length: n}, () => Array.from({length: n}, () => undefined));
+   for(let i = n-1; i >=0; i--) {
+    for(let j = i; j<n; j++) {
+        if(str[i] == str[j] && (j -i <= 2 || dp[i+1][j-1])) {
+            dp[i][j] = true
+        }
+    }
+   }
+```
 --------------------------------------------------------------------------------------------------------------------------------
 ### 35. M coloring problem
 
@@ -6003,7 +6023,7 @@ var minCost = function(n, cuts) {
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-# 117. Burst Baloons
+### 117. Burst Baloons
 
 Similar pattern as the min cost to cut rods
 

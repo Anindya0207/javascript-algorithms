@@ -6055,3 +6055,81 @@ var maxCoins = function(nums) {
 
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### 118. Partiion array for max sum
+
+We need to find the max sum we can get after putting paritions of atmost k length in a array where each element of the array after paritioning will become the maximum element of the corresponding partition.
+
+- In this kinds of problem we apply something called `Front partioning`. instead of partioning in middle and calculating left and right like we were doingin the previous problems we will do parition in the front and calculate the rest as a overlapping subproblem
+- Here we need to find the max sum at 0th index
+- So we can start at index 0 and stand there and traverse till k distance to the right and ask for max sum from the remaining array sequence as a overlapping subproblem
+- at index 0 lets say we have the max element 1 hence the max sum = max el 1 + max sum from 1 to n
+- at index 1 lets say the max element is el 2 then the max sum = 2 * el2 + max sum from 2 to n
+- at index 3 lets say the max elemenet is still el 2 then the max sum  = 3 * el2 + max sum fro 3 to n
+- that's it, if we check these three partiions standing at 0, rest partitions will be part of the subproblem and we will already get the max sum possible.
+
+```javascript
+var maxSumAfterPartitioning = function (arr, k) {
+    let  n = arr.length;
+    let dp = Array.from({length: n}, () => undefined);
+    const _calc = (index) => {
+        if(index >= n) return 0;
+        if(dp[index] != undefined) return dp[index];
+        let j = index;
+        let localmax = -Infinity, max = -Infinity
+        while(j < Math.min(index + k, n)) {
+            localmax = Math.max(localmax, arr[j]);
+            let len = j -index + 1;
+            let mul = len * localmax;
+            j++;
+            let bachikuchi = _calc(j);
+            max = Math.max(max, mul + bachikuchi);
+        }
+         dp[index]= max;
+         return  dp[index];
+    }
+
+    return _calc(0);
+};
+```
+-------------------------------------------------------------------------------------------------------------------------------- 
+
+### 119. Count square submatrices with all Ones
+
+We need to count all square submatrices in a n * m matrix with all 1
+
+- We will follow tabulation dp where first row and first column is same of that of matrix because in the first row and first column all cell will have that exact number of submatrices as it is given in the original matrix
+- We will iterate the matrix and for any i,j cell 
+    - if it's 1, then the count of square matrice will be minimum of all it's neighbours + 1 (for the cell itself)
+    - if it's 0, it will be 0
+- So the formula is `dp[i][j] = 1+ Math.min(dp[i-1][j-1], dp[i][j-1], dp[i-1][j])`
+
+```javascript
+var countSquares = function(matrix) {
+    let n = matrix.length;
+    let m = matrix[0].length
+    let dp = Array.from({length: n}, ()=> Array.from({length: m}, () => 0))
+    // first row and first column is the same
+    dp[0] = matrix[0];
+    for(let i = 0; i < n; i++) {
+        dp[i][0] = matrix[i][0]
+    }
+    for(let i = 1; i < n; i++) {
+        for(j = 1; j< m; j++) {
+            if(matrix[i][j] == 1) {
+                dp[i][j] = 1 + Math.min(dp[i-1][j] , dp[i-1][j-1] , dp[i][j-1])
+            } else {
+                dp[i][j] = 0
+            }
+        }
+    }
+    let sum = 0;
+    for(let i = 0; i < n; i++) {
+        for(j = 0; j< m; j++) {
+            sum += dp[i][j]
+        }
+    }
+    return sum
+};
+```
+--------------------------------------------------------------------------------------------------------------------------------

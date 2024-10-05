@@ -163,5 +163,24 @@ Remedies for these attacks can be -
     - `X-Frame-Options`: Prevents clickjacking attacks by disallowing your website to be loaded in iframes.
 - use serverside protection like `app.use(helmet())`
 
+2. SQL injection
+
+Attacker injects SQl query in the request to execute them in databse to get sentsitive information
+
+3. CSRF (Cross site request forgery)
+
+Here Attacker generates a UI form resembling the actual ui and sends to the actual user, this form will have hidden field as a form of input fields, When user hits the server usingthat form, the request makes payment to the attacker. 
+To prevent this, we should use a token which will be supplied by the server and will be user specific. It will be set in the meta tag of the html page. Once the user submits the page, the server validates the token sent to the html vs the token saved at server and then validate the request.
+This way, the form attacker will create will not match the token at server and the request will fail
+
+4. Clickjacking
+
+In this attack, a malicious user hijacks clicks meant for a visible top-level site and routes them to a hidden page beneath. This technique might be used, for example, to display a legitimate bank site but capture the login credentials into an invisible `<iframe>` controlled by the attacker. 
+To prevent this, sites should use `X_Frame_Options: deny` so that to prevent it to be rendered in an iframe
+
+5. Dos (Denial of Service)
+
+In this attack, the attacker floods the site with huge number of fake requests such that the service is denied to access for legitimate users for too many resource utilisation by the fake requests.
+To prevent this we can implement ratelimiting or WAF (web application firewall)
 
 --------------------------------------------------------------------------------------------------------------------------------

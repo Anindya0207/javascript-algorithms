@@ -1,90 +1,67 @@
 
-//Stack
-var MyStack  = function() {
-    this.top = -1;
-    this.arr = [];
-}
-
-MyStack.prototype.push = function(elem) {
-    this.arr[++this.top] = elem;
-}
-MyStack.prototype.pop = function() {
-    if(this.top == -1) return;
-    return this.arr[this.top--];
-}
-MyStack.prototype.topp = function() {
-    if(this.top == -1) return;
-    return this.arr[this.top];
-}
-MyStack.prototype.empty = function() {
-    return this.top == -1;
-}
-
-
-var getNSE = function(nums) {
-    let nse = new Array(nums.length).fill(nums.length - 1)
-    let myStack = new MyStack();
-    for(var i = nums.length - 1; i >=0 ; i--) {
-        while(!myStack.empty() &&  nums[i] <= nums[myStack.topp()]) {
-            myStack.pop();
-        }
-        if(!myStack.empty()) {
-            nse[i] = myStack.topp() - 1;
-        }
-        myStack.push(i)
-    } 
-    return nse
-};
-var getPSE = function(nums) {
-    let pse = new Array(nums.length).fill(0)
-    let myStack = new MyStack();
-    for(var i = 0; i < nums.length ; i++) {
-        while(!myStack.empty() &&  nums[i] <= nums[myStack.topp()]) {
-            myStack.pop();
-        }
-        if(!myStack.empty()) {
-            pse[i] = myStack.topp() + 1;
-        }
-        myStack.push(i)
-    } 
-    return pse
-};
-var maximalRectangle = function(matrix) {
-    const getMaxFromHisto = (_arr) => {
-        let pse = getPSE(_arr);
-        let nse = getNSE(_arr);
-        let final = -Infinity;
-        for(let i  = 0; i < _arr.length; i++) {
-            let leftWidth = i - pse[i];
-            let rightWidth = nse[i]-i;
-            let totalWidth = leftWidth + rightWidth + 1;
-            area = totalWidth * _arr[i];
-            final = Math.max(final, area);
-        }
-        return final
+  
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const animate = () =>  {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
+        renderClock(ctx);
+        renderHands(ctx);
     }
-    let n = matrix.length;
-    let m = matrix[0].length;
-    let histo = Array.from({length:n}, () => Array.from({length: m}, () => 0));
-    histo[0] = matrix[0].map(r => Number(r));
-    for(let i = 1; i < n; i++) {
-        for(let j = 0; j < m; j++) {
-            histo[i][j] = matrix[i][j] == 1 ? histo[i-1][j] + Number(matrix[i][j]) : 0;
-        }
+    const renderClock = (ctx) => {
+        ctx.beginPath();
+        ctx.fillStyle ='yellow';
+        ctx.strokeStyle ='green';
+        ctx.lineWidth = 4;
+        ctx.arc(400, 400, 300, 0, 2 * Math.PI);
+        ctx.closePath()
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle ='red';
+        ctx.beginPath();
+        ctx.arc(400, 400, 3, 0, 2 * Math.PI);
+        ctx.closePath()
+        ctx.fill();
     }
-    let ans = -Infinity;
-    for(let i = 0; i < histo.length; i++) {
-        const histoRow = histo[i];
-        let blabla =  getMaxFromHisto(histoRow);
-        ans = Math.max(ans, blabla);
+    const renderHands = (ctx) => {
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        renderClock(ctx);
+        ctx.beginPath();
+        
+        angleSec = xSec * Math.PI / 180;
+        angleMin = xMin * Math.PI / 180;
+        let x1 = 400, y1 = 400;
+        let x2 = x1 + 280 * Math.cos(angleSec);
+        let y2 = y1 + 280 * Math.sin(angleSec);
+        let x3 = x1 + 180 * Math.cos(angleMin);
+        let y3 = y1 + 180 * Math.sin(angleMin);
+        let x4 = x1 + 100 * Math.cos(angleMin);
+        let y4 = y1 + 100 * Math.sin(angleMin);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = 'black';
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x3, y3);
+        ctx.stroke();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'green';
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x4, y4);
+        ctx.stroke();
+        xSec += 6; 
+        xMin += 0.1;
+        xHr += 6 / 3600;
+        setTimeout(() => {
+            requestAnimationFrame(() => renderHands(ctx));
+        }, 1000 );
     }
-    return ans;
-};
-
-
-console.log(maximalRectangle([["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]))
-
-const obsubmit = (e) => {
-    const data = new FormData(e.target);
-    e.preventDefault();
-};
+    var xSec = -90;
+    var xMin = -90;
+    var xHr = -90;
+    animate()
+})

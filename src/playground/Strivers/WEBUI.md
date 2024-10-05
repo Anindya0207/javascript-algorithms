@@ -155,7 +155,7 @@ Remedies for these attacks can be -
 - We shoudl always store userInput in `textContent rather than innerHTML`
 - We can implement any content security policy(CSP) 
     - `Content-Security-Policy: script-src 'self' https://trusted-source.com;` this type of CSP only allows resources from some trusted sites.
-    - `<script nonce="random-value"></script>   ` - this type of CSP allows only nonce enabled script minimising the chance of attacks
+    - `<script nonce="random-value"></script>` - this type of CSP allows only nonce enabled script minimising the chance of attacks
 - Use some std library like `DOMPurify` to sanitise userInput
 - use security headers while emitting user data to server like
     - `X-Content-Type-Options: nosniff`: Prevents MIME-type sniffing, which could allow attackers to bypass security mechanisms by interpreting files as different types.
@@ -215,7 +215,7 @@ window.addEventListener('message', function(event) {
 
 - Mitigation strategies
     - Use X_Frame_Option as deny or same origin
-    - Use sandbox to properly define the permissions and restrict ifram usage <iframe sandbox="allow-popup">
+    - Use sandbox to properly define the permissions and restrict ifram usage `<iframe sandbox="allow-popup">`
         - `allow-popup`: allow iframe to open popups
         - `allow-same-origin`; this will allow iframe to behave as the same origin as the host site, it can access DOM, localstorage, cookie etc
         - `allow-scripts`: this will allow iframe to execute scripts inside the frame

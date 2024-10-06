@@ -6133,3 +6133,76 @@ var countSquares = function(matrix) {
 };
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### TRIE
+
+This is a different kind of data structure where we line up strings as a garland of connected objects. refer the below image of four words
+
+![alt text](<TRIE.jpg>)
+
+- We create a object which has two attributes
+    - links: this contains {a.....z} for each character the link to the next Trienode
+    - flag: this is boolean flag indicating if this is the last trienode or not? basically if the end of word has come or not
+- The Trie datastructure can be used to insert, search, startswith word etc..
+- The basic `TrieNode` object looks like this - 
+
+```javascript
+class TrieNode {
+    links = {};
+    flag = false;
+    getFlag () {
+        this.flag;
+    }
+    setFlag(val) {
+        this.flag= val;
+    }
+    getLink(ch) {
+        return this.links[ch]
+    }
+    setLink(ch, node) {
+        this.links[ch] = node;
+    }
+}
+```
+
+Now if we need to insert/search/startswith a word in Trie
+
+```javascript
+var Trie = function() {
+    this.root = new TrieNode();
+}
+Trie.prototype.insert = function(word) {
+    let pivot = root;
+    for(let  i = 0; i <word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            pivot.setLink(word[i], new TrieNode());
+        }
+        pivot = pivot.getLink(word[i]);
+    }
+    pivot.setEnd(true);
+}
+
+Trie.prototype.search = function(word) {
+    let pivot = root;
+    for(let  i = 0; i <word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            return false
+        }
+        pivot = pivot.getLink(word[i]);
+    }
+    return !!pivot.getEnd()
+}
+
+Trie.prototype.startsWith = function(word) {
+    let pivot = root;
+    for(let  i = 0; i <word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            return false
+        }
+        pivot = pivot.getLink(word[i]);
+    }
+    return true;
+}
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

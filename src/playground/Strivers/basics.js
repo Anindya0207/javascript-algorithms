@@ -123,101 +123,90 @@ DQueue.prototype.popBack = function() {
 }
 
 
+class PriorityQueue {
+  constructor(minMax) {
+      this.heap = [];
+      this.minMax = minMax || 'min'
+  }
+  getParent(index) {
+      return Math.floor((index - 1) / 2);
+  }
+  getLeftChild(index) {
+      return 2 * index + 1;
+  }
+  getRightChild(index) {
+      return 2* index + 2;
+  }
+  swap(index1, index2) {
+      [this.heap[index1], this.heap[index2]] = [this.heap[index2], this.heap[index1]];
+  }
+  enqueue(value) {
+      this.heap.push(value);
+      this.heapifyUp();
+  }
+  heapifyUp() {
+      let index = this.heap.length - 1;
+      while(index > 0) {
+          let parent = this.getParent(index);
+          if(this.minMax == 'min' && this.heap[parent].priority <= this.heap[index].priority) break;
+          if(this.minMax == 'max' && this.heap[parent].priority >= this.heap[index].priority) break;
+          this.swap(index, parent);
+          index = parent;
+      }
+  }
+  heapifyDown() {
+      let index = 0;
+      let n = this.heap.length;
+      while(true) {
+          let leftIndex = this.getLeftChild(index);
+          let rightIndex = this.getRightChild(index);
+          let overrideIndex = index
+          if(leftIndex < n  ) {
+              if(this.heap[leftIndex].priority < this.heap[overrideIndex].priority && this.minMax == 'min')
+              overrideIndex = leftIndex;
+              if(this.heap[leftIndex].priority > this.heap[overrideIndex].priority && this.minMax == 'max')
+              overrideIndex = leftIndex;
+          } 
+          if(rightIndex < n) {
+              if(this.heap[rightIndex].priority < this.heap[overrideIndex].priority && this.minMax == 'min')
+              overrideIndex = rightIndex;
+              if(this.heap[rightIndex].priority > this.heap[overrideIndex].priority && this.minMax == 'max')
+              overrideIndex = rightIndex;
+          } 
+          
+          if(index == overrideIndex) break;
+          this.swap(index, overrideIndex);
+          index = overrideIndex;
+      }
+  }
+  peek() {
+      return this.heap[0]
+  }
+  isEmpty() {
+      return this.heap.length == 0
+  }
+  dequeue() {
+     if(this.heap.length == 0) return null
+     if(this.heap.length == 1) return this.heap.pop();
+     let min = this.heap[0];
+     this.heap[0] = this.heap.pop();
+     this.heapifyDown();
+     return min;
+  }
+}
 
-const heapify = (arr, root, start, end) => {
-    let left = 2 * root + 1 - start;
-    let right = 2 * root + 2 - start;
-    let maxPriorityIndex = root;
-    if(arr[left] && arr[left].priority < arr[maxPriorityIndex].priority && left <= end) {
-      maxPriorityIndex = left;
-    }
-    if(arr[right] && arr[right].priority < arr[maxPriorityIndex].priority && right <= end) {
-      maxPriorityIndex = right;
-    }
-    if(maxPriorityIndex != root) {
-      let temp = arr[root];
-      arr[root] = arr[maxPriorityIndex];
-      arr[maxPriorityIndex] = temp;
-      heapify(arr, maxPriorityIndex, start, end);
-    } 
-   
-    else {
-      let minPrecendence = root;
-      if(arr[left] && arr[left].index < arr[minPrecendence].index && arr[left].priority ==  arr[minPrecendence].priority && left <= end) {
-        minPrecendence = left;
-      }
-      if(arr[right] && arr[right].index < arr[minPrecendence].index && arr[right].priority == arr[minPrecendence].priority && right <= end) {
-        minPrecendence = right;
-      }
-      if(minPrecendence != root) {
-        let temp = arr[root];
-        arr[root] = arr[minPrecendence];
-        arr[minPrecendence] = temp;
-        heapify(arr, minPrecendence, end);
-      }
-    }
-   
-  }
-  
-  const buildMaxHeap = (arr, start, end) => {
-    const mid = Math.floor((start + end) /2);
-    for(let i = mid ; i >= start ; i--) {
-      heapify(arr, i, start, end);
-    }
-  }
-  
-  class Item {
-    index;
-    priority;
-    value;
-    constructor(_index, _priority, _value) {
-      this.index = _index;
-      this.priority = _priority;
-      this.value = _value;
-    }
-  }
-  
-  var PriorityQueuee = function() {
-    this.front = -1; this.rear = -1;
-    this.arr = new Array(Math.pow(10, 5));
-  }
-  
-  PriorityQueuee.prototype.enqueue = function(item) {
-    if(item.value == undefined || item.priority == undefined) {
-      return;
-    }
-    if(this.rear == this.arr.length - 1) {
-      return;
-    }
-    if(this.front == -1) this.front = 0;
-    const newItem = new Item(++this.rear, item.priority, item.value);
-    this.arr[this.rear] = newItem;
-  }
-  
-  
-  PriorityQueuee.prototype.dequeue = function() {
-    if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
-      return;
-    }
-    buildMaxHeap(this.arr, this.front, this.rear);
-    return this.arr[this.front++];
-  }
+let pq = new PriorityQueue('max');
+pq.enqueue({value: 10, priority: 10});
+pq.enqueue({value: 5, priority: 5})
+pq.enqueue({value: 4, priority: 4})
+pq.enqueue({value: 2, priority: 2})
+pq.enqueue({value: 10, priority: 10})
+pq.enqueue({value: 7, priority: 7})
+pq.enqueue({value: 23, priority: 23})
+pq.enqueue({value: 8, priority: 8})
 
-  PriorityQueuee.prototype.empty = function() {
-    if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
-      return true;
-    }
-    return false;
-  }
-  
-  PriorityQueuee.prototype.top = function() {
-    if(this.front == -1 || this.front == this.arr.length-1 || this.front > this.rear) {
-      return
-    }
-    buildMaxHeap(this.arr, this.front, this.rear);
-    return this.arr[this.front];
-  }
-  
+
+
   function DisjoinSet(size) {
     this.rankArr = Array.from({length: size} , () => 0);
     this.sizeArr = Array.from({length: size} , () => 1);
@@ -371,4 +360,22 @@ Trie.prototype.erase = function(word) {
           delete node.links[word[i]]
       }
   }
+}
+
+function binaryInsert(arr, value) {
+  let left = 0;
+  let right = arr.length;
+
+  // Binary search to find the insertion index
+  while (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      if (arr[mid] < value) {
+          left = mid + 1;
+      } else {
+          right = mid;
+      }
+  }
+
+  // Insert the value at the found index
+  arr.splice(left, 0, value);
 }

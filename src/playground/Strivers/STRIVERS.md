@@ -6206,3 +6206,241 @@ Trie.prototype.startsWith = function(word) {
 
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Prefix TRIE: count word and count prefix
+
+- Only difference is we need to take a `wordCount` and keep setting that where one word is getting completed along with flag
+- Also we need to take a `count` keep setting it for each sub word
+- For count Whole word, traverse the TRIE i the entire word is found return `wordCount`
+- For count prefix, if entire prefix found, return the `count`
+- For erase method we need to cleanup also, so take a stack `nodes` keep pushing nodes while going till end of word
+- Iterrate backwords in the word and decrease count for each node. If count becoms 0, delete the node.
+
+```javascript
+class TrieNode {
+    links = {};
+    flag = false;
+    wordCount = 0;
+    count = 0;
+    getLink(ch) {
+        return this.links[ch]
+    }
+    setLink(ch, node) {
+        this.links[ch] = node;
+    }
+    getFlag() {
+        return this.flag;
+    }
+    setFlag(f) {
+        this.flag = f;
+    }
+    getCount() {
+        return this.count
+    }
+    setCount(c) {
+       this.count = c;
+    }
+    getWordCount() {
+        return this.wordCount
+    }
+    setWordCount(c) {
+       this.wordCount = c;
+    }
+}
+
+var Trie = function() {
+    this.root = new TrieNode();
+}
+Trie.prototype.insert = function(word) {
+    let pivot = this.root;
+    for(let i = 0; i < word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            pivot.setLink(word[i], new TrieNode())
+        }
+        pivot = pivot.getLink(word[i]);
+        pivot.setCount(pivot.getCount() + 1)
+    }
+    pivot.setFlag(true);
+    pivot.setWordCount(pivot.getWordCount() + 1);
+}
+Trie.prototype.countWordsEqualTo = function(word) {
+    let pivot = this.root;
+    for(let i = 0; i <word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            return 0;
+        }
+        pivot = pivot.getLink(word[i]);
+    }
+    return pivot.getWordCount();
+}
+Trie.prototype.countWordsStartingWith = function(word) {
+    let pivot = this.root;
+    for(let i = 0; i <word.length; i++) {
+        if(!pivot.getLink(word[i])) {
+            return 0;
+        }
+        pivot = pivot.getLink(word[i]);
+    }
+    return pivot.getCount();
+}
+Trie.prototype.erase = function(word) {
+    let pivot = this.root;
+    let nodes = []
+    for(let i = 0; i <word.length; i++) {
+        nodes.push(pivot);
+        pivot = pivot.getLink(word[i]);
+        if(!pivot) return;
+    }
+    pivot.setWordCount(pivot.getWordCount() - 1);
+    for(let i = word.length - 1; i >=0 ;i--) {
+        let node = nodes[i].getLink(word[i]);
+        node.setCount(node.getCount() - 1);
+        if(node.getCount() == 0) {
+            delete node.links[word[i]]
+        }
+    }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Number of Distinct substrings of a string
+
+- Extreme bruteforce will be toi iterate over the string and calculate the unique substrings frmo that index till the end of string
+- like one loop from `i 0...n-1` and another `j = i ... n-1` and then check for substrings and add in a map or set
+- This will have O(n^2 * logM) TC logM for the set and map operation but the real challenge is the SC. It can have near to O(n^3) space complexity
+- TO optimise, we can use TRIE as TRIE will reduce the space utilisation
+- So the process will be similar that we will start loop from each index till end of string
+- We will try to insert one character at a time in TRIE
+- If there is no link we will insert a TrieNode and increment `count`
+- If there is a link already, we don't increase count.
+- We finally add 1 to the final count as we need to also consider the empty string
+
+```javascript
+class TrieNode {
+    links = {};
+    flag = false;
+    getLink(ch) {
+        return this.links[ch]
+    }
+    setLink(ch, node) {
+        this.links[ch] = node;
+    }
+    getFlag() {
+        return this.flag;
+    }
+    setFlag(f) {
+        this.flag = f;
+    }
+  }
+  
+  var Trie = function() {
+    this.root = new TrieNode();
+  }
+  Trie.prototype.insert = function(word) {
+    let c = 0;
+    for(let i = 0; i < word.length; i++) {
+        let pivot = this.root;
+        for(let j = i; j < word.length; j++) {
+            if(!pivot.getLink(word[j])) {
+                pivot.setLink(word[j], new TrieNode());
+                c++;
+            }
+            pivot = pivot.getLink(word[j]);
+        }
+    }
+    return c;
+  }
+  
+
+const countDistinctSubstrings = (word) => {
+    let trie = new Trie();
+    return trie.insert(word) + 1
+}
+
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Maximum XOR of two numbers in array
+
+We may be given problems like we need to find maximum XOR between two numbers in one array or two arrays. 
+
+- Our target is to find out maximum XOR of a series of numbers with a number x
+- We will use TRIE to do this. 
+- Trick is to `represent a number in 32 bit binary string -> n.toString(2).padStart(32, '0')` will help us
+- next step is easy. We will build the TRIE
+- Now for any number we will compare with the TRIE and greedily try to choose the opposite bit from TRIE
+- ie if the number is 101001 we will try to move the TRIE in 0 -> 1 -> 0 -> 1 -> 1 -> 0 direction
+- It might not be possible till end. But our target is to mke as much 1 in the lefter side as possible
+
+```javascript
+class TrieNode {
+    links = {};
+    flag = false;
+    getLink(ch) {
+        return this.links[ch]
+    }
+    setLink(ch, node) {
+        this.links[ch] = node;
+    }
+    getFlag() {
+        return this.flag;
+    }
+    setFlag(f) {
+        this.flag = f;
+    }
+  }
+  
+  var Trie = function() {
+    this.root = new TrieNode();
+  }
+  Trie.prototype.insert = function(bitStr) {
+    let pivot = this.root;
+    for(let i= 0; i<bitStr.length; i++) {
+        if(!pivot.getLink(bitStr[i])) {
+            pivot.setLink(bitStr[i], new TrieNode())
+        }
+        pivot = pivot.getLink(bitStr[i]);
+    }
+  }
+  Trie.prototype.getMax = function(bitStr) {
+    let pivot = this.root;
+    let finalBitStr = '';
+    for(let i = 0; i<bitStr.length; i++) {
+        if(bitStr[i] == '1') {
+            if(!!pivot.getLink('0')) {
+                finalBitStr = `${finalBitStr}1`;
+                pivot = pivot.getLink('0')
+            } else if(!!pivot.getLink('1')) {
+                finalBitStr = `${finalBitStr}0`;
+                pivot = pivot.getLink('1')
+            }
+        } else if(bitStr[i] == '0') {
+            if(!!pivot.getLink('1')) {
+                finalBitStr = `${finalBitStr}1`;
+                pivot = pivot.getLink('1')
+            } else if(!!pivot.getLink('0')) {
+                finalBitStr = `${finalBitStr}0`;
+                pivot = pivot.getLink('0')
+            }
+        }
+    }
+    return parseInt(finalBitStr, 2);
+  }
+  
+
+const findMaximumXOR = (nums) => {
+    let trie = new Trie();
+    for(let i = 0; i<nums.length; i++) {
+        let bitStr = nums[i].toString(2).padStart(32, '0');
+        trie.insert(bitStr);
+    }
+    let max = -Infinity;
+    for(let i = 0; i<nums.length; i++) {
+        let bitStr = nums[i].toString(2).padStart(32, '0');
+        max = Math.max(max, trie.getMax(bitStr));
+    }
+    return max
+}
+
+```
+--------------------------------------------------------------------------------------------------------------------------------

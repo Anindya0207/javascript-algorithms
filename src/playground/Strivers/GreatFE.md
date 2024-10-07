@@ -155,7 +155,7 @@ new obj.printThis() // here also we have two rules, we are using the function as
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-### Cookie vs sessionStorage vs localstora
+### Cookie vs sessionStorage vs localstorage
 
 - Cookie is short lived, specific to domain, same origin, and session. sent in every request. 4KB
 - Session storage is for a particular origin and session, persistent across tabs but gone if window is reopened - 5MB. not sent in requests
@@ -169,5 +169,47 @@ new obj.printThis() // here also we have two rules, we are using the function as
 - with < script async > the scripts are `downloaded in any order` `parallel to the HTML parsing`. `executed as soon as downlaoded blocking HTML parsing` It should only nbe used with those scripts which are not critical for the initial rendering of the DOM.
 - with < script defer> the scripts are `downloaded in order` `parallel to HTML parsing` but it `will execute only after the HTML parsing is completed`. This script is executed after DOM parsing is done and before `DOMContentLoaded` event is triggered.
 - Even though these are downloaded with HTML parsing, the execution happens in the main thread. so if the script are computation heavy the UI becomes laggy. this problem can be solved with `web worker` and offloading the scripts to a different thread.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### .bind using call or apply
+
+```javascript
+Function.prototype.mybind = function(...args) {
+   let _this = this;
+   const context = args[0]; 
+   let params = args.splice(1);
+   return function(...moreArgs) {
+     _this.call(context, ...params, ...moreArgs)
+     // OR
+     // _this.apply(context, [...params, ...moreArgs])
+   }
+}
+
+function blabla(...args) {
+    console.log(args)// [1,2,3,5,6,7]
+}
+
+const a = blabla.mybind(null, 1,2,3)
+a(5,6,7);
+```
+
+```javascript
+Function.prototype.myCall = function(...args) {
+    let _this = this;
+    cb = _this.bind(this, ...args)
+    cb();
+ }
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### where to add < link > tags and < script >
+
+- < link > should be added in < head > tag to do progressive rendering
+- this way, HTML and css will be parsed together and give the users the optimal page experience, otherwise users will see unstyled page 
+- if we put stylesheet in bottom of the html, some browser blocks rendering to acvoid repainting if the style changes
+- This causes blank screen.
+- < script > tag should be placed on top of body, such that it blcoks the HTML parsing till completely executed. If we dont' do this, HTML might be shown to users before sript is loaded and if there is some conditional rendering in the script it won't work.
+- if we want to use < script defer > we can use it inside head since it will only be parsed after the entire DOM is loaded.
 
 --------------------------------------------------------------------------------------------------------------------------------

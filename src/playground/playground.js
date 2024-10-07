@@ -70,7 +70,7 @@ class PriorityQueue {
     }
 }
 
-let pq = new PriorityQueue('max');
+let pq = new PriorityQueue('min');
 pq.enqueue({value: 10, priority: 10});
 pq.enqueue({value: 5, priority: 5})
 pq.enqueue({value: 4, priority: 4})

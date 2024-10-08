@@ -174,6 +174,9 @@ new obj.printThis() // here also we have two rules, we are using the function as
 
 ### .bind using call or apply
 
+- bind allows to set a `this` context to a function with some initial arguments and allows to let it execute later with more arguments
+- It allows method borrowing, which means `var obj1 = {name : "Anindya", getName: function() {return this.name}}` if we call `obj1.getName.bind({name: "Sanchita"})` then the this gets changed inside the borrowed method. It will return Sanchita instead of Anindya.
+
 ```javascript
 Function.prototype.mybind = function(...args) {
    let _this = this;
@@ -201,6 +204,7 @@ Function.prototype.myCall = function(...args) {
     cb();
  }
 ```
+
 --------------------------------------------------------------------------------------------------------------------------------
 
 ### where to add < link > tags and < script >
@@ -212,4 +216,330 @@ Function.prototype.myCall = function(...args) {
 - < script > tag should be placed on top of body, such that it blcoks the HTML parsing till completely executed. If we dont' do this, HTML might be shown to users before sript is loaded and if there is some conditional rendering in the script it won't work.
 - if we want to use < script defer > we can use it inside head since it will only be parsed after the entire DOM is loaded.
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### How browser applies selector
+
+- It aplies from right to left. So for "p span" it searches for all span tags and then traverseup until it finds a p tag.
+- the distance between the chiuld to parent determines how fast browser will take time to paint and style the DOM
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### translate vs position: absolute
+
+- translate does not alter the original position fo rthe element `position: relateive` it just triggers compositions.
+- position absolute breaks the flow of the page and and impacts the other elements position also.
+- translate causes browser to assign a GPU but position absolute repaints the DOm and bnrowser has to allocate a CPU 
+- Hence translate is always optimal
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Prototypal inheritance
+
+- All javascript object has a attribute called `[[Prototype]]` or `__proto__` which is inherited from the parent object, if not then implicitly from `Object` object
+- In JS if we have a function we can add a prototype member. like 
+
+```javascript
+function Human(name) {
+  this.name = name;
+}
+
+Human.prototype.sayHello = function() {
+  console.log("Human can say hello " + this.name);
+}
+```
+- Now if we create an object using this constructor function Human `new Human('Anindya')` then the object will have `sayHello` method and all the other implicit methocs like `toString` which is inherited from Object
+- Now, lets say we do 
+
+```javascript
+function Person(name, gender) {
+  Human.call(this, name);
+  this.gender = gender;
+}
+```
+- This means, we are calling the constructor of Human from Person constructor, hence the Person constructor will have the `name` and `gender` both attributes
+- Now let's say we do either of these
+
+```javascript
+Person.prototype = Object.create(Human.prototype);
+// OR
+Object.setPrototypeOf(Person, Human);
+//OR
+Object.setPrototypeOf(Person.prototype, Human.prototype);
+```
+
+- This way the Person object will have the `sayHello` member function also as its there in it's prototype chain
+- But let's say we do 
+```javascript
+const blabla = Object.create(Human.prototype);
+```
+- Here blabla will definitely have `sayHello` function but for it, `name` and `gender` will be undefined. because it was not created using new keyword
+- But if I do `anindya = new Human('Anindya', 'male')` then I will have everything
+
+Read: https://www.greatfrontend.com/questions/quiz/explain-how-prototypal-inheritance-works
+
+- Now in ES6 we generally write constructor 
+
+```javascript
+class Human {
+  constructor(name) {
+    this.name = name;
+  }
+  sayHello = function() {
+    console.log("Hello from " + +this.name)
+  }
+}
+
+class Person extends Human{
+  constructor(name, gender) {
+    super(name)
+    this.gender = gender;
+  }
+  sayGoodBye = function() {
+    console.log("Bye from " + +this.name + this.gender)
+  }
+}
+
+const anindya = new Person('Anindya', 'male')
+```
+- Notice here Person extended Human but it's important to call super. this is equivalent to `Human.call(this, name)` which we did earlier in ES5 syntax
+- Now we call the parent constructor by `super(name)` and pass name to set it in it's constructor
+- but we can't access this before calling this as it extends a class. we will get an error like `// This will throw an error because 'this' cannot be passed before calling 'super()'`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Different ways to create Object
+
+- {} -> object literal
+- a = new Object() a.name = "asfasf"
+- Object.create() -> using a prototype
+- constructor functions new Class('Aninfya') 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Closures
+
+- Closure is a phenomenon `where a function can access it's lexical scope even it's executed outside of it's lexical scope`
+- JS closure works in this way that it remembers the variables that was accessible when the function was initialised. It has the access of those scope vairables even if it's executed after and outside of that scope
+
+```javascript
+function createCounter() {
+    let counter = 0;
+    return function() {
+        counter++;
+        return counter;
+    }
+}
+const counter = createCounter();
+counter() ; // 1;
+counter(); //2
+```
+
+- This is used to `encapisulate `private variables such that those are not accessible outside the functiomn scope
+- in `Function programming` and `modules pattern` its useful
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Event bubbling
+
+- When the event bubles up from target node all the way to the root of the DOM that is called event bubbling
+- Bubbling phase happens evemn `after the capture` phase where the root slement captures the element and then it drills down to the chiuld elements
+- We can stop bubbling at any DOM hierarchy by oing `e.stopPropagation`
+- To delegate event, we can have only one parent handling all the child events which will anyway bubble up to the parent based on the `event.target.id ` but it might lead to unintended behaviour if the event propagation is not handleds properly.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Event capture
+
+- the Event phase are three- 
+    - Capture phase : the event gets captured by the ancestor node
+    - Target phase: the event reached the target DOM element
+    - bubble phase: the event bubbled from the target element all the way to the top / ancestor node
+- So even before bubbling happens capture event listereners are triggered
+
+```javascript
+const parent = document.getElementById('parent');
+const child = document.getElementById('child');
+
+parent.addEvenetListener('click' , () => {
+    console.log("parent captured the event")
+}, true); // this true is the important part  which enables evnet capture
+```
+- example: when we are designing a dropdown menu and we need to close it on click of the DOM (anywhere) but we don't want that to propagate down to the target modes anywhere within the DOM, we can capture the click event in the body and then do `event.stopPropagation()`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Sync vs Async functions 
+
+- Sync functions are the ones which are executed sequentially and each line is a non blocking call. Hence it executes them in the main thread one by one before releasing the thread
+- Async functions are the ones which are executed asynchronously. They often have a callback or resolver which gets called after the execution of the async job is done.
+- Async functions though asyn in nature, are also run in the main thread as we have observed in event loop
+- To offload them in different thread we can use `web workers`
+- `Web worker is executed in different thread and they can talk between each other by passing messages. `
+- `But they do not have any access to the DOM or WEB APIs`
+
+```javascript
+//main.js
+
+const worker = new Worker('worker.js');
+
+worker.onMessage = () => {
+    console.log('Result from worker:', event.data);
+}
+
+worker.postMessage('Start Execution');
+
+// worker.js
+
+self.onMessage = () =>{
+    const result = computeHeavy();
+    return result
+}
+computeHeavy= () => {...}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### All kind of Promise pollyfills
+
+```javascript
+class MyPromise {
+  constructor(executor) {
+    this.callbacks = [];
+    this.state = 'pending';
+    this.value = val;
+    const resolve = (val) => {
+      if(this.state != 'pending') return;
+      this.state = 'fulfilled';
+      this.value = val;
+      this.callbacks.forEach(cb => cb.onFullfilled(this.value))
+    }
+    const reject = (val) => {
+      if(this.state != 'pending') return;
+      this.state = 'rejected';
+      this.value = val;
+      this.callbacks.forEach(cb => cb.onRejected(this.value))
+    }
+    try {
+      executor(resolve, reject);
+    } catch(err) {
+      reject(err);
+    }
+  }
+
+  then = (onFullfilled, onRejected) => {
+    return new Promise((resolve, reject) => {
+      const handleCallback = (callback, resolveFunc, rejectFunc) => {
+         try {
+          const result = callback(this.value);
+          resolveFunc(result)
+         } catch(error) {
+          rejectFunc(error)
+         }
+      }
+      if(this.state == 'fulfilled') {
+        onFullfilled && handleCallback(onFullfilled, resolve, reject);
+      } else  if(this.state == 'rejected') {
+        onRejected && handleCallback(onRejected, resolve, reject)
+      } else {
+        this.callbacks.push({
+          onFullfilled: (value) => {
+            onFullfilled && handleCallback(onFullfilled, resolve, reject)
+          },
+          onRejected: (val) => {
+            onRejected && handleCallback(onRejected, resolve, reject);
+          }
+        })
+      }
+    })
+  }
+
+  catch = (onRejected)  => {
+    return this.then(null, onRejected)
+  }
+}
+
+Promise.prototype.myResolve = (value) => {
+  if(value && typeof value === 'object' && typeof value.then === 'function') {
+    return new Promise((resolve, reject) => {
+      value.then(resolve, reject)
+    })
+  }
+  return new Promise(resolve => {
+    resolve(value);
+  })
+} 
+
+Promise.prototype.myReject = (value) => {
+  if(value && typeof value === 'object' && typeof value.then === 'function') {
+    return new Promise((resolve, reject) => {
+      value.then(resolve, reject)
+    })
+  }
+  return new Promise((_, reject) => {
+    reject(value);
+  })
+} 
+
+Promise.prototype.myAll = (promises) => {
+  return new Promise((resolve, reject) => {
+    let responses = [];
+    let completed = 0;
+    if(promises.length == 0) {
+      resolve([])
+    }
+    promises.forEach((promise,index) => {
+      Promise.resolve(promise).then(res => {
+        responses[index] = res;
+        completed++;
+        if(completed == promises.length) {
+          resolve(responses);
+        }
+      }).catch((err) => {
+        reject(err);
+      })
+    })
+  });
+}
+Promise.prototype.myRace = (promises) => {
+  return new Promise((resolve, reject) => {
+    if(promises.length == 0) {
+      resolve([])
+    }
+    promises.forEach((promise) => {
+      Promise.resolve(promise).then(res => {
+        resolve(res);
+      }).catch((err) => {
+        reject(err);
+      })
+    })
+  });
+}
+Promise.prototype.myAllSettled = (promises) => {
+  return new Promise((resolve) => {
+    responses = [];
+    settled = 0;
+    if(promises.length == 0) {
+      resolve([])
+    }
+    promises.forEach((promise, index) => {
+      Promise.resolve(promise).then(res => {
+        responses[index] = {status: 'fulfilled', value: res}
+      }).catch((err) => {
+        responses[index] =  {status: 'rejected', value: err}
+      }).finally(() => {
+        settled++;
+        if(settled == promises.length) {
+          resolve(responses)
+        }
+      })
+    })
+  });
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### for..of vs for..in
+
+- for..of iterates over `iterables like array, map, string, obj` while for..in does over `objects and arrays`
+- for..of `iterates over the values` while for..in `iterates over indices/keys`
 --------------------------------------------------------------------------------------------------------------------------------

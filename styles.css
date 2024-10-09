@@ -1,0 +1,19 @@
+.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  .container {
+    background-color: #f0f0f0;
+    border: 2px solid #ccc;
+    padding: 10px;
+  }
+
+  .box {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background-color: #3498db;
+    margin-right: 10px;
+  }

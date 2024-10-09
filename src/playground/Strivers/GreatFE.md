@@ -543,3 +543,124 @@ Promise.prototype.myAllSettled = (promises) => {
 - for..of iterates over `iterables like array, map, string, obj` while for..in does over `objects and arrays`
 - for..of `iterates over the values` while for..in `iterates over indices/keys`
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Map vs object
+
+- Map can store `any data type`, it has `size` method, it is `iterable` through it's built in functions. It's ideal for faster operation when the data set is bigger
+- object literals can store string or number key value pair, it does not have a built in size method, it's iterable through for..in or for ..of. Ideal for faster access when the data set is smaller
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Map vs weakmap
+
+- Map stores key value pair where key are strings and they are persistent till the time the map exists
+- Weakmap stores object as keys and they can get garbage collected even if the the weak map is still existing
+- It depends on the object is being referenced any where. Based on that, the garbage collector might garbage collect it
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Symbol in JS
+
+- Symbols are keywords in javascript which is used to create private properties which then can be used as a property in an object 
+- It is guranteed that two symbols will never collide even if the key passed to create the symbols are same like - `const symbol = Symbol('key')` and `const symbol1  = Symbol('key')` then we can say for sure `symbol != symbol1`
+- Symbol are` not enumerable`
+- Symbol can give a means to create secret immuatable properties which is beneficial for large scale application
+- Symbols should be used `with out new keyword` becuase it doesn't have a constructor
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Worker
+
+- Workers are background threads in JS which runs out of the main thread minifying the workload in the main thead
+- while UI is rednering int he main thread, a worker theread can take care of the computation heavy operations in a paralelle thread 
+- Workers are of three types
+    - Web workers : this is to run computation heavy operation parallel to the JS main thread. These workers have access to the web apis but they can't access the DOM. They communicate with each other or with the main thread using `postmessage` or`onMessage`
+
+    ```javascript
+    // main.js
+    const worker = new Worker('worker.js');
+    worker.postMessage("Some mesage");
+    worker.onMessage((event) => {
+        console.log(event.data);
+    })
+
+    // worker.js
+    self.onMessage = () => {
+        console.log(event.data);
+        const res = computeHeavy();
+        postMessage(res);
+    }
+    ```
+
+    - Service worker: these are used as proxy between web and server. They can be used as push notification or caching etc.
+
+    ```javascript
+    //main.js
+    if('serviceWorker' in navigator) {
+        navigatior.serviceWorker.register("./some-sw.js")
+        .then((registration) => {
+            console.log(registration);
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+    // some-sw.js
+    self.addEventLister('fetch', (event) => {
+        event.respondwith(
+            caches.match(event.request).then((response) => {
+                if(response) return response;
+                return fetch(event.request)
+            })
+        )
+    })
+    ```
+
+    - Shared worker
+
+    These workers are shared across multiple js files or frames given that they are all in same origin. 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+#### BFC 
+
+- Block formatting context is part of CSS rendering where `floats, absolutely positioned elements, inline-blocks, table-cells` establish a BFC
+- BFC happens when  
+    - float :none
+    - position: relative / static
+    - display: table-cell, table-capture, inline-block
+    - overflow is visible
+- In BFC, left outer margin touches the parent's left outer margin if it layout left to right else right outer margin.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### float
+
+- float is CSS property to position some element irrespective of it's flow on the page to right, left, bottom or top
+- It impacts the positioning of the other elements. Other elements flow around the floated elements but unlike position: absiolute, it does not break the flow of the page. 
+- For floated elements the parent container (if it only has floated elements) fail to wrap them in a particular height. 
+- To solve this, we used to use `clear: both` hack
+
+```html
+<div class="container">
+    <div class="box"></div>
+    <div class="box"></div>
+</div>
+<head>
+.box {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background-color: #3498db;
+    margin-right: 10px;
+  }
+  .clearfix::after {
+    content: " ",
+    clear: both;
+    visibility: hidden;
+    heihgt: 0
+  }
+</head>
+
+- Here `clear both` artribute helps to define the css flow. But today   `display: flow-root` is used.
+
+--------------------------------------------------------------------------------------------------------------------------------

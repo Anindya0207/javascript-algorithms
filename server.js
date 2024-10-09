@@ -15,6 +15,18 @@ const server = http.createServer((req, res) => {
         res.end(data);
       }
     });
+  } else if (req.url === '/styles.css') {
+    // Serve JavaScript file
+    const filePath = path.join(__dirname, 'styles.css');
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end('Internal Server Error');
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/text' });
+        res.end(data);
+      }
+    });
   } else if (req.url === '/') {
     // Serve HTML file
     const htmlPath = path.join(__dirname, 'index.html');

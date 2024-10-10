@@ -2,48 +2,51 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const server = http.createServer((req, res) => {
-  if (req.url === '/src/playground/playground.js') {
-    // Serve JavaScript file
-    const filePath = path.join(__dirname, 'src', 'playground', 'playground.js');
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'application/javascript' });
-        res.end(data);
-      }
-    });
-  } else if (req.url === '/styles.css') {
-    // Serve JavaScript file
-    const filePath = path.join(__dirname, 'styles.css');
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'application/text' });
-        res.end(data);
-      }
-    });
-  } else if (req.url === '/') {
-    // Serve HTML file
-    const htmlPath = path.join(__dirname, 'index.html');
-    fs.readFile(htmlPath, (err, html) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(html);
-      }
-    });
-  } else {
-    // Handle other requests (e.g., favicon.ico)
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
+
+// Define the base directory where the playground folder is located
+const playgroundDirectory = path.join(__dirname);
+
+// Helper function to determine the correct MIME type
+const getContentType = (filePath) => {
+  const ext = path.extname(filePath);
+  switch (ext) {
+    case '.html':
+      return 'text/html';
+    case '.js':
+      return 'application/javascript';
+    case '.css':
+      return 'text/css';
+    case '.json':
+      return 'application/json';
+    case '.png':
+      return 'image/png';
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.gif':
+      return 'image/gif';
+    case '.svg':
+      return 'image/svg+xml';
+    default:
+      return 'application/octet-stream';
   }
+};
+
+const server = http.createServer((req, res) => {
+  // Create the file path based on the request URL
+  let filePath = path.join(playgroundDirectory, req.url === '/' ? 'index.html' : req.url);
+
+  // Serve the file
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('File Not Found');
+    } else {
+      const contentType = getContentType(filePath);
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(data);
+    }
+  });
 });
 
 const PORT = 4000;

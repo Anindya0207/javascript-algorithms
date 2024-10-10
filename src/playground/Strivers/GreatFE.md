@@ -23,7 +23,7 @@ How Browser compiler give weigthage to different CSS selectors . These are often
 - a: inline style
 - b: ID selector
 - c: class selector
-- d: element selector\
+- d: element selector
 - To override eveything we can use !important. The resulting specificity is not a single numerical score
 - It is a array of values where left most values are having most precendence or highest specificity 
 - So 0 , 1, 0, 1 is having more specificity than 0, 0, 10, 10 (means 10 class selector and 10 element selector)
@@ -660,7 +660,113 @@ Promise.prototype.myAllSettled = (promises) => {
     heihgt: 0
   }
 </head>
+```
 
 - Here `clear both` artribute helps to define the css flow. But today   `display: flow-root` is used.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### pseudo element and pseeudo class
+
+- Pseudo eleement are key word which are applied on selector to style/decorate them.
+- they are applied to create separation of concern as they should not be in the actual DOM like the traiangle in the tooltip
+- they are often denoted as `::` double colons appended after the actual class
+- for ex: `::first-line` or `::first-letter` is used to decorate texts
+- also `::after` and `::before` is used to decoreate an element and insert certain things before and after that element without modifying the actual DOM.
+- psedudo classes are denoted by `:` single colons and they are styles to be applied on certain events like `:hover` or `:focus`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### zIndex
+
+- zindex property in css controls the vertical stacking of the elements `which are not static postioned`
+- zindex creates a stacking context for every element which will be higher than it's children
+- Automatically all the elements in the DOM will be stacked int he order they appear on the DOM
+- The non statically positioned elements will be always stacked ontop irrespective of the HTML hierarchy.
+- The stacking context will be impacgted by setting css properties like `opacity` , `transform` etc.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### How to make website ready for multilingual use with SEO
+
+- we can use `lang` attribute on the `html` tag
+- we can set an alternate locale `<link rel="alternate" hreflang="other_locale" href="url_for_other_locale">`
+- and a default `<link rel="alternate" hreflang="x-default"  href="url_for_fallback"/>`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### sprite in css
+
+- To optimise image loading we can use sprite which generates a big background iamge consisting of all the images
+- Now it uses `background-image` `background-position` and `background-size` to display certain images
+- Gmail uses sprite to display all their images
+- It will give definite advantage in http1.x but in http2.x image loading is not much of an issue
+- It will remvoe the flicker effect for pseudo classes lkike `:hover`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Grid in CSS
+
+- Before `flex` we had `grid` system in CSS using `float` as part of bootstrap 4
+- Now we also have `display:grid` or `inline-grid`
+- We have two properties to specify `grid-template-columns` and `grid-template-rows` where the unit is `fr` (fraction)
+- We also have `grid-column-start` `grid-column-end` `grid-row-start` and `grid-row-end` to specify where the box would be placed in the grtid
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### how to serve pages in feature controlled browser 
+
+- Graceful degradation - there should be features for advanced browser features with fallback for older browsers
+- use of `caniuse.com` to know browser support
+- use `modernizr` to detect feature
+- use `@support` css tag
+- use `browserify` to add browser restriction in application
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### RWD vs adaptive web design
+
+- RWD uses responsive flexbox grid, responsive images and fluid design to make a website look good in all devices
+- Adaptive web design detects the features supported for the device in partidular and then render the web page in the most supprotive way possible.
+- RWD has issues like what would the the breakpoints for different device resolutions. what if those layout changes
+- Adaptive design uses user agent sniffing and DPI detection which is not reliable.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### HOw to fix browser specific CSS problems
+
+- use a different custom style sheet only for the offending browser
+- use `autoprefixer` to add vendor prefixes automatically for us.
+- use react css or normalise css
+- use libraries like bootstrap
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### data- attributes
+
+- In early dys of javascript data- attributes was used to store extra information on the DOM itself. 
+- Many libraries still use this to perform certaimn operation like opennign modal or linking to a modal. 
+- But in modermn days, data- attributes are not encouraged to be used because users an easily modify these using inspect element and if there is feature behind it, it will stop working
+- Butone perfect usage might be `data-testid` used by several testing frameworks like playwright, jest, selenium etc to identify an element using a unique id without affecting the semantics of that element in runtime
+
+-------------------------------------------------------------------------------------------------------------------------------- 
+
+#### HIde an eleement and make it available only for screen readers
+
+- These ways are with accessibility. 
+- `width: 0px; height: 0px` is one way
+- `position absolute; left: -9999px` is another way
+- `text-indent: -9999` can be also done
+- But we should never use `display: none` or `visibility:hidden` these properties and 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Progressive rendering
+
+- Optimised way of rendering HTML
+- Can be donw in these wayhs - 
+  - Image lazy load `<img loading="lazy>` so that the images which are mnot in view port will not load
+  - above the fold rednering: Include the minimum CSS requirex to render the part of the webpaage user has rendered. We can use `DFomContentLoaded` events
+  - Async HTML templates - Flushing part of HTMl to the browser from server
 
 --------------------------------------------------------------------------------------------------------------------------------

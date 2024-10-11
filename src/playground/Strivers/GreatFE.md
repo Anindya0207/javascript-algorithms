@@ -766,7 +766,303 @@ Promise.prototype.myAllSettled = (promises) => {
 - Optimised way of rendering HTML
 - Can be donw in these wayhs - 
   - Image lazy load `<img loading="lazy>` so that the images which are mnot in view port will not load
-  - above the fold rednering: Include the minimum CSS requirex to render the part of the webpaage user has rendered. We can use `DFomContentLoaded` events
+  - above the fold rendering: Include the minimum CSS requirex to render the part of the webpaage user has rendered. We can use `DFomContentLoaded` events
   - Async HTML templates - Flushing part of HTMl to the browser from server
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### UA string
+
+- UA string is a browser encoded string by which browser understads the application type, OS, software vendor or network provider. 
+- this is available in `navigation.useAgent`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Resetting vs normalising
+
+- Resetting means to unstyle all browser default styles for all elements and strip them down to no style at all. It's very aggresive way.
+- It means we need to redeclare all styles for all common elements. 
+- Normalising is a bit less aggressive when it doesn't entirely unstyle all the elements but preserve common browser styling for elemetns while trying to fix the issues for the elements wherever required.
+
+```css
+// Resetting
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+//Normlising
+html {
+  line-height: 1.15; /* 1 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### srcset
+
+- `srcset` is a html tag which is used to display dynamic size of images to the web page basis the cilent's display resolution
+- it does make sense to render a high dimension image is the display resoltuion is good (retina display)
+- but for a lower resolution display or for a smaller device it will cause data wastage if we try to render a higher dimension image
+- if we do  `<img srcset="small.jpg 500w, medium.jpg 1000w, large.jpg 2000w">` then it means that 500ps width image is small.jpg etc..
+- Now if the client display resolution is 320px then it calculates, 500/320 is close to 1 then it will render the small.jpg
+- But for a retina display the width will be much higher, lets say 3000px, then that is closest to large.jpg
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Fucntion constructor vs class constructor
+
+| Function Constructor    | Class constructor |
+| ----------------------- | ----------------- |
+| uses functions and prototypes  | uses ES6 classes    |
+| to inherit the parent we need to call this on the parent function constructor | super within constructor   |
+| to extend we use setPrototypeOf or do Child.prototype = Parent.prototype    | extends    |
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Higher ordeer function
+
+- Fucntions that take another function as an argument and return abstract out some operation before finally retirning a single value or another fiunction is called Higher order function
+- `Array.prototype.reduce`, `Array.prototype.filter`, `Array.prototype.map` or `Object.prototype.bind` are all higher order functions
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### use strict
+
+- It enforces `no global variable`
+- this is `undefined` in global scope
+- `unintentional deletion of non deletable property `throws exception
+- `re assignment of constants` will throw exception
+- `duplicate function parameter names` will throw exception
+- there is global level strict mode and function level. if we do it on function level, global scope will be in non-strict mode only
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Ajax
+
+- Ajax (Async javascript and xml) is the process of async data transfer between client and server using network transfer protocol (now http and https)
+- Traditionally we used submit entire the form (client) to submit data to server which would require the entire page to reload
+- But with Ajax, we can transfer certain client data to server without disturbing the presentation layer
+- Traditionally xml used to be transfered as part of a XHR request (xml http request) but in modern web applications we use `fetch` api where JSON(javascript object notation) is transfered as it's native to javascript
+- Traditional xhr calls used to look like this -
+
+```javascript
+const xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          console.log(xhr.responseText);
+        } else {
+          console.error('Request failed: ' + xhr.status);
+        }
+      }
+}
+xhr.open('POST', 'http://api.com', true);
+xhr.setRequestHeaders('Content-type', 'application/json')
+xhr.send(JSON.stringify({id: 1, name: 'blabla'}))
+// abort
+xhr.onabort = function() {..do something}
+xhr.abort();
+// Upload support
+xhr.upload.onprogress = (event) => {
+  console.log(Math.round((event.loaded / event.total) * 100) + '%');
+};
+// error handling
+xhr.onerror = function() {..do something}
+```
+
+```javascript
+  const controller = new AbortController();
+  const signal = controller.signal
+  fetch('https://jsonplaceholder.typicode.com/todos/1', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: 'John Doe',
+      age: 30,
+    }),
+    signal
+  })
+  .then(response => response.json())
+  .then(response => {..do something})
+  .catch(err => {..do something});
+
+  // abort
+  controller.abort()
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Polyfills
+
+- Pollyfills are those libraries which give modern functionilities to the older browser who lack native support.
+- `core-js` is a library which helps with teh missing features / polyfills `import 'core-js/actual/array/flat-map';`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Global namespace pollution problems
+
+- As a best practice it is advisable not to polluyte the global namespace which otherwise the script ahas access to 
+- `Naming conflicts`, `cluttered namespace`, `security leak`, `scope leak`,`compatibility and portability` and `modularity` are common pitfalls 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Difference between commonJS modules and ESM modules
+
+| Common JS   | ESM |
+| ----------------------- | ----------------- |
+| used to be used in old node.js environment. This is not browser compatible. It's `require` based module strategy  | uses import/ export statement   |
+| Not browser compatible | Browser compatible  |
+| Dynamic in nature, can conditionally import  | static    |
+| Can't optimise due to dynamic nature         | tree shaking etc library can optimise |
+| Sync in nature                               | Async in nature |
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Tree shaking
+
+- Tree shaking is a phenomnon generally used by web bundlers like webpack to reduce `dead code reduction` to reduce the bundled file size
+- But there are different challenges to tree shaking - 
+  - If we have dyamic imports like `require('/blabla/{component}.js)` bundler will eventually take the entire module
+  - If we have sideEffect in a file in global namespace like `console.log('sfadfgs'); function module() {}` in this, bundler will import the whole file instead of the function as there is sideeffect in the global scope
+  - If we are using any library which does not support modular imports or we are not importing modules. Like insead of `import debounce from ' lodash/debounce` we are using `import _ from 'lodash'`
+- So what are the rememdies of these
+  - Use ESM `import /export`
+  - Use libraries with modules like use `import debounce from 'lodash/debounce'` or use smaller libraries like `date-fn` and `lodash-es` etc
+  - mark modules are sideEffectFree in package.json -  
+  ```json
+  {
+  "name": "your-package",
+  "version": "1.0.0",
+  "sideEffects": false
+  }
+  ```
+  - dont use dynamic import like `require('/blabla/{component}.js)`
+  - enable optimisation in webpack config -
+  ```javascript
+  module.exports = {
+    optimization: {
+      usedExports: true, // Mark unused exports
+      minimize: true,    // Minify and remove dead code
+    },
+  };
+  ```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Iterators and Gewnerators
+
+Iterator :
+
+- Iterators are objects that are used to define an range or act on a pre existing range. 
+- Iterators must implement a `next` function qwhich will return a `value and done` 
+- A custom iterator may look like this - 
+
+```javascript
+class Range {
+  constructor(start, end) {
+    this.start = start;
+    this.end = end;
+  }
+  [Symbol.iterator]() {
+    let current = this.start;
+    const end = this.end;
+    return {
+      next: () => {
+        if(current <= end) return {value: current++, done: false}
+        return {value: undefined, done: true}
+      }
+    }
+  }
+}
+const range = new Range(0, 5);
+const iterator = range[Symbol.iterator]();
+console.log(iterator.next()); //0
+console.log(iterator.next()) //1
+console.log(iterator.next()) //2
+```
+- We can also latch on to an existing range with iterator
+
+```javascript
+const arr = [1,2,3,4];
+const iterator = arr[Symbol.iterator]();
+console.log(iterator.next());//1
+console.log(iterator.next())// 2
+// we can do this with a string also
+```
+
+Generator:
+
+- Generators are special functions that can pause and resume their execution
+- It can generate sequence of values on the fly. 
+- Genrators has some advantages over normal iterators- 
+  - `It can pause and resume `
+  - `Lazy evaluation` which is mempry efficient
+  - `Async iteration` - it can be used to manage async data flows with async/await
+- Generator needs to implement a function which should `yield` something whenever called
+
+```javascript
+class Range {
+  constructor(start, end) {
+    this.start = start;
+    this.end = end;
+  }
+  *[Symbol.iterator]() {
+    let current = this.start;
+    while(current <= this.end) {
+      yield current++;
+    }
+  }
+}
+const range = new Range(0, 5);
+const generator = range[Symbol.iterator]();
+console.log(generator.next())
+console.log(generator.next())
+console.log(generator.next())
+console.log(generator.next())
+```
+- Or we can also do 
+
+```javascript
+for(const el of range) {
+  console.log(el)
+}
+```
+
+- We can also do async operation with generators like `data batching` or `pagination`
+
+```javascript
+async *function fetchData() {
+  let page = 0;
+  while(true) {
+    let res = await fetch("http://api.com" + page);
+    let data = await res.json();
+    if(data.length == 0) break;
+    page++;
+    yield data;
+  }
+}
+const iterator = fetchData();
+for(const res of iterator) {
+  console.log(res);
+}
+```
 
 --------------------------------------------------------------------------------------------------------------------------------

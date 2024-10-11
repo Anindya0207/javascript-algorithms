@@ -967,7 +967,7 @@ xhr.onerror = function() {..do something}
   ```
 --------------------------------------------------------------------------------------------------------------------------------
 
-### Iterators and Gewnerators
+### Iterators and Generators
 
 Iterator :
 
@@ -1063,6 +1063,132 @@ const iterator = fetchData();
 for(const res of iterator) {
   console.log(res);
 }
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Mutable vs immutable
+
+- When an object is frozen to any change of states (be it alteration of any existing property or addition or deletion of an existing property) then that object is called immutable object
+- There are 4 properties
+  - `configurable`: the object state can be extended or deleted later
+  - `writable`: the object properties can be changed
+  - `value`: value of the actual property
+  - `enumerable`: this property will be coming in the for..in loop
+- By default primtiive data types like `boolean` `number` `string` `null` and `undefined` are immutable. means their values once assigned can not be chnaged.
+- This might feel like powered by `const` but no,  `const` just prevents the reinitialisation of a variable
+- since primitive data types are immutable in nature, they can't be changed once declared as const
+- Now for objects, if you declare them as const, you can change its properties anytime. 
+- To make objects immutable, we need to use `Object.freeze()` This will make the object frozen to change in state, addition or deletion of new properties etc
+- To just seal obnjects, we camn use `Object.seal()` this will not accept new properties to bne added/deleted from the object. But existing properties can be changed
+- To prevent extensions on an object we can use `Object.preventExtensions(myObject);` So. `seal()` and `freeze()` implicitly calls `preventExtension`
+
+```javascript
+// Primitive data types
+const num = 123
+num = 456;// not allowed
+const str = "blabla";
+str.toUpperCase() // str is still blabla
+// Normal object
+const obj = {id: 1};
+obj.id = 2 // id changes to 2
+// Frozen object
+const obj = Object.freeze({id: 1});
+obj.id = 2; // id is still 1
+delete obj.id // not allowed
+obj.name = 'asovmasfg' // not allowed
+// Sealed object
+const obj = Object.seal({id: 1});
+obj.id = 2; // id changes to 2
+delete obj.id // not allowed
+obj.name = 'asovmasfg' // not allowed
+// Prevent extension
+const obj = {id : 1};
+Object.preventExtensions(obj);
+obj.id = 2 //id changes to 2
+obj.name = 'asovmasfg' // not allowed
+delete obj.id //deleted
+```
+
+- Now if you are geek enough, you can play with the immutable properties that is mentioned above while creating an object itself
+
+```javascript
+Object.defineProperty(Object.prototype, 'myFun', {
+  value: () => {
+    console.log("This is a frozen function in any object you create in the history of this application")
+  },
+  writeable: false,
+  configurable: false,
+  enumerable: false
+})
+// Now lets'create a object
+const obj = {};
+obj.myFun() // This is a frozen function in any object you create in the history of this application
+```
+
+- We can also pass these while doing Object.create
+```javascript
+obj = Object.create({}, {
+  myFun: {
+    value: () => {
+      console.log("This is a frozen function in any object you create in the history of this application")
+    },
+    writeable: false,
+    configurable: false,
+    enumerable: false
+  }
+})
+```
+- We can do `Object.getOwnPropertyDescriptor(obj, 'myFun')` to check the  configuration of the object property
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### SSE
+
+- SSE is a way to sending data to browser from server in a unidirectional way. In browser these events are listened by a `EventSource`
+- Unlike `websocket` which is bidirectional and talks to server over `ws://` protocol, SSE works unidirectional and talks over `http://`
+- Websocket also allows text and binary data, while SSE only allows text
+- To register a SSE in client side
+
+```javascript
+const eventSource = new EventSource("/sse");
+eventSource.addEventListener('open', () => {
+  console.log("registered:")
+})
+eventSource.addEventListener('message', (event) => {
+  console.log("message:" event.data)
+})
+eventSource.addEventListener('update', (event) => {
+  console.log("update:", event.data)
+})
+eventSource.addEventListener('error', (err) => {
+  console.log("error:", err)
+})
+eventSource.addEventListener('close', () => {
+  console.log("close:")
+})
+```
+- And in server side
+```javascript
+const http  = require('http');
+http.createServer((req, res) => {
+  if(req.url == '/sse') {
+    rea.writeHead(200, {
+      'Content-type': 'text/event-stream',
+      'Cache-control': 'no-cache',
+      'Connection': 'keep-alive'
+    });
+    const sendMessage = (message) => {
+      res.write(`data: ${message}\n\n`); // Messages are delimited with double line breaks.
+    };
+    sendMessage(`Current time: ${new Date().toLocaleTimeString()}`);
+    req.on('close', () => {
+      res.end();
+    })
+  }
+}).listen(8080, () => {
+    console.log('SSE server running on port 8080');
+  });
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------

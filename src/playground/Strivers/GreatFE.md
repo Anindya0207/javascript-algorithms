@@ -621,7 +621,7 @@ Promise.prototype.myAllSettled = (promises) => {
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-#### BFC 
+### BFC 
 
 - Block formatting context is part of CSS rendering where `floats, absolutely positioned elements, inline-blocks, table-cells` establish a BFC
 - BFC happens when  
@@ -823,6 +823,22 @@ html {
 - if we do  `<img srcset="small.jpg 500w, medium.jpg 1000w, large.jpg 2000w">` then it means that 500ps width image is small.jpg etc..
 - Now if the client display resolution is 320px then it calculates, 500/320 is close to 1 then it will render the small.jpg
 - But for a retina display the width will be much higher, lets say 3000px, then that is closest to large.jpg
+
+```html
+<div responsive-background-image>
+  <img
+    src="/images/test-1600.jpg"
+    sizes="
+      (min-width: 768px) 50vw,
+      (min-width: 1024px) 66vw,
+      100vw"
+    srcset="
+      /images/test-400.jpg   400w,
+      /images/test-800.jpg   800w,
+      /images/test-1200.jpg 1200w
+    " />
+</div>
+```
 
 --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1191,4 +1207,175 @@ http.createServer((req, res) => {
   });
 ```
 
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Object getter / setter
+
+- When we define an `obj = {name: 'balbla'}` and we change it to `obj.name = 'hhhh'` then implicitly the JS compiler runs object getter and setter to set the property.
+- But we can override that also to run `side effect` or to do `additional validation`
+
+```javascript
+const obj = {
+  _name: 'blabla',
+  get name() {
+    return name;
+  }
+  set name(__name){
+    // we can run any sideeffect or validation here
+    _name = __name;
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Garbage collection
+
+- Let's just know that JS garbage collection happens in a `mark - sweep` algorithm
+  - It first marks all objects from global variable to down to currently executing methods etc
+  - Then it sweeps the unmrked objects to free up space
+  - There are two generations it maintains, initially all objecgts are kept in `younger generatiomn`
+  - Once few objects are mnot removed ebven after few GC, they are moved to `old generation`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### JSONP vs Ajax
+
+- JSONP (JSON with padding) is just another way to transfer data in `same-origin` domains
+- It is limited to `GET` requests only and it's powered by `dynamic <script> tag injection` by server. 
+- This does not have robust error handling compared to XHR.
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <title>JSONP Example</title>
+    <script>
+      function handleResponse(data) {
+        console.log(data);
+      }
+
+      function fetchData() {
+        var script = document.createElement('script');
+        script.src = 'https://example.com/data?callback=handleResponse';
+        document.body.appendChild(script);
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="fetchData()">Fetch Data</button>
+  </body>
+</html>
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### SEO in SPA
+
+- once its a SPA where for any user interaction the entire page doesn't change but the same html is dynamically changed with new contents after user interaction, SEO engine fails to index the context
+- To fix that, we can use SSR (Server side rendering) or SSG( static site generation) powered by `Next` for `React` and `Nuxt` for `Vue`
+- Once the page is fully rendered from server and sent back to client Search engine can index the fully rendered content
+
+```javascript
+import React from 'react';
+import { GetServerSideProps,GetStaticProps } from 'next';
+
+const Page = ({ data }) => {
+  return (
+    <div>
+      <h1>{data.title}</h1>
+      <p>{data.content}</p>
+    </div>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const res = await fetch('https://api.example.com/data');
+  const data = await res.json();
+
+  return {
+    props: {
+      data,
+    },
+  };
+};
+// OR
+export const getStaticProps: GetStaticProps = async () => {
+  const res = await fetch('https://api.example.com/data');
+  const data = await res.json();
+
+  return {
+    props: {
+      data,
+    },
+  };
+};
+
+export default Page;
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### styling svg
+
+- SVG can be styled using tags like `fill` to fill the box, `stroke` to draw border
+- Any internal css like `svg {fill : blue}` can change svg
+
+```html
+<rect
+  x="10"
+  y="10"
+  width="100"
+  height="100"
+  stroke="blue"
+  fill="purple"
+  fill-opacity="0.5"
+  stroke-opacity="0.8" />
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Mobile first app vs Responsive
+
+- Responsive design and mobile first design are not mutually excludive. 
+- RWD makes sure that the webpage is renders properly in any dimension using `media` query
+
+```css
+@media (min-width: 768px){
+  .myclass {
+    font-size: 22px;
+  }
+}
+@media (max-width: 767px){
+  .myclass {
+    font-size: 12px;
+  }
+}
+```
+
+- but in mobile first approach, it is guranteed to apply the css first for mobile devices and then it will aply for other devices.
+
+```css
+.myclass {
+  font-size: 12px;
+}
+@media (min-width: 768px){
+  .myclass {
+    font-size: 22px;
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Media usage
+
+- `media` query can be applied in the following media types
+- `all` all media type
+- `print` for printer
+- `screen` for screens (desktop, mobile, tablet etc)
+- `speech` screen readers that read the page out loud
+
+```css
+@media print {
+  body {
+    color: black;
+  }
+}
+```
 --------------------------------------------------------------------------------------------------------------------------------

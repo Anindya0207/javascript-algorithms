@@ -64,11 +64,61 @@
 // obj.name = 'asovmasfg' // not allowed
 // delete obj.id //deleted
 
-Object.defineProperty(Object.prototype, 'myFun', {
-    value: () => {
-      console.log("This is a frozen function in any object you create in the history of this application")
-    },
-    writeable: false,
-    configurable: false,
-    enumerable: false
-  })
+// Object.defineProperty(Object.prototype, 'myFun', {
+//     value: () => {
+//       console.log("This is a frozen function in any object you create in the history of this application")
+//     },
+//     writeable: false,
+//     configurable: false,
+//     enumerable: false
+//   })
+
+
+const debounce = (func, delay) => {
+    let timeoutId = null
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func(...args);
+        }, delay)
+    }
+}
+
+const throttle = (func, delay) => {
+    let isThrottled = false;
+    return (...args) => {
+        if(isThrottled) return;
+        isThrottled = true;
+        func(...args);
+        setTimeout(() => (isThrottled = false), delay)
+    }
+}
+
+
+const el = document.getElementById('stest');
+const observer = new MutationObserver(el, {
+    childList: true,
+    attributes: true,
+    subTree: true
+})
+
+const callback = (mutatioList, _) => {
+    mutatioList.forEach(mutation => console.log(mutation))
+}
+observer.observe(callback)
+
+<div id="content"/>
+<div id="sentinel"/>
+
+const sentinel = document.getElementById('sentinel');
+const intersectionObserver = new IntersectionObserver(el, {
+    rootMargin: 0,
+    threshold: 1.0
+})
+const intersectionCallback = (mutationList) => {
+    const sentinel = mutationList[0]
+    if(sentinel.isIntersecting) {
+        //fetchMoreItems();
+    }
+}
+intersectionObserver.obnserver(intersectionCallback);

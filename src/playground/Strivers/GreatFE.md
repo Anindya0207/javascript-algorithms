@@ -1488,6 +1488,28 @@ targetNode.innerHTML = "<p>New content</p>"; // Another mutation
 ```
 --------------------------------------------------------------------------------------------------------------------------------
 
+### IntersectionObserver
+
+- Unlike `MutationObserver` IntersectionObserver is used to detect any DOM element is intersecting or not. Basic usecase is initinite scroll
+- `IntersectionObserver` can observe an element with some configurations like `threshold` and `rootMargin`
+
+```javascript
+const elem = document.getElementById('sentinel');
+const observer = new IntersectionObserver(elem, {
+  rootMargin: 0,
+  threshold: 1.0
+});
+observer.observe((entries) => {
+  const sentinel = entries[0];
+  if(sentil.isIntersecting) {
+     fetchMoreData()
+  }
+})
+```
+- to stop observing we can call `observer.unobserve()`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
 ### CSP
 
 - `Content security policy` is a security feature which helps prevent XSS or SQl injection attacks
@@ -1502,6 +1524,56 @@ targetNode.innerHTML = "<p>New content</p>"; // Another mutation
   - `default-src`: fallback if nothing is explicitly defined
 - THis is applued like `Content-Security-Policy default-src 'self'; script-src 'self'; http://trustedsrc.com`
 - Or using meta tag `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted.cdn.com" />`
+- `http-equiv` tag is used to set http like headers for all the requests originating from browser
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### CSRF
+
+- CSRF (cross site request forgery) is an attack when-
+  - user logs in site 1 using his valid authentication hedaers and get a auth code
+  - attacker sends a form or siome othjer link which takes the user to another malicious site while he is still logged in the first site
+  - Once the attacker got the auth code, it sends a unintended yuet authenticated request from site 1 mimicking the user getting access to his PII information
+- To mitigate this, we generally use a `csrf token` which is sent from server to client and it won't be available if the request is not sent from the particular broweser which has the csrf token
+- We can sepcify the csrf token in a hidden input like `input type= 'hidden' value='csrf_token_value'/>` 
+- but the most common practice is to set in `meta` like `<meta name="csrf-token" content="csrf_token_value" />`
+- This way all the requests coming to the server will have this and in server we can easily get is by `document.querySelectorAll('meta[name='csrf-token']).getAttribute('content')`
+- Another way to mitigate CSRF is applying CORS in server. so that no request can be triggered from any other domain to the server `Access-Control-Allow-Origin: https://trustedwebsite.com`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### debounce and throttle
+
+- `debounce` ensures that irrespective of how many ever times the action in triggered the function is called after a certain amount of time. It creates a timeout and keep on updating it every time the functio  is called with in the supplied delay. Only after the supplied delay it executes the function
+
+```javascript
+const debounce = (fn, delay) => {
+  let timeoutId = null
+  return (...args) => {
+    timeoutId && clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  }
+}
+```
+
+- `throttle` makes sure that the function is called at least once within a certain time. 
+
+```javascript
+const throttle = (fn, delay) => {
+  let isThrottle = false;
+  return (...args) => {
+    if(isThrottle) return;
+    fn(...args);
+    isThrottle  = true;
+    setTimeout(() => (isThrottle = false), delay);
+  }
+}
+```
+Use cases
+- `Infinite scroll` :we need to fetch more data asynchronously while user scrolls. We cant wait for the scroll evenet to complete. we need to periodically fetch more data. here throttle makes more sense
+- `Autocomplete` here if we periodically fetch results there might be too many uncesssary request. Rather, once user types the search string we should call the fetch api. hence debounce makes more sense
 
 --------------------------------------------------------------------------------------------------------------------------------
 

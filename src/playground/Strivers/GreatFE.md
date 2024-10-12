@@ -760,7 +760,7 @@ Promise.prototype.myAllSettled = (promises) => {
 
 -------------------------------------------------------------------------------------------------------------------------------- 
 
-#### HIde an eleement and make it available only for screen readers
+### Hide an eleement and make it available only for screen readers
 
 - These ways are with accessibility. 
 - `width: 1px; height: 1px` is one way
@@ -1577,3 +1577,190 @@ Use cases
 
 --------------------------------------------------------------------------------------------------------------------------------
 
+### tagged templates
+
+- Not that we use it every day but JS tagged template works like we can use a function like - 
+
+```javascript
+const test = (str, ...values) => {
+    // str = ['some string sdfksdngnngfsndfnsdfsf ', 'avnnfsdmfsmdfm', 'sdgsgsdgsgd'] // splitby values
+    // values = ['some value', 'some other value']
+    console.log(str, values);
+}
+
+test`some string sdfksdngnngfsndfnsdfsf ${'some value'} avnnfsdmfsmdfm ${'some other value'} sdgsgsdgsgd`
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### TDD
+
+- Test driven development is used to write a faiing test case for reliability, better debuggability and maintainability.
+- Benefits include `better code quality`, `faster debugging`, `documentation`
+- Challenges are `initial learning curve`, `overhead` and `time consuming`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Strategy Pattern
+
+- When we have multiple algorithms to do similar operation, we can make use of `Strategies` to avoid changing in the client code
+- So to implement this, we need to create a class `Context` which several ContextStrategy classes can inherit
+
+```javascript
+class Context {
+  constructor(_strategy) {
+    this.strategy = _strategy;
+  }
+  executeStrategy(data) {
+    this.strategy.doAlgorithm(data);
+  }
+}
+class ContextStrategyA extends Context {
+   doAlgorithm(data) {
+    return data.sort((a, b) => a-b)
+   }
+}
+class ContextStrategyB extends Context {
+   doAlgorithm(data) {
+    return data.sort((a, b) => b-a)
+   }
+}
+```
+- Now we can use this in client code
+
+```javascript
+const data = [3, 1, 4, 1, 5, 9];
+const context = new Context(new ContextStrategyA());
+console.log(context.executeStrategy(data));
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Websocket
+
+- `Websocket` connection provides a secure two way connection between client and server
+- Unlike http where the communication is one way (server to client) with ws client and server can seamlessly talk to each other
+- unlike http websocket connect uses `ws://` or `wss://` protocol to communicate
+- `Duplex connection` , `real time updates` are some advantages for this
+
+```javascript
+//Client side
+const socket = new WebSocket('ws://api.com/socket');
+
+socket.addEventListener('open', () => {
+  socket.send('Hello server');
+})
+socket.addEventListener('message', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Data', data);
+})
+socket.addEventListener('close', () => {
+  console.log('socket closed');
+})
+socket.addEventListener('error', (err) => {
+  console.log('Error', err);
+})
+
+//Server side
+const ws = require('ws');
+
+const wss = new ws.Server({port: 8000});
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+  ws.on('message', (message) => {
+    console.log('Received:', message);
+    const response = JSON.stringify({ message: 'Hello from server', received: message });
+    ws.send(response);
+  });
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+  ws.on('error', (error) => {
+    console.log('WebSocket error:', error);
+  });
+  ws.send(JSON.stringify({ message: 'Welcome to WebSocket server!' }));
+});
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### shallow copy and deep copy
+
+- In shallow copy we either `spread` or do `object.assign`. Both ways the refernce of the object is also copied, meaning if the shallowObj property is changed the actual object is also altered.
+
+```javascript
+let obj1 = {a:1, b:{c:2}};
+let obj2 = {...obj1};
+// in obj2 the property b points to the same memory location as obj1 so..
+obj2.b.c = 3;
+console.log(obj1.b.c) // 3
+```
+- In deep copy we do `JSON.parse(JSON.stringify())` or `lodash.deepCopy()` here the refernce is not copied 
+- We can also use `window.structuredClone(obj1)` to make a deep copy
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Same-Origin policy
+
+- By default browser does not allow cross origin resource sharing. To access a resource hosted in a server the client needs to be in the same Origin
+- But there are some exceptions like `CORS headers` or `JSONP` or `Websocket`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Why function foo(){}() doesn't work?
+
+- In Javascript function declaration and function expression are diffently parsed
+- `function foo(){}` is function declaration which is hoisted hence it's not immidiately invocable
+- `(function foo(){})()` on the contrary is a function expression and can be immidiately invoked
+- this is like this because function foo(){} is a statement in JS which is not invocable
+- but (function foo(){}) is a expression which is executable
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Optimise DOM manipulations
+
+- minimise DOM access repeatedly. reading and accessing DOM elements are expensive. we can get it once and store it in a variable to use later
+```javascript
+const element = document.getElementById('myElement');
+element.style.color = 'red';
+element.style.backgroundColor = 'blue';
+```
+- batch DOM updates `element.style.cssText='color:red; font-size: 12px'`
+- Use `documentFragement` 
+```javascript
+const fragment = document.createDocumentFragment();
+for (let i = 0; i < 100; i++) {
+  const newElement = document.createElement('div');
+  newElement.textContent = `Item ${i}`;
+  fragment.appendChild(newElement);
+}
+document.getElementById('container').appendChild(fragment);
+```
+- leverage on virutal dom libraries like `react-dom`
+- use `requestAnimationFrame` for animation
+- avoid `layout thrashing` where we try to read write DOM attribuites repeatedly causing browser to repeatedly recalculate the styles and reflow and repaint DOM
+```javascript
+const element = document.getElementById('myElement');
+const height = element.clientHeight; // Read
+element.style.height = `${height + 10}px`; // Write
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Optimise network requests
+
+- `Gzip/brotli`
+- `image lazy loading` 
+- try `image sprites`
+- `http cache`
+- use `Service worker`
+- use `http2` or `cdn`
+- use `graphQl` and `api optimisation`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Clickjacking
+
+- When an iframe embedded in a page an attacker can use a hidden element in an iframe in the page to simulate the click in the frame to get critical information
+- Hence it's important to consciously allow iframe to be embedded in webpage
+- we can use `X-Frame-Options: SAMEORIGIN` or `X-Frame-Options: deny` altogether
+- Or we can use CSP  `Content-Security-Policy: frame-ancestors 'self'`
+
+--------------------------------------------------------------------------------------------------------------------------------

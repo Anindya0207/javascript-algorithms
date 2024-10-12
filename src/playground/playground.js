@@ -74,51 +74,64 @@
 //   })
 
 
-const debounce = (func, delay) => {
-    let timeoutId = null
-    return (...args) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func(...args);
-        }, delay)
-    }
+// const debounce = (func, delay) => {
+//     let timeoutId = null
+//     return (...args) => {
+//         clearTimeout(timeoutId);
+//         timeoutId = setTimeout(() => {
+//             func(...args);
+//         }, delay)
+//     }
+// }
+
+// const throttle = (func, delay) => {
+//     let isThrottled = false;
+//     return (...args) => {
+//         if(isThrottled) return;
+//         isThrottled = true;
+//         func(...args);
+//         setTimeout(() => (isThrottled = false), delay)
+//     }
+// }
+
+
+// const el = document.getElementById('stest');
+// const observer = new MutationObserver(el, {
+//     childList: true,
+//     attributes: true,
+//     subTree: true
+// })
+
+// const callback = (mutatioList, _) => {
+//     mutatioList.forEach(mutation => console.log(mutation))
+// }
+// observer.observe(callback)
+
+// const sentinel = document.getElementById('sentinel');
+// const intersectionObserver = new IntersectionObserver(el, {
+//     rootMargin: 0,
+//     threshold: 1.0
+// })
+// const intersectionCallback = (mutationList) => {
+//     const sentinel = mutationList[0]
+//     if(sentinel.isIntersecting) {
+//         //fetchMoreItems();
+//     }
+// }
+// intersectionObserver.obnserver(intersectionCallback);
+
+// const tag = (str, ...values) => {
+//     console.log(str, values);
+// }
+
+// tag`Hello ${2354645}  welcome ${2323535} my channel`
+
+
+
+const functionAnyName = (str, ...values) => {
+    // str = ['some string sdfksdngnngfsndfnsdfsf ', 'avnnfsdmfsmdfm', 'sdgsgsdgsgd'] // splitby values
+    // values = ['some value', 'some other value']
+    console.log(str, values);
 }
 
-const throttle = (func, delay) => {
-    let isThrottled = false;
-    return (...args) => {
-        if(isThrottled) return;
-        isThrottled = true;
-        func(...args);
-        setTimeout(() => (isThrottled = false), delay)
-    }
-}
-
-
-const el = document.getElementById('stest');
-const observer = new MutationObserver(el, {
-    childList: true,
-    attributes: true,
-    subTree: true
-})
-
-const callback = (mutatioList, _) => {
-    mutatioList.forEach(mutation => console.log(mutation))
-}
-observer.observe(callback)
-
-<div id="content"/>
-<div id="sentinel"/>
-
-const sentinel = document.getElementById('sentinel');
-const intersectionObserver = new IntersectionObserver(el, {
-    rootMargin: 0,
-    threshold: 1.0
-})
-const intersectionCallback = (mutationList) => {
-    const sentinel = mutationList[0]
-    if(sentinel.isIntersecting) {
-        //fetchMoreItems();
-    }
-}
-intersectionObserver.obnserver(intersectionCallback);
+functionAnyName`some string sdfksdngnngfsndfnsdfsf ${'some value'} avnnfsdmfsmdfm ${'some other value'} sdgsgsdgsgd`

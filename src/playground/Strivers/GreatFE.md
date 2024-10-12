@@ -101,6 +101,7 @@ of event loop is
 - dequeues and add a macrotask and execute it.
 - POst that, it again checks for new microtasks in microtask queue
 - this continues indefinitely.
+- `MutationObserver` api uses microtask to notify changes on DOM
 
 --------------------------------------------------------------------------------------------------------------------------------
 
@@ -605,6 +606,14 @@ Promise.prototype.myAllSettled = (promises) => {
         })
     }
     // some-sw.js
+    //cache implementation
+    self.addEventListener('install', (event) => {
+      event.waitUntil(
+        caches.open('v1').then((cache) => {
+          return cache.addAll(['/index.html', '/styles.css', '/app.js']);
+        }),
+      );
+    });
     self.addEventLister('fetch', (event) => {
         event.respondwith(
             caches.match(event.request).then((response) => {
@@ -754,10 +763,10 @@ Promise.prototype.myAllSettled = (promises) => {
 #### HIde an eleement and make it available only for screen readers
 
 - These ways are with accessibility. 
-- `width: 0px; height: 0px` is one way
+- `width: 1px; height: 1px` is one way
 - `position absolute; left: -9999px` is another way
 - `text-indent: -9999` can be also done
-- But we should never use `display: none` or `visibility:hidden` these properties and 
+- But we should never use `width: 0px; height: 0px` `display: none` or `visibility:hidden` these properties and 
 
 --------------------------------------------------------------------------------------------------------------------------------
 
@@ -929,6 +938,7 @@ xhr.onerror = function() {..do something}
 
 ### Polyfills
 
+- Extending existign prototypes can be dangerous as in there can be `namespace collisions` like two or more libraries are trying to update the native prototype. This is only ok iof we are trying to write a polyfill ie the browser has no native support for some features and we are adding it in the builtin native prototype
 - Pollyfills are those libraries which give modern functionilities to the older browser who lack native support.
 - `core-js` is a library which helps with teh missing features / polyfills `import 'core-js/actual/array/flat-map';`
 
@@ -1379,3 +1389,119 @@ export default Page;
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### BEM
+
+- `BEM (Block element modifier)` concept tells that since browser perceive the selector for a DOM element from right to left, every node should have a single class.
+- when we need hierarchy, this gets baked into the name of the class as well which gets efficient for the selector as well.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Doctype
+
+- Doctype (document type) is always associated with `DTD (document type definiition)`
+- Doctype for webpage specifies `how the document should be struictured` ie a `button` should not contain `div` but it can contain `span`
+- Doctype html tells the browser (user agent) to support which version of HTML document respects.
+- If the useragent support that doctype, it will render the document in `no quirks mode` otherwise it will go to `quirks mode`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### load vs DomContentLoad
+
+- `load` event gerts triggered after the DOM is laoded completely with all the resources
+- `DOMContentLoaded` event gets triggered when the DOM model is constructed but all the resources might not be loaed already. It is preffered in cases where we want a faster loading for the webpage while other resources can lazy load.
+- we should use `DomContentLoaded` if we want to attach some event listener or execute some script as soon as the DOM is constructed and before the stylesheets or images are loaded.
+- we shoud use `load` if our script is dependent on the image layout computations etc.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### mouseenter vs mouseover
+
+- mouseenter does not bubble.it gets triggered on enter of the element itself, not it's descendents
+- if there is mouseenter event listener attached to an element, and it has multiple children. The `event gets triggered only for the parent once`, not for the children.
+- if the event is attached for parent and child both,`it will get only trigger for the child` once the pointer moves from parent to child
+- mouseover bubbles all the way up the DOM hierarchy. it is triggered when mouse enters an element or it's descendents.
+- if there is a mouseover event attached to an element, and it has multiple children, `it will trigger again for the parent once the mouse enters the child`
+- if mouseover event attached for parent and child both, it will trigger for the parent twice. first the parent one, then again when the pointer moves to child, it will bubble
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Primitive vs non promitive datatypes
+
+- Primitive data types : number, string, boolean, null, undefined, Symbol, BigInt
+- Non primitive: object, array, function, date, regexp, map, set 
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Static members of class
+
+- When properties/methods are declared with `static` keyword in a ES6 class, its not accessbile on the instances of that class, but those are accessible on the class directly. like `Number.Infinity` or `Math.PI` or `Math.max()` etc
+- Advantages?
+  - singleton pattern: enforcing static means that those will be constants acorss, and there will be only once isntance for that class which has that property/method
+  - They are useful to define `constants` or `helper` functions.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Proxy
+
+- Proxies are intermediary between the code and the actual object. It is an interceptor between the object and the target object once it's properties are accessed or altered
+
+```javascript
+const proxy = {
+  get: function(target, prop, recevier) {
+    console.log(`Someone accessed property "${prop}"`);
+    return target[prop];
+  },
+  set: function(target, prop, value) {
+    console.log(`Someone set property "${prop}"`);
+    target[property] = value;
+    return target[prop];
+  }
+}
+const obj = {id: 1}
+const proxyObj = new Proxy(obj, proxy);
+console.log(obj.id); // someone accessed property id
+obj.id = 2;// someone get property id
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### MutationObserver
+
+- MutationObserver is used to notify changes on any DOM node on it's atributes or children list or subtree
+- It attaches a callback in microtask queue for execution later 
+- It taskes a config on what to watch. we can observe changes on `attributes` or `subTree` or `childList`
+```javascript
+const el = document.getElementById('test');
+const observer = new MutationObserver(el, {
+  childList: true,
+  attributes: true,
+  subTree: true
+})
+const callback = (mutationList, observer) => {
+  mutationList.forEach(mutation => console.log(mutation))
+}
+observer.observe(callback)
+
+// usage
+targetNode.setAttribute('data-test', '123'); // Mutation detected
+targetNode.innerHTML = "<p>New content</p>"; // Another mutation
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### CSP
+
+- `Content security policy` is a security feature which helps prevent XSS or SQl injection attacks
+- It allows to accept image, content, script and other resources only from trusted sources
+- It is set in the header or http meta tags so that whenever browser loads the page, it gets applied.
+- There are different directives for different resource types
+  - `script-src`: for scripts
+  - `style-src` : for css
+  - `content-src`: for contents 
+  - `connect-src`: for Ajax requests, eventsource conneections or Websockets
+  - `object-src`: for objects likeflash
+  - `default-src`: fallback if nothing is explicitly defined
+- THis is applued like `Content-Security-Policy default-src 'self'; script-src 'self'; http://trustedsrc.com`
+- Or using meta tag `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://trusted.cdn.com" />`
+
+--------------------------------------------------------------------------------------------------------------------------------
+

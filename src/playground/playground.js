@@ -128,10 +128,71 @@
 
 
 
-const functionAnyName = (str, ...values) => {
-    // str = ['some string sdfksdngnngfsndfnsdfsf ', 'avnnfsdmfsmdfm', 'sdgsgsdgsgd'] // splitby values
-    // values = ['some value', 'some other value']
-    console.log(str, values);
-}
+// const functionAnyName = (str, ...values) => {
+//     // str = ['some string sdfksdngnngfsndfnsdfsf ', 'avnnfsdmfsmdfm', 'sdgsgsdgsgd'] // splitby values
+//     // values = ['some value', 'some other value']
+//     console.log(str, values);
+// }
 
-functionAnyName`some string sdfksdngnngfsndfnsdfsf ${'some value'} avnnfsdmfsmdfm ${'some other value'} sdgsgsdgsgd`
+// functionAnyName`some string sdfksdngnngfsndfnsdfsf ${'some value'} avnnfsdmfsmdfm ${'some other value'} sdgsgsdgsgd`
+
+
+// const add = (...args) => {
+//     let sum = args.reduce((acc, curr) => acc + curr, 0);
+//     const nextFn = (...nextArgs) => {
+//         if(nextArgs.length == 0) return sum;
+//         sum += nextArgs.reduce((acc, curr) => acc + curr, 0);
+//         return nextFn;
+//     }
+//     return nextFn;
+// }
+
+// class Singleton {
+//     constructor() {
+//         if(Singleton.instance) return Singleton.instance;
+//         Singleton.instance = this;
+//     }
+//     someMethod() {
+//         console.log("Hey I am a singleton")
+//     }
+// }
+
+// const singleTon1 = new Singleton();
+// const singleTon2 = new Singleton();
+// console.log(singleTon1 == singleTon2)
+
+// const FnSingleton = function() {
+//     if(FnSingleton.instance) return FnSingleton.instance;
+//     FnSingleton.instance = this
+//     FnSingleton.someMethod = function() {
+//         console.log("Hey I am a singleton")
+//     }
+// }
+// const singleTon1 = new FnSingleton();
+// const singleTon2 = new FnSingleton();
+// console.log(singleTon1 == singleTon2)
+
+// const GLOBAL = (() => {
+//     val = '';
+//     return {
+//         setValue: (_val) => (val = _val),
+//         getValue:() => val
+//     }
+// })();
+
+class Car {
+    drive() {
+      return 'Driving';
+    }
+  }
+  class GPSCar extends Car {
+    constructor(car) {
+        super()
+      this.car = car;
+    }
+    drive() {
+      return `${super.drive()} with GPS`
+    }
+  }
+  const gpsCar = new GPSCar(new Car());
+  console.log(gpsCar.drive())

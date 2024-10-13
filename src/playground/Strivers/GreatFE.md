@@ -1764,3 +1764,232 @@ element.style.height = `${height + 10}px`; // Write
 - Or we can use CSP  `Content-Security-Policy: frame-ancestors 'self'`
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### ways to mitigate SQL injection
+
+- Use prepared statements with `mysql` library
+- Use `ORM libraries` 
+- Use sanitised inputs
+- Use stored procedure
+- Use `express validators`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Creatiung a dynamic currying function
+
+```javascript
+const add = (...args) => {
+    let sum = args.reduce((acc, curr) => acc + curr, 0);
+    const nextFn = (...nextArgs) => {
+        if(nextArgs.length == 0) return sum;
+        sum += nextArgs.reduce((acc, curr) => acc + curr, 0);
+        return nextFn;
+    }
+    return nextFn;
+}
+// Usage
+add(1)() // 1
+add(1)(2)() // 3
+add(1,2)() // 3
+add(1,2)(4,5) // 12
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### iframe communication
+
+- iframe can talk to the parent window with `window.parent` 
+- parent widnow can talk to ifram by `iframe.contentWindow`
+```javascript
+// From host to iframe
+const iframe= document.getElementById('iframeId')
+iframe.contentWindow.postMessage('hello','URL');
+
+// from iframe to host
+window.parent.postMessage('hello', 'URL')
+
+// to accept the data 
+window.addEventListener('message', function(event) {
+  if (event.origin !== 'URL') return;
+  console.log(event.data);
+});
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Array splice vs slice
+
+- `splice` is used to replace / delete certain elements from the array and insert new ones. 
+- Syntax for splice is `Array.splice(targetIndex, numberOfElemToRemove, ...newElements)`
+
+```javascript
+const arr = [1,2,3];
+arr.splice(1,1, 4,5) ;// [1,4,5,3]
+```
+
+- `slice` is used to extract certain subarray from the original array
+- It does not change the original array
+- The syntax for slice is `Array.slice(start, end)` it will slice start to end-1
+
+```javascript
+const arr = [1,2,3,4];
+arr.slice(1,4); // [2,3,4]
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### in vs hasOwnProperty
+
+- `in` checks for both own and inherited properties
+- `hasOwnProperty` only checks for own property
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### How to check if javascript is enabled inthe page
+
+- we can use `noscript` tag and write certain certain things inside it. It will be presented if JS is disabled
+
+```javascript
+<noscript>
+  <p>
+    JavaScript is disabled in your browser.
+  </p>
+</noscript>
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Different ways of navigation
+
+- `window.location.href='/new-location'` will redirect the user to a new page. The page will reload. It will also create a new history.
+- `window.location.replace('/new-location')` will redirect the user to a new page, the page will reload but it will not create a new history.
+- `window.location.assign('new-location')` same as href
+- `window.location.reload()` just reloads the page
+- `window.history.pushState({page : 1}, 'page 1', '/new-location')` will behave like SPA, the user will go to the new location but the page will not reload, it will add a new entry in the history.
+- `window.history.replaceState({page: 2}, 'page 2', '/page2')` will replace the route but won't add a new entry in the history
+- `window.go()` jumpto history states
+- `window.history.forward()` go next in history stack
+- `window.history.back()` go back in history stack
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Constraint validation API
+
+- when we write `input type = 'text' required` HTML5 automatically validate the inout before it allows the form to be submitted (orcourse if the input box is enclosed in a form and the form is getting submitted)
+- But we can programmatically check the validatity also by `input.checkValidity()`
+- We can set validity like `input.setValidity()` and `input.reportValidity()`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Singleton in JS
+
+- `Singleton` means instances of object which is only one through out the lifecycle of the application
+- We can create a Singleton class like this - 
+
+```javascript
+class SigleTon {
+  constructor() {
+    if(SingleTon.instance) return SingleTon.instance;
+    SingleTon.instance = this;
+  }
+  someMethod() {
+    console.log("I am a singleton")
+  }
+}
+```
+- We can also use IIFE to create a simngleTon scope . this is `encapusalution` and called module pattern.
+```javascript
+const SingleTon = (() => {
+  let scope = null
+  return {
+    setScope: (_scope) => (scope = _scope),
+    getScope: () => scope
+  }
+})();
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### ways to handle sensitive data in web
+
+- Using sessionstorage or localstorage is riskyu to store these as they will be available acorss multiple tabs of the same session for the user.
+- We can use secure cookie `res.cookie('token', token, {httpOnly: true, secure: true})`
+- We can use `jwt` to sign and encrypt them We can use `express-validator` to sanitise the input in server
+- We can also use `secrets` and inject them in runtime to the container and access them as `process.env.secret`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Different security headers
+
+- For XSS we have seen `Content-Security-Policy default-src 'self'; script-src 'self'; trusted.com`
+- For XSS we can also use `X-XSS-Protection: 1; mode=block`
+- For MIME sniffing we can use `X-Content-Type-Options: nosniff`
+- For clickjacking we can use `X-Frame-Options: sameorigin/deny`
+- We can also use `Referrer-Policy: no-referer/no-referrer-when-downgrade/strict-origin-when-cross-origin` this cntrols how much information of the referrer is shared.
+- We can also use `Strict-Transport-Security: max-age=12344; includeSubDomains preload` this enforces the connection is always https for max-age amount of time for the domain and it's sub domains as well. and it will also add the site to the preload of HSTS (Http strict transport security)
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Tools to detect security vulnerability
+
+- `ESLint`
+- `OWASP Zed attack Proxy` can be used to detect security issues in web apps dynamically
+- `npm audit` or `synk test` to constantly check dependencies
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Tools for JS performance testing
+
+- `Chrome devtools`
+- `Lighthouse`
+- `Webpagetest`
+- `JsPerf`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### license in package.json
+
+- License indicates under which license this package can be used. `MIT` `apache 2.0` or `GPL3.0` are common licenses
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Deorator pattern
+
+- Pattern of inheriting parent class and calling some function from the child using `super`
+
+```javascript
+class Car {
+  drive() {
+    return 'Driving';
+  }
+}
+class GPSCar extends Car {
+  constructor(car) {
+    super();
+    this.car = car;
+  }
+  drive() {
+    return `${super.drive()} with GPS`
+  }
+}
+const gpsCar = new GPSCar(new Car());
+gpsCar.drive() // Driving with GPS
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Difference between setTimeout, setImmediate, process.nextTick
+
+- `setTimeout` is a callback which is scheduled to be executed after the given delay. it's generatlly added in the macro task queue
+- `setImmediate` is a callback in nodejs which is set to be executed after the current event loop cycle finishes
+- `process.nextTick` is also a callback in nodejs which is set to be executed before the next event loop execution begins.
+
+```javascript
+setTimeout(() => console.log('setTimeout'), 0);
+setImmediate(() => console.log('setImmediate'));
+process.nextTick(() => console.log('nextTick'));
+```
+In this example, `process.nextTick` will execute then `setTimeout` then `setImmediate`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### What is Intl
+
+- `Intl` is a ecmascript api for accessing internalisation resources
+- ex: `Intl.DateTimeFormat('en-us')` is used to set date time format for US zone
+--------------------------------------------------------------------------------------------------------------------------------

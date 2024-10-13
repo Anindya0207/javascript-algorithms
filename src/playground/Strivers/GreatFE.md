@@ -1993,3 +1993,63 @@ In this example, `process.nextTick` will execute then `setTimeout` then `setImme
 - `Intl` is a ecmascript api for accessing internalisation resources
 - ex: `Intl.DateTimeFormat('en-us')` is used to set date time format for US zone
 --------------------------------------------------------------------------------------------------------------------------------
+
+### ARIA
+
+- `Accessible Rich internet application` are set of attribites which is to specify how an input is accesible to the user and should be implemented specially to improve user interactions, intuitiveness and ease of acess for people with speical abilities.
+- There are multiple attributes listed under aria 
+  - `role` role of an input whether it is `button`, `modal` `navigation` or `alert`
+  - `aria-hidden` if the input is hidden
+  - `aria-label` lanbel for the input
+  - `aria-live` if updates to this content shoudl be read by screen readers
+  - `aria-expanded` if this is collapsed/expanded
+  - `aria-controls` if this is impacted by the an action 
+  
+```html
+<button id="menuButton" aria-controls="menu" aria-expanded="false">Menu</button>
+<div id="menu" class="hidden" aria-hidden="true">
+  <ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+  </ul>
+</div>
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Binary data types
+
+- In JS there are four types of binary data structutes
+- `ArrayBuffer` it is a buffer array of binary data. It's immutable. means once created it can not be changed or modified
+
+```javascript
+const bufer = new ArrayBuffer(16);
+console.log(buffer.byteLength); // 16
+```
+
+- `TypedArray` this is derived from Arraybuffer with certain type of the binary data but it is contiguous meaning all the memory location is filled with same type of data
+- several types can be `Int8Array` `Int16Array` `Int32Array` `Float8Array` `Float32Array`
+
+```javascript
+const buffer = new ArrayBuffer(16);
+const intArray = new Int8Array(buffer);
+intArray[0] = 42;
+```
+
+- `DataView` is derived from ArrayBuffer only but it can have different type of datatypes ie it doesn't have to be contiguous
+
+```javascript
+const buffer = new ArrayBuffer(16);
+const dataV = new DataView(buffer);
+data.setInt8(0, 127);
+console.log(data.getInt8(0));
+```
+
+- `Blob` is another way to represent binary data which is again immutable and can be derived from  Arraybuffer an Typed Array
+
+```javascript
+const blob = new Blob(['Hello'], {type: 'text/plain'});
+//we can convert a blob to arraybuffer
+const buffer = await blob.arrayBuffer();
+```
+--------------------------------------------------------------------------------------------------------------------------------

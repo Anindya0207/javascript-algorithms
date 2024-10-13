@@ -1075,7 +1075,7 @@ for(const el of range) {
 - We can also do async operation with generators like `data batching` or `pagination`
 
 ```javascript
-async *function fetchData() {
+async function* fetchData() {
   let page = 0;
   while(true) {
     let res = await fetch("http://api.com" + page);
@@ -1086,7 +1086,7 @@ async *function fetchData() {
   }
 }
 const iterator = fetchData();
-for(const res of iterator) {
+for await(const res of iterator) {
   console.log(res);
 }
 ```

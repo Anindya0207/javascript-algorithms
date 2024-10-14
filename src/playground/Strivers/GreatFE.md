@@ -2053,3 +2053,21 @@ const blob = new Blob(['Hello'], {type: 'text/plain'});
 const buffer = await blob.arrayBuffer();
 ```
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Creating a carousal
+
+- Trick for the smooth scrolling is `scroll-snap-type: x mandatory` or `scroll-snap-type: y mandatory`
+- With this, we should make sure the children slide is having same width and height of parent
+- parent container should be `display: flex` and `overflow-x: auto`
+- children should also be `display : flex` and `flex: 0 0 600px` meaning they will not grow or shrink and take max width as 600px
+- To have a smooth carousal effect,` prepend last slide ` and `append the first child` in the container
+- Now whenever `offset >= scrollWidth - itemWidth` reset `scrollleft = itemWidth; offset = itemWidth` ie take it to the first actual slide
+- Whenever `offset <= 0` reset `scrollLeft= scrollwidth - 2 *itemwidth; offset = scrollwidth - 2 *itemwidth;` ie take it to the last actual slide.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### How to check a directory in nodejs
+
+`fs.existsSync(path) && fs.statSync(path).isDirectory()`
+
+--------------------------------------------------------------------------------------------------------------------------------

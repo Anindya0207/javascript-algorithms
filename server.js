@@ -32,11 +32,18 @@ const getContentType = (filePath) => {
   }
 };
 
-const server = http.createServer((req, res) => {
-  // Create the file path based on the request URL
-  let filePath = path.join(playgroundDirectory, req.url === '/' ? 'index.html' : req.url);
 
-  // Serve the file
+const server = http.createServer((req, res) => {
+  let filePath = path.join(playgroundDirectory, req.url === '/' ? 'index.html' : req.url);
+  if(req.url.includes('/machine-coding')) {
+    filePath = path.join(__dirname, 'src', 'playground', 'MachineCoding');
+    const module = req.url.split('/machine-coding/')[1];
+    filePath = path.join(filePath, module);
+    if(fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(filePath, 'index.html');
+    }
+  }
+  // Serve the filede
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });

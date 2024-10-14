@@ -180,19 +180,58 @@
 //     }
 // })();
 
-class Car {
-    drive() {
-      return 'Driving';
-    }
-  }
-  class GPSCar extends Car {
-    constructor(car) {
-        super()
-      this.car = car;
-    }
-    drive() {
-      return `${super.drive()} with GPS`
-    }
-  }
-  const gpsCar = new GPSCar(new Car());
-  console.log(gpsCar.drive())
+// class Car {
+//     drive() {
+//       return 'Driving';
+//     }
+//   }
+//   class GPSCar extends Car {
+//     constructor(car) {
+//         super()
+//       this.car = car;
+//     }
+//     drive() {
+//       return `${super.drive()} with GPS`
+//     }
+//   }
+//   const gpsCar = new GPSCar(new Car());
+//   console.log(gpsCar.drive())
+
+
+
+//   const http = require('http'  );
+
+//   http.createServer((req, res) => {
+//     if(req.url == '/sse') {
+//       res.writeHead(200, {
+//         'content-type': 'text/event-stream',
+//         'cache-control': 'nocache',
+//         'connection': 'keep-alive'
+//       })
+//     };
+//     res.write('sdgsdglmsdlgmsdg');
+//     req.on('close',()=> res.end())
+//   }).listen(8000, () => {
+//     console.log("Server lsitening on 8000")
+//   });
+
+//   const ws = require('ws');
+
+//   const wss = ws.Server({port: 8000});
+//   wss.on('connection', () => {
+//     wss.on('message', (event) => {
+//       console.log(event.data);
+//       wss.send("afsdgsdgsg")
+//     } )
+//     wss.on('close', () =>{
+//       console.log('closed')
+//     });
+//     wss.on('error', () =>{
+//       console.log('err')
+//     });
+//     wss.send('adgsdgsfgw')
+//   })
+
+//   iframe.contentWindow.onmessage / postMessage
+//   parent.window.onmessage / postMessage
+

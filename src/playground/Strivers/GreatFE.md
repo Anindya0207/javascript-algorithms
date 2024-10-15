@@ -2071,3 +2071,148 @@ const buffer = await blob.arrayBuffer();
 `fs.existsSync(path) && fs.statSync(path).isDirectory()`
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### typeof
+
+- `typeof [1, 2];` is `object`
+- `typeof null` is `object`
+- `typeof NaN` is `number` 
+- `typeof undeclaredVar` is undefined
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Concatenate number and string
+
+- trick is `n1 + n2 + s1 + s2 + n3 + n4 + s3 + s4 + n5 + n6` in this expression, only n1 and n2 are numerically added rest are all concetenated as strings 
+- `1 + 2 + "3" + "4" + 5 + 6 -> '33456'`
+- But `1 + 2 + "3" + "4" + (5 + 6); -> 33411` as parenthesis gets upper hand and compute first
+- `"1" + "2" + (3 + 4) + 5 + "6"; -> 12756`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### ?? operator
+
+- If the left operand is `null or undefined` it takes the right operand else left
+- `undefined ?? 10; -> 10`
+- `false ?? num1; -> false`
+- `0 ?? num2; -> 0`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### NaN
+
+- Did you know `NaN` is produced by illegal numeric operation
+- `isNaN(NaN) -> true`
+- `isNaN("text" - 10) -> true`
+- `isNaN("text") -> false` this is not a illegal numeric operation hence it's not NaN
+
+--------------------------------------------------------------------------------------------------------------------------------  
+
+### Number operations
+
+- parseInt will always convert the given input to number. like `parseInt("123abc") -> 123` 
+- parseFloat will always convert the given input to float. like `parseFloat("-12.5ffg") -> -12.5`
+- toFixed will round off after the decimal point `(52.128).toFixed(2) -> 52.13` toFixed(n) will always make sure n decimal points `(10).toFixed(3) -> 10.000`
+- toPrecision(n) will make sure total n digits of the entire number. `(98.1).toPrecision(2) -> 98` but `(98.1).toPrecision(1) -> 1+e2`
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Number.isNaN pollyfill
+
+```javascript
+Number.myisNaN = function(input) {
+    return typeof input == 'number' && input !== input
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### 0.1 + 0.2 != 0.3 how to solve
+
+- decimal addition does not equal the actual decimal exactly
+- we can do `0.1 + 0.2 - 0.3 <= Number.EPSILON` Number.EPSILON is 1 >> 32 is very small number
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### How to check if a function is called with the parameters equal to the number of arguments it is expecting
+
+```javascript
+const func1 = () => {
+  if(func1.length != arguments.lenght) {
+    console.log("Arguments not match");
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Write a pollyfill for Object.create
+
+Object.create is used to create an object out of an prototype. In JS there is no other way to create an object without a prototype. And there is no way to create an object from a prototype in JS apart from Object.create. hence we are creating a constructor function such that we can set the prototype and create an object using `new` keyword
+
+```javascript
+Object.create = Object.create || function(proto) {
+  if(typeof proto != object || proto === null) {
+    throw new Error('wrong prototype format. it must be an object');
+  }
+  function F() {}
+  F.prototype = proto
+  return new F();
+}
+```
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Fucntion to return random value in an range
+
+```javascript
+const getRandom = (start, end) => {
+    return Math.random(Math.random() * (end - start))
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Get random hex color code
+
+```javascript
+function getGetHEXColorCode() {
+  const r = Math.round(0xff * Math.random()).toString(16).padStart(2, '0');
+  const g = Math.round(0xff * Math.random()).toString(16).padStart(2, '0');
+  const b = Math.round(0xff * Math.random()).toString(16).padStart(2, '0');
+  return `#${r}${g}${b}`
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
+### Softbinding
+
+- In hardbinding we generally call the actual function with the context which we receoved at the time of bind call
+
+```javascript
+Function.prototype.hardBind = function(...args) {
+    const [context, ...params] = args;
+    const _this = this;
+    return function(...moreParams) {
+        _this.call(context, ...params, ...moreParams);
+    }
+}
+// Notice that we are calling _this with the context which we called hardBind with. so..
+function myFun(...args) {
+  console.log("this", this);
+  console.log("arg", ...args);
+}
+const bounded = myFun.hardBind({name: "Anindya"}, 1,2,3);
+bounded.call({name: "Sanchita"}, 4,5,6); // this will out put =  Anindya 1,2,3,4,5,6 instead of sanchita
+// because of _this.call(context. to override the context - 
+Function.prototype.softBind = function(...args) {
+    const [context, ...params] = args;
+    const _this = this;
+    return function(...moreParams) {
+       const overrideContext = this == undefined || this == globalThis ? context: this;
+        _this.call(overrideContext, ...params, ...moreParams);
+    }
+}
+
+const bounded2 = myFun.hardBind({name: "Anindya"}, 1,2,3);
+bounded2.call({name: "Sanchita"}, 4,5,6); // Sanchita 1,2,3,4,5,6
+```
+
+--------------------------------------------------------------------------------------------------------------------------------

@@ -2165,7 +2165,7 @@ Object.create = Object.create || function(proto) {
 
 ```javascript
 const getRandom = (start, end) => {
-    return Math.random(Math.random() * (end - start))
+    return Math.round(Math.random() * (end - start))
 }
 ```
 --------------------------------------------------------------------------------------------------------------------------------

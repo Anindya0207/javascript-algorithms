@@ -5446,6 +5446,38 @@ var coinChange = function (coins, amount) {
 - Base condition for tabulation is also same. We said that for any amount which is divisible by the 0-th denomination we can add that many coins. for the other amount where its not possible, it would be Inifinity.
 - Similarly, an amount of 0 can be made at any index without taking that denomination hence `for index 0---n dp[index][0] = 0`
 
+Recursion 
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let dp = Array.from({length: n}, ()=> Array.from({length: amount+1}, () => undefined))
+    const _calc = (index, _amt) => {
+        if(_amt == 0) {
+            return 0;
+        }
+        if(index==0) {
+            if(_amt % coins[0] == 0) {
+                return _amt / coins[0]
+            }
+            return Infinity;
+        }
+        if(dp[index][_amt] != undefined) return dp[index][_amt];
+        let notake = _calc(index- 1, _amt);
+        let take = Infinity;
+        if(coins[index] <= _amt) {
+            take = 1 + _calc(index, _amt - coins[index]);
+        }
+        dp[index][_amt]= Math.min(take, notake);
+        return dp[index][_amt];
+    }
+
+    let blabla = _calc(n-1, amount);
+    return blabla == Infinity ? -1 : blabla
+}
+```
+Tabulation
+
 ```javascript
 var coinChange = function (coins, amount) {
     let n = coins.length;
@@ -5477,12 +5509,70 @@ var coinChange = function (coins, amount) {
 Space optimisation #1
 
 We can optimise the space by taking only a prev and a curr array which will have dp[index-1] and dp[index] rows. We dont need to store the entire 2D dp right?
+```
 
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let prev = Array.from({length: amount+1}, () => 0);
+    let curr = Array.from({length: amount+1}, () => 0)
+    prev[0] = 0;
+    for(let _amt = 0; _amt <= amount; _amt++){
+        if(_amt % coins[0] == 0) {
+            prev[_amt] = _amt / coins[0]
+        } else {
+            prev[_amt] = Infinity
+        }
+    }
+    for(let index = 1; index<n; index++) {
+        for(let _amt = 1; _amt <= amount; _amt++) {
+            let notake = prev[_amt];
+            let take = Infinity;
+            if(coins[index] <= _amt) {
+                take = 1 + curr[_amt - coins[index]];
+            }
+            curr[_amt]= Math.min(take, notake);
+        }
+        prev = [...curr];
+    }
+    return prev[amount] == Infinity ? -1: prev[amount]
+}
+```
+```
 Space optimisation #2
 
-Now do we really need the prev and curr array also? Notice that we are only accessing the previous values of the prev rows `prev[_amt - coins[index]]` So if we iterate the amount from Right to left ie. `let _amt = amount; _amt >= amount; _amt--` then we can simply do 
+Now do we really need the prev and curr array also? Notice that we are only accessing the previous values of the prev rows `prev[_amt - coins[index]]` So if we iterate the amount from Right to left ie. `let _amt = amount; _amt >= 0; _amt--` then we can simply do 
 `prev[_amt] = 1 + prev[_amt - coins[index]]` becuase for the current index, we are only accessing the amount which is lesser than _amt and since we are traversing from right to left it will not disturb the values to the right.. 
 
+```
+
+```javascript
+var coinChange = function (coins, amount) {
+    let n = coins.length;
+    let prev = Array.from({length: amount+1}, () => Infinity);
+    prev[0] = 0;
+    for(let _amt = 0; _amt <= amount; _amt++){
+        if(_amt % coins[0] == 0) {
+            prev[_amt] = _amt / coins[0]
+        }
+    }
+    for(let index = 1; index<n; index++) {
+        for(let _amt = 1; _amt <= amount; _amt++) {
+            let notake = prev[_amt];
+            let take = Infinity;
+            if(coins[index] <= _amt) {
+                take = 1 + prev[_amt - coins[index]];
+            }
+            prev[_amt]= Math.min(take, notake);
+        }
+    }
+    return prev[amount] == Infinity ? -1: prev[amount]
+}
+```
+
+```
+ALWAYS REMEMBER right to left will not work for UNBOUNDED knapsack. USE left to right for Unbouned knapsack. 
+Use right to left for 0/1 kanpsack problem only where items can not be repeated
 ```
 
 Similar problems: 

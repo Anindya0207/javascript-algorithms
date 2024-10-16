@@ -2216,3 +2216,25 @@ bounded2.call({name: "Sanchita"}, 4,5,6); // Sanchita 1,2,3,4,5,6
 ```
 
 --------------------------------------------------------------------------------------------------------------------------------
+
+### Create an object with obj.func1().func2().func3() functionality
+
+```javascript
+var obj = {
+  id: 1,
+  func1: function() {
+    console.log("Hi, I am func1");
+    return this
+  },
+  func2: function() {
+    console.log("Hi, I am func2");
+    return this
+  },
+  func3: function() {
+    console.log("Hi, I am func3");
+    return this
+  }
+}
+```
+--------------------------------------------------------------------------------------------------------------------------------
+
